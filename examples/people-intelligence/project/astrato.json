@@ -1,0 +1,17 @@
+{
+  "$schema": "https://schemas.astrato.invalid/hosted-app/v1/astrato.schema.json",
+  "semanticLayerId": "00000000-0000-0000-0000-000000000000",
+  "build": {
+    "output": "dist",
+    "script": "build"
+  },
+  "dev": {
+    "adapter": "vite",
+    "script": "dev"
+  },
+  "hosting": {
+    "spa": true
+  },
+  "kind": "app",
+  "schemaVersion": 1
+}

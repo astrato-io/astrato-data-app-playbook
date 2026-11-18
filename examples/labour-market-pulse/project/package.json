@@ -1,0 +1,22 @@
+{
+  "name": "labour-market-pulse",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A chief economist's monthly read of the ONS labour market release as an Astrato App.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "compile-check": "node ../../../kit/verify/compile-check.mjs tools/compile-adapter.mjs"
+  },
+  "dependencies": {
+    "@astrato-io/app-runtime": "^0.8.0",
+    "@astrato-io/visualizations": "^0.9.0",
+    "@fontsource/roboto": "^5.3.0",
+    "vite": "^8.3.8"
+  },
+  "devDependencies": {
+    "jsdom": "^31.0.1"
+  }
+}

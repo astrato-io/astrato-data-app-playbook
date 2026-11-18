@@ -1,0 +1,85 @@
+slug: snowline
+title: Snowline
+company: None (fictional Alpine resorts on synthetic data; the app is branded Snowline and names no operator)
+layer: ski-resort-operations
+summary: >-
+  The head of resort operations, with the marketing lead, reviews the season every Monday and
+  decides which resorts and weeks to push next season and where the marketing budget goes: did a
+  snowier season bring more guests, which resorts and weeks perform best, how snow and holidays
+  drive crowds, where good snow went unsold, and a budget plan on governed levers proposed and
+  approved maker–checker. A test agent was given raw Snowflake tables and no semantic layer; it
+  built and published the layer itself, then the app. The reference example for building the
+  layer from raw tables (playbook/build-the-layer.md). Scored 47/52 by an independent judge.
+industry: leisure
+function: operations
+persona: Head of resort operations, with the marketing lead
+archetype: planner
+look: >-
+  light; a slate-to-ice-blue masthead (#0F2A3D to #1F6FB2) with the brand mark, a "Synthetic data ·
+  ends 30 Mar 2026" badge and an Excel report button; snow is ice blue (#1F6FB2, light #9CC3E6)
+  and crowds lift-pass amber (#C9731E) on almost every chart, green (#2E7D4F) / red (#B83B3B) only
+  for good and bad change, grey for the default plan; white rounded cards on a glacier page
+  (#EEF3F7); a Georgia serif headline sentence over Segoe UI / system-ui page text, Roboto from npm
+  inside charts; a sticky selection bar (Resort, Country, Season Stage and Week Type dropdowns
+  beside the library filter bar with chips and Clear all) above five underlined tabs; card titles
+  are the stored questions; each tab fits one 1440 screen
+tabs:
+  - Season review — did a snowier season bring more guests? Five KPIs against 2024/25, snow and crowd by week of the season, each resort's season with a crowd-by-week sparkline
+  - Best resorts & weeks — which resorts and weeks perform best? Ranked resorts, a resort × week heat map, the ten best resort-weeks of 2025/26, each resort's score profile
+  - Snow & crowds — how do snow conditions drive visits? Crowd by fresh-snow band and week type, the holiday uplift, base depth against crowds by stage, 3-week moving averages, crowd level by snowfall band
+  - Where to market — where is good snow going unsold? Demand headroom by resort, quiet powder weeks by resort with share, gateway airports
+  - Plan next season — how do we split next season's marketing budget? Three levers on governed measure parameters, target weeks against 2024/25, the scenario beside the default plan by resort and by stage, a maker–checker marketing plan with audit trail (browser-only)
+patterns:
+  - governed-business-questions
+  - kpi-sparkline-comparison
+  - selection-bar
+  - preload-tabs
+  - what-if-parameters
+  - query-scheduler
+  - table-sparklines
+  - role-switcher
+  - xlsx-export
+charts: [kpi, sparkline, bar, combo, heatmap, table, table-sparklines]
+interactions: [click-to-filter, selection-bar, tabs, sliders, compare, role-switcher]
+workflows: [maker-checker-approval]
+writeback: false
+exports: [xlsx]
+objects: 40  # 4 filter dropdowns + 17 on Season review (5 KPIs as number + change row + mini chart, a combo, a table) + 4 on Best + 7 on Snow & crowds + 3 on Where to market + 5 on Plan, all mounted at load; plus the library filter bar
+score: { total: 47, max: 52, judged: 2026-11-18, by: independent judge, file: SCORE.md }
+start_here:
+  - project/src/app.js — boot, the governed headline query, shell and tabs, per-tab selection groups mirrored from main, chart clicks into main, the levers, mount lanes, idle prefetch, resize refit, 17 self-checks
+  - project/src/catalogue.js — every object as data (a stored question plus presentation), change rows, sparkline columns, scenario beside the default plan, the static Season filter, compile
+  - project/src/questions.js — the app's copy of the layer's stored questions, read back from the published layer
+  - project/src/workflow.js — the 2026/27 marketing plan: propose, approve or return, four-eyes rule, audit trail (browser-only)
+capabilities:
+  - what-if — project/src/app.js:359
+  - narrative-headline — project/src/app.js:274
+  - simulated-workflow — project/src/workflow.js:25
+  - role-switcher — project/src/workflow.js:75
+  - excel-export — project/src/export.js:22
+stealable:
+  - "Three levers set the layer's measure parameters (budget, minSnow, maxCrowd) on every mounted tile marked params with setMeasureDefinedParameter through applyRuntimeOperations, no remount — project/src/app.js:364"
+  - "Scenario beside a governed baseline: one stored question carries Suggested Budget at Default Rule (no parameters) and the parameterised Suggested Budget, relabelled Default plan and Scenario, so the levers move one series and the other stays put — project/src/catalogue.js:257"
+  - "This-season questions carry Season = 2025/26 as a static filter group on the raw Season column, not as an app selection — project/src/catalogue.js:289"
+  - "KPI change row: a one-row table with a three-segment indicator, red / grey inside ±flat (what the format rounds to zero) / green, with up or down good per measure — project/src/catalogue.js:114"
+  - "Idle prefetch: once no real query has run for a second, re-run the active tab's queries with each Country, Stage and Week type value added, so the next pick is answered from the session cache — project/src/app.js:111"
+  - "A selection group per tab, mirrored from main by difference and only while the tab shows; chart clicks arrive pending in the tab's group and are handed to main after 200 ms (src/app.js:331) — project/src/app.js:311"
+  - "Query lane with 429 and 502/503/504 backoff, timeouts, a session cache keyed by the exact request and a query log — project/src/throttle.js:120"
+  - "Table column widths from header length at the font size, the resort column taking the rest; re-applied on resize through a ResizeObserver without a remount (src/app.js:376) — project/src/prepare.js:34"
+caveats:
+  - "Built by a test agent from raw Snowflake tables with no semantic layer: it built and published the layer (5 views, 47 measures, 32 stored questions), then the app; a staging pass brought it up to standard and an independent judge admitted it at 47/52 (SCORE.md). Read it as what the playbook produces, not as a hand-polished demo."
+  - "Synthetic data: ten fictional Alpine resorts, 18 weeks in each of two seasons (2024/25 and 2025/26), ending 30 Mar 2026. Not live. The data holds no visits, revenue or marketing spend: the Crowd Index (0–100) stands in for visits, and the budget split is a governed planning rule, not a spend history."
+  - "Filter dropdowns need Apply: a pick there makes a pending chip with Cancel / Apply and nothing changes until Apply, while chart and table clicks apply at once. The app's own selection checks set applied selections through the API (src/app.js:487), so they never meet this step."
+  - "The marketing plan is not written back, because the brief forbade creating warehouse tables. Plan, decisions and audit trail live in localStorage (key snowline-plan-2026-27-v1, src/workflow.js:20), and the screen says so."
+  - "The plan's resort-split chart labels only every other resort (5 of 10) at 1440 and 1280."
+  - "The three Best resorts & weeks tables cut a partial row at 1440, so ten rows need a scroll inside the card; at 1280 the By week and Headroom headers ellipsise."
+  - "Filter chips show raw field names (Season_Stage, Resort Name, Snowfall_Band): selections are written on the raw columns (src/app.js:303). Filter controls truncate their value while a selection is held."
+  - "Scenario is blue in the resort split and amber, the crowd colour, in the stage split (src/catalogue.js:257, src/catalogue.js:258)."
+  - "The landing tab reuses league-table-planner's skeleton (masthead with Excel button, dropdowns and filter bar, tabs, headline sentence, KPI row, chart left and table right); the judge marked design down for it."
+  - "Cold first load took about 59 s to landing-ready and failed the kit smoke's 15 s landing budget; warm loads took 6–7 s. At 1024 the layout stacks and the page scrolls vertically."
+  - "Objects re-express their stored questions in src/questions.js rather than run them by id (runQuestion needs a published App); three of the 32 stored questions are unused (targets, split, splitStage)."
+  - "The 3-week moving-average chart has no clickable points (combo lines on 0.9); its card says so. Top 10 is a sort plus a 10-row limit, since tables take no topN on 0.9 (src/catalogue.js:217)."
+  - "Excel report: change values are raw decimals, and the Definitions sheet says the comparison uses the Season Axis over 1 Dec 2025 – 5 Apr 2026 (src/export.js:68); the measures filter Season explicitly and the data ends 30 Mar 2026."
+  - "Checked by the judge: all 40 objects rendered with 0 console errors and 0 failed requests through the kit smoke (17 app checks, all tabs, 1440, 1280 and 1024) and two runs with real mouse input; the KPIs reconciled with MCP queries unfiltered and with Country = Italy. Not published, so no live smoke."
+  - Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.9.0 with Vite.
+  - astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too.

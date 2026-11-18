@@ -1,0 +1,83 @@
+slug: ed-wait-watch
+title: ED Wait Watch
+company: None (a fictional emergency department on a public hospital emergency-room sample dataset (see DATA-SOURCES.md); the app is branded ED Wait Watch and names no hospital)
+layer: hospital-er-operations
+summary: >-
+  An emergency department's ED operations lead and duty managers open a morning board for the
+  30-minute waiting-time target: are we seeing patients in time against the same days of the month
+  before, which weekday and arrival slots and which departments miss it, who waits longest, whether
+  satisfaction falls as waits grow, and a flag on a slot or department handed to a named owner,
+  resolved and signed off maker–checker. Flags are written back in Live mode to two workflow tables
+  (records and audit events); a labelled Practice mode runs the same rules and writes nothing. The first
+  monitor among the examples. Scored 45/52 by an independent judge.
+industry: healthcare
+function: operations
+persona: ED operations lead, with the duty managers
+archetype: monitor
+look: >-
+  light; a deep teal-ink masthead (#0E2A33) with a round "30" mark, the data-to date and the
+  comparison window, five underlined tabs and an Excel report button; teal (#0B6E79) = seen within
+  target, coral (#C2410C) = over target and the heat map's bad end, plum (#6D4C7D) = satisfaction,
+  the same on every tab, green (#15803D) / red (#B42318) only on the comparison state; white rounded
+  cards on a pale grey-green page (#F2F6F6); IBM Plex Sans page text, Roboto from npm inside charts;
+  a sticky selection line under the masthead and Month, Dept, Arrival and Day dropdowns beside each
+  tab's question title; a bordered headline with a Target missed verdict badge; card titles are the
+  stored questions; each tab fits one 1440 screen
+tabs:
+  - Morning board — are we seeing patients within 30 minutes? A headline with the verdict and the worst slot, four KPI cards (seen within 30 min in points, average wait, satisfaction, visits) against the same days of the month before with mini lines, the flag counts, a weekday × arrival-band heat map, the monthly trend with a 3-month average, a departments drivers bridge
+  - When — when do patients wait longer than 30 minutes? Over-target visits by hour, share seen in time by weekday, an arrival-band table with rank, share of over-target visits and a trend column, a what-if on the target itself (15–45 min)
+  - Who — which departments and patient groups wait longest? Two KPI cards, departments worst first, a department table with rank, share, wait, satisfaction and trend, age band, race and gender
+  - Satisfaction — does satisfaction fall as waits grow? Two KPI cards, satisfaction by wait band, within against over target, satisfaction and the target month by month, departments ranked by satisfaction with trend
+  - Flags — what has been flagged, who owns it, and what is overdue? Practice or Live mode, Acting as, raise a flag on a slot or department with a named owner and due date, act on it (start, resolve, reassign, sign off, reopen), flag counts, owners, the flag list and the audit trail as native tables over the writeback views
+patterns:
+  - governed-business-questions
+  - kpi-sparkline-comparison
+  - selection-bar
+  - preload-tabs
+  - query-scheduler
+  - table-sparklines
+  - what-if-parameters
+  - writeback-workflow
+  - role-switcher
+  - xlsx-export
+charts: [kpi, sparkline, bar, combo, heatmap, table, table-sparklines]
+interactions: [click-to-filter, selection-bar, tabs, sliders, role-switcher, compare]
+workflows: [flag-hand-off, maker-checker-approval]
+writeback: true
+exports: [xlsx]
+objects: 63  # 45 data objects (15 on Morning board, 6 When, 9 Who, 8 Satisfaction, 7 Flags) + 18 filter dropdowns, all mounted at load
+score: { total: 45, max: 52, judged: 2026-11-18, by: independent judge, file: SCORE.md }
+start_here:
+  - project/src/app.js — boot, the comparison window read from the data, the headline and KPI captions with "Updating…", the selection mirror and auto-applied pending clicks, the what-if, mount lanes, 15 self-checks
+  - project/src/catalogue.js — every object as data (a stored question plus presentation) — KPI card factory, heat map, trend with moving average, drivers bridge, flag tables, filters
+  - project/src/workflow.js — the flag workflow — one rule function for both modes, Live writeback of records and audit events, Practice in the browser tab, Acting as
+  - project/src/tiles.js — tile to definition to operations (moving average, widths, sparkline columns)
+capabilities:
+  - writeback-workflow — project/src/workflow.js:106
+  - simulated-workflow — project/src/workflow.js:120
+  - role-switcher — project/src/workflow.js:28
+  - what-if — project/src/app.js:451
+  - narrative-headline — project/src/app.js:347
+  - excel-export — project/src/export.js:21
+stealable:
+  - "One rule function for both modes: decide(action, flag, actor, note) refuses with a reason (lead-only sign-off, four eyes on raiser and resolver, note required); the change then goes to writeback in Live or to the browser tab in Practice (src/workflow.js:125) — project/src/workflow.js:48"
+  - "Live writeback as a record update plus an insert into an audit-events view, refusing an update that changed no row, then the query cache cleared and only the flag objects remounted (src/app.js:579) — project/src/workflow.js:106"
+  - "The comparison window read from the data, not hard-coded: the latest month with visits and its last day give '1–30 Oct 2020 with 1–30 Sep 2020' for the masthead, captions and Excel — project/src/app.js:286"
+  - "Text figures never show one selection's words beside another's numbers: every selection change switches the headline and KPI captions to 'Updating…', and only the read for the current selection may fill them — project/src/app.js:335"
+  - "Drivers bridge as a native table: Change, Now and Before from a This Month / Last Month measure family per department, sorted by change, with a trend column; the changes add up to the total — project/src/catalogue.js:78"
+  - "Pending clicks applied after 200 ms in every group, and the visible tab's applied state mirrored into one app-wide selection; the trend's own group never takes the month, so it keeps every month — project/src/app.js:430"
+  - "What-if on the target itself: a slider sets the layer's Target Minutes parameter on two native numbers with setMeasureDefinedParameter, beside a governed 30-minute baseline that stays put — project/src/app.js:464"
+caveats:
+  - "Scored 45/52 by an independent judge and admitted (bar 44, no gate at 0); the judge's gaps come first below (SCORE.md)."
+  - "The comparison window can be mislabelled under a selection: the Review Month axis ends at the latest day in the filtered rows, but the captions use the unfiltered last day (src/app.js:286). Department = Renal compares 1–9 Oct with 1–9 Sep while the cards say 1–30; Wed 06-09h computes 1–28 Sep."
+  - "The headline's worst slot is picked in the app (lowest share among slots with at least 30 visits, src/app.js:388), not by a stored top-N question; weekdays sort through zero-width spaces in the layer's Arrival Day labels."
+  - "The flag views are not joined to visits: visit filters do not narrow flags, and the Flags tab has only its own Status and Owner filters."
+  - "Legibility at 1440: '+100.0 pts' clips under a mini line (Renal); the Acting as select overflows its card and its label wraps; the empty By status mini chart shows the library's small grey text; 'No comparison for 1–30 Mar' lacks a year; 'unchanged than' and '±0.0 ▼ worse' copy nits from rounding."
+  - "At 1024 table cells end in ellipses, headers wrap mid-word, the Flags table drops its Overdue column and the Acting as select overflows; there is no horizontal page scroll."
+  - "Board selections settle in 3.8–4.8 s (the judge's real clicks), over 3 s; the other tabs 1.9–4.1 s. The five app-text reads run on every selection."
+  - "Live writeback was not exercised by the judge or by the app's checks, which drive Practice mode through DOM clicks and assert that no write was made. Hosted viewers may not be able to write; the panel then offers Practice only. Not published, so no live smoke."
+  - "The app's selection checks put pending selections from code rather than pointer events; the judge's real clicks worked at 1440×860."
+  - "Public sample data: a public hospital emergency-room sample dataset, Apr 2019 – 30 Oct 2020 (31 Oct missing). Satisfaction is recorded for about 27% of visits; small groups swing a lot. Not live."
+  - "Acting as switches between four demo personas (two duty managers, two leads); in production the role would come from the signed-in user's group."
+  - Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.9.0 with Vite.
+  - astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too.

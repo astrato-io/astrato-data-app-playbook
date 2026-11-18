@@ -1,0 +1,22 @@
+{
+  "name": "snowline",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Snowline: the Monday resort review, an Astrato App on the Ski Resort Operations semantic layer",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "compile-check": "node ../../../kit/verify/compile-check.mjs tools/compile-adapter.mjs"
+  },
+  "dependencies": {
+    "@astrato-io/app-runtime": "^0.9.0",
+    "@astrato-io/visualizations": "^0.9.0",
+    "@fontsource/roboto": "^5.2.6",
+    "vite": "^8.3.6"
+  },
+  "devDependencies": {
+    "jsdom": "^31.0.1"
+  }
+}

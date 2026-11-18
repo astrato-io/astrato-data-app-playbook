@@ -1,0 +1,24 @@
+{
+  "name": "hotel-weather",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Hotel demand × weather: governed Astrato charts, a public weather API read by DuckDB-WASM in the browser, and a blend of the two, all on one Astrato selection.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "compile-check": "node ../../../kit/verify/compile-check.mjs tools/compile-adapter.mjs"
+  },
+  "dependencies": {
+    "@astrato-io/app-runtime": "^0.9.0",
+    "@astrato-io/visualizations": "^0.9.0",
+    "@duckdb/duckdb-wasm": "^1.32.0",
+    "@fontsource/material-icons": "5.3.0",
+    "@fontsource/roboto": "^5.3.0",
+    "vite": "^8.3.8"
+  },
+  "devDependencies": {
+    "jsdom": "^31.0.1"
+  }
+}

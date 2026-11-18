@@ -1,0 +1,70 @@
+slug: superstore-explorer
+title: Superstore explorer
+company: Superstore (the public Superstore sample dataset)
+layer: superstore-sample
+summary: >-
+  The plain, minimal explorer, on the public Superstore sample: a sales or category
+  manager picks a period and a comparison (previous period or same period last year) and asks who
+  and what drives sales and profit in it, then drills through to one customer or product to see how
+  it compares with its own previous period. The one to start from for a clean explore app, not a
+  branded command centre.
+industry: retail
+function: sales
+persona: Sales / category manager
+archetype: explorer
+look: >-
+  light and minimal, "storytelling with data": white page, greys, one blue accent (#1F5FB8) and
+  orange-red (#C2410C) only for losses; Source Sans 3, Roboto inside charts; a narrow icon rail
+  (Overview, Detail), a masthead with the period button, a filter bar with a Filters drawer,
+  ship-mode quick buttons and chips; ruled KPI cards with a mini chart; master list on the left,
+  detail pane on the right; both pages fit one screen with no page scroll
+tabs:
+  - Overview — in the chosen period, how do sales, profit, orders and profit ratio compare with the comparison period, which customers or products drive them, and where in Category › Sub-Category › Product does the picked one sell?
+  - Detail — for the picked customer or product, what are its KPIs against its own comparison period, its monthly trend and its order lines, and how does the next one compare?
+patterns:
+  - selection-bar
+  - kpi-sparkline-comparison
+  - query-scheduler
+charts: [kpi, sparkline, bar, line, table]
+interactions: [click-to-filter, selection-bar, drill-down, search, compare, period-picker, filter-drawer, quick-filters, drill-through, previous-next]
+workflows: []
+writeback: false
+exports: [xlsx, csv]
+objects: 13  # only the open page's objects are mounted: 7 on the overview (drill bar, trend, order-lines table, 4 KPI mini charts), 6 on the detail page (trend, order lines, 4 mini charts)
+start_here:
+  - project/src/app.js — boot, the getData wrapper (lanes, cache, operator fix), period picker and selections, KPI comparisons, master list, narrative, detail page, object menu, smoke checks
+  - project/src/charts.js — the four native object builders (drill bar, trend with moving average, KPI mini chart, order-lines table) and the visualizations 0.9 operation fixes
+  - project/src/exports.js — CSV and a dependency-free single-sheet .xlsx writer
+  - project/tools/compile-adapter.mjs — every object the app can mount, for the offline compile check
+capabilities:
+  - drill-down — project/src/app.js:562
+  - narrative-headline — project/src/app.js:743
+  - excel-export — project/src/exports.js:96
+stealable:
+  - "Every control is an applied selection in one group: the period (a `between` selection on Order Date), the drawer filters, the ship-mode buttons, the drill path and the picked item; native objects follow by themselves, and the app's own queries turn the same selections into filters — project/src/app.js:236"
+  - "Period picker: presets anchored on the last order date and a comparison choice (previous period, same period last year, none), turned into a second date range — project/src/app.js:222"
+  - "KPI change against the comparison period: the layer's calculations queried twice with the same filters, once per range; ratios change in points — project/src/app.js:605"
+  - "Mirror group: the overview's KPI mini charts sit in a second group that copies every selection except the picked item, so they describe all items while the drill bar, trend and order lines follow the pick — project/src/app.js:596"
+  - "Operator-less selections sent as inList: a filter without an operator is refused with HTTP 400 \"Astrato rejected the runtime request\" — project/src/app.js:142"
+  - "One getData wrapper for charts and app queries: 4 lanes, one retry, a session cache keyed by the exact request — project/src/app.js:147"
+  - "Dashed 3-month moving average: a second copy of the measure with a native movingCalculation (AVG, window −2 to 0) — project/src/charts.js:172"
+  - "Table columns as pixel widths of their slot, dropping Ship mode then Order ID when narrow, refitted on resize with updateInstance and no remount — project/src/app.js:726"
+  - "Visualizations 0.9 operation shapes: updateMeasure customLabel is {enabled, value}, setAnimationEnabled takes {enabled}, and the Order Date column needs setColumnFormatType yyyymmdd (addressed by column name) or it prints epoch numbers — project/src/charts.js:276"
+  - "Object menu on every object (Show as table, CSV, Excel), each from a query the app re-runs for that object — project/src/app.js:980"
+caveats:
+  - "Public sample data: the classic Superstore orders table, one view and no joins. The data ends on 30 Dec 2019, and every period counts back from the last order date (src/app.js:187)."
+  - "No stored business question behind any object. The layer's 8 questions do not match the objects' shapes; every object and app query reads the layer's calculations (Sales, Profit, Orders, Profit Ratio) over raw Orders columns. The governed dimensions, including the Category > Sub-Category > Product hierarchy, are unused: the drill is the app's own, one raw column per level."
+  - KPI values are text from governed queries, not native number objects; their mini charts are native lines.
+  - No period comparison on the drill bar or the trend. The layer has no time axis or comparison measures; the trend carries a 3-month moving average instead, and that average skips months with no orders.
+  - "The master list is an HTML list with value bars, the one A2 exception: it is navigation (search, pick, Previous/Next), not a data visual. It renders the first 300 rows of a query limited to 2,500 (src/app.js:642, src/app.js:672). The Show as table dialog also draws an HTML table (src/app.js:958)."
+  - "Detail KPI changes run to figures like \"9901.7%\" when the item's previous period was tiny."
+  - Money axes label zero as "0.00"; product names are cut to an ellipsis in narrow slots.
+  - "When a filter change drops the picked customer from the list, the top one is picked instead and the original is not restored (src/app.js:648); the smoke checks pick it back by hand."
+  - "With the Customers list open, a product bar click at the drill's third level filters the drill bar, trend and order lines but not the KPIs, mini charts, list or narrative, which leave both item fields out (src/app.js:596, src/app.js:814). A click on the trend is dropped (src/app.js:844)."
+  - Pages are not preloaded. Switching page releases every object and mounts the other page's (src/app.js:884).
+  - "Excel is one unformatted sheet per object, written in the browser (src/exports.js:96); there is no multi-sheet management report, no what-if and no workflow, since it is an explorer. The order-lines export stops at 5,000 rows (src/app.js:932)."
+  - "Inert leftovers: src/theme.js reads a saved dark-mode choice, but styles.css defines no dark theme; a smoke check names the quarter-to-date start `ytdStart` (src/app.js:1074)."
+  - "Checked in staging: smoke test PASS at 1440, 1280 and 1024 with no page scroll, landing in about 3 s, 5/5 app checks (region filter, drill click, quarter-to-date range reaching the trend query, detail Next/Previous, Excel export of the order lines); compile-check 30/30; build passes."
+  - "The script that loaded the sample into the warehouse is not included in this repo; layers/superstore-sample/schema/ddl.sql gives the table. tools/available-fields.json is the field catalogue a smoke run saved; the compile check falls back to layer.json without it."
+  - Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite.
+  - astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too.

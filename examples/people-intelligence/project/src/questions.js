@@ -1,0 +1,231 @@
+/**
+ * Stored business questions of People Intelligence. `tools/questions.mjs` commits them to the
+ * semantic layer; Ask People Intelligence answers by matching a question to one (or several) of these
+ * and running it through the governed engine — it never invents a number.
+ *
+ * `kw` are matching hints for the assistant (synonyms a leader might use); `chart` is the preferred chart.
+ */
+const d = (name, key) => ({ name, key });
+const m = (name, key) => ({ name, key });
+const eq = (dimension, ...values) => ({ dimension, operator: values.length > 1 ? 'inList' : 'equals', values });
+
+export const QUESTIONS = [
+  // ---- Executive briefing
+  { name: 'What should I focus on today?', cat: 'Executive briefing', chart: 'table', kw: 'focus today priorities attention matters important consequential',
+    description: 'One row per business unit combining retention (SuccessFactors), cost vs budget (S/4HANA), critical skills (Talent Intelligence Hub) and open critical roles (Recruiting) — the cross-source view behind the daily briefing.',
+    dimensions: [d('Business Unit', 'bu')], measures: [m('Voluntary Attrition', 'va'), m('Voluntary Attrition vs P2Q', 'vd'), m('Cost vs Budget % FYTD', 'cb'), m('Critical Skills Coverage', 'cs'), m('Open Critical Roles', 'oc'), m('Replacement Cost Exposure', 'rx')], orderBy: [['vd', 'desc']] },
+  { name: 'How big is our workforce and how is it changing?', cat: 'Executive briefing', chart: 'kpi', kw: 'workforce size headcount total employees people how many',
+    description: 'Headcount and FTE at 30 Sep 2026 against a year ago, with twelve-month hires, leavers and net movement.',
+    dimensions: [], measures: [m('Headcount', 'h'), m('Headcount YoY', 'hy'), m('Headcount vs PY', 'hd'), m('FTE', 'f'), m('External Hires LTM', 'eh'), m('Total Leavers LTM', 'tl'), m('Net Movement LTM', 'nm')] },
+  { name: 'What are the headline people KPIs this quarter?', cat: 'Executive briefing', chart: 'kpi', kw: 'headline kpis quarter summary scorecard overview',
+    description: 'Jul–Sep 2026 headline indicators with quarter-on-quarter movement.',
+    dimensions: [], measures: [m('Headcount', 'h'), m('Headcount QoQ', 'hq'), m('Voluntary Attrition', 'va'), m('Voluntary Attrition vs PQ', 'vq'), m('Engagement Index CQ', 'e'), m('Engagement Index QoQ', 'eq'), m('Absence Rate CQ', 'a'), m('Cost vs Budget % CQ', 'c')] },
+
+  // ---- Workforce
+  { name: 'How is headcount distributed by region and country?', cat: 'Workforce', chart: 'bar', kw: 'distribution region country geography where located map',
+    description: 'Headcount at 30 Sep 2026 by HR region and country, with year-on-year change and cost per employee.',
+    dimensions: [d('Region', 'r'), d('Country', 'c')], measures: [m('Headcount', 'h'), m('Headcount YoY', 'y'), m('FTE', 'f'), m('Payroll Cost per Employee YTD', 'pc')], orderBy: [['h', 'desc']] },
+  { name: 'How is headcount split by business unit and department?', cat: 'Workforce', chart: 'bar', kw: 'business unit department organisation structure split breakdown',
+    description: 'Organisational breakdown at 30 Sep 2026 with growth, critical-role share and span of control.',
+    dimensions: [d('Business Unit', 'b'), d('Department', 'dp')], measures: [m('Headcount', 'h'), m('Headcount YoY', 'y'), m('Critical Role Share', 'cr'), m('Span of Control', 'sc')], orderBy: [['h', 'desc']] },
+  { name: 'How have headcount and FTE trended over the last 24 months?', cat: 'Workforce', chart: 'line', kw: 'headcount fte trend over time history months',
+    description: 'Month-end headcount and FTE, Oct 2024 – Sep 2026.',
+    dimensions: [d('Month', 'mo')], measures: [m('Monthly Headcount', 'h'), m('Monthly FTE', 'f')], orderBy: [['mo', 'asc', 'dim']] },
+  { name: 'What is the seniority mix by business unit?', cat: 'Workforce', chart: 'stacked_bar', kw: 'seniority mix grade level junior senior leadership pyramid',
+    description: 'Headcount by seniority level within each business unit.',
+    dimensions: [d('Business Unit', 'b'), d('Seniority', 's')], measures: [m('Headcount', 'h')] },
+  { name: 'How many people are on fixed-term contracts?', cat: 'Workforce', chart: 'bar', kw: 'fixed-term contract temporary employment type permanent',
+    description: 'Headcount by employment type and business unit.',
+    dimensions: [d('Employment Type', 'e'), d('Business Unit', 'b')], measures: [m('Headcount', 'h'), m('Headcount YoY', 'y')] },
+  { name: 'What is the span of control by business unit?', cat: 'Workforce', chart: 'bar', kw: 'span of control managers layers organisation design',
+    description: 'Employees per people manager at 30 Sep 2026 against a year ago.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Span of Control', 's'), m('Span of Control vs PY', 'd'), m('People Managers', 'p')], orderBy: [['s', 'asc']] },
+
+  // ---- Movement
+  { name: 'How many people have we hired and lost each month?', cat: 'Movement', chart: 'combo', kw: 'hires leavers joiners movement monthly net change flows',
+    description: 'External hires, internal moves, voluntary and involuntary leavers and net movement by month.',
+    dimensions: [d('Month', 'mo')], measures: [m('External Hires', 'h'), m('Internal Moves', 'i'), m('Voluntary Leavers', 'v'), m('Involuntary Leavers', 'x'), m('Net Movement', 'n')], orderBy: [['mo', 'asc', 'dim']] },
+  { name: 'Where is net workforce growth coming from?', cat: 'Movement', chart: 'bar', kw: 'growth net movement growing shrinking departments',
+    description: 'Twelve-month net movement, hires and voluntary leavers by department.',
+    dimensions: [d('Department', 'dp')], measures: [m('Net Movement LTM', 'n'), m('External Hires LTM', 'h'), m('Voluntary Leavers LTM', 'v'), m('Headcount YoY', 'y')], orderBy: [['n', 'desc']] },
+  { name: 'How does hiring this year compare with last year?', cat: 'Movement', chart: 'bar', kw: 'hiring this year last year ytd compare recruitment volume',
+    description: 'External hires Jan–Sep 2026 vs Jan–Sep 2025 by business unit.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('External Hires YTD', 'h'), m('External Hires PY YTD', 'p'), m('External Hires YTD YoY', 'y')], orderBy: [['h', 'desc']] },
+  { name: 'How did headcount move month on month and quarter on quarter?', cat: 'Time intelligence', chart: 'table', kw: 'month on month mom quarter on quarter qoq headcount change',
+    description: 'Headcount at Sep 2026 against Aug 2026 (MoM) and Jun 2026 (QoQ) by business unit.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Headcount', 'h'), m('Headcount PM', 'pm'), m('Headcount MoM', 'mm'), m('Headcount PQ', 'pq'), m('Headcount QoQ', 'qq')], orderBy: [['h', 'desc']] },
+
+  // ---- Retention
+  { name: 'Where are we at risk of losing critical talent?', cat: 'Retention', chart: 'table', kw: 'risk losing critical talent key people flight risk retention exposure',
+    description: 'Critical-role and high-performer attrition by business unit and country (rolling 12 months), with replacement cost exposure.',
+    dimensions: [d('Business Unit', 'b'), d('Country', 'c')], measures: [m('Critical Role Attrition', 'ca'), m('Critical Role Attrition vs PY', 'cd'), m('Critical Role Headcount', 'ch'), m('High Performer Attrition', 'ha'), m('Replacement Cost Exposure', 'rx')], orderBy: [['ca', 'desc']] },
+  { name: 'Why is attrition increasing in Technology?', cat: 'Retention', chart: 'table', kw: 'why attrition increasing technology engineers drivers cause reasons tech',
+    description: 'Technology voluntary attrition by country, department and seniority with the movement over two quarters and the associated pay, promotion and regretted-loss indicators.',
+    dimensions: [d('Country', 'c'), d('Department', 'dp'), d('Seniority', 's')], measures: [m('Voluntary Attrition', 'va'), m('Voluntary Attrition vs P2Q', 'vd'), m('Compa Ratio', 'cr'), m('Promotion Rate', 'pr'), m('Regretted Attrition', 'ra')],
+    filters: [eq('Business Unit', 'Technology')], orderBy: [['vd', 'desc']] },
+  { name: 'Which business units have the highest voluntary attrition?', cat: 'Retention', chart: 'bar', kw: 'highest voluntary attrition turnover business unit resignations',
+    description: 'Rolling twelve-month voluntary attrition by business unit, with changes vs two quarters and a year ago.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Voluntary Attrition', 'va'), m('Voluntary Attrition vs PY', 'vy'), m('Voluntary Attrition vs P2Q', 'vq'), m('Voluntary Leavers LTM', 'l')], orderBy: [['va', 'desc']] },
+  { name: 'How has voluntary attrition trended over the last year?', cat: 'Retention', chart: 'line', kw: 'attrition trend rolling over time turnover trend history',
+    description: 'Rolling twelve-month voluntary and involuntary attrition at each month end.',
+    dimensions: [d('Month', 'mo')], measures: [m('Rolling Voluntary Attrition', 'v'), m('Rolling Involuntary Attrition', 'i')], orderBy: [['mo', 'asc', 'dim']] },
+  { name: 'Compare employee turnover in Germany and the UK', cat: 'Retention', chart: 'bar', kw: 'compare germany uk united kingdom turnover attrition countries versus',
+    description: 'Rolling twelve-month turnover indicators for Germany and the United Kingdom side by side.',
+    dimensions: [d('Country', 'c')], measures: [m('Voluntary Attrition', 'va'), m('Voluntary Attrition PY', 'vp'), m('Involuntary Attrition', 'ia'), m('Total Attrition', 'ta'), m('Regretted Attrition', 'ra'), m('High Performer Attrition', 'ha'), m('Hiring Rate', 'hr')],
+    filters: [eq('Country', 'Germany', 'United Kingdom')] },
+  { name: 'How is attrition trending in UK Technology by seniority?', cat: 'Retention', chart: 'line', kw: 'uk technology senior engineers seniority trend attrition',
+    description: 'Rolling twelve-month voluntary attrition in UK Technology by seniority level.',
+    dimensions: [d('Month', 'mo'), d('Seniority', 's')], measures: [m('Rolling Voluntary Attrition', 'v')], filters: [eq('Country', 'United Kingdom'), eq('Business Unit', 'Technology')], orderBy: [['mo', 'asc', 'dim']] },
+  { name: 'Why are people leaving?', cat: 'Retention', chart: 'bar', kw: 'why leaving exit reasons survey resign quit',
+    description: 'Voluntary exits by primary exit-survey reason (Qualtrics), with the regretted share.',
+    dimensions: [d('Exit Reason', 'r')], measures: [m('Voluntary Exits', 'v'), m('Regretted Exits', 'g'), m('Regretted Share', 's')], filters: [eq('Exit Type', 'Voluntary')], orderBy: [['v', 'desc']] },
+  { name: 'Where do our leavers go?', cat: 'Retention', chart: 'pie', kw: 'where leavers go destination competitors big tech hyperscalers',
+    description: 'Destination of voluntary leavers from the exit survey.',
+    dimensions: [d('Exit Destination', 'x')], measures: [m('Voluntary Exits', 'v'), m('High Performer Exits', 'h')], filters: [eq('Exit Type', 'Voluntary')], orderBy: [['v', 'desc']] },
+  { name: 'Are we retaining our high performers?', cat: 'Retention', chart: 'bar', kw: 'high performers top talent retaining retention best people',
+    description: 'High-performer attrition (rolling 12 months) by business unit against a year ago.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('High Performer Attrition', 'h'), m('High Performer Attrition PY', 'p'), m('High Performer Attrition vs PY', 'd'), m('High Performer Headcount', 'n')], orderBy: [['h', 'desc']] },
+  { name: 'What is the replacement cost exposure of attrition?', cat: 'Retention', chart: 'bar', kw: 'replacement cost exposure financial impact attrition cost money',
+    description: 'Twelve-month replacement and lost-productivity cost of voluntary leavers by business unit, vs the prior twelve months.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Replacement Cost Exposure', 'x'), m('Replacement Cost Exposure PY', 'p'), m('Replacement Cost Exposure vs PY', 'd')], orderBy: [['x', 'desc']] },
+  { name: 'How does pay positioning relate to attrition?', cat: 'Retention', chart: 'scatter', kw: 'pay compensation compa ratio market salary tenure relationship',
+    description: 'Compa-ratio, voluntary attrition and tenure by department (association, not causation).',
+    dimensions: [d('Department', 'dp')], measures: [m('Compa Ratio', 'c'), m('Voluntary Attrition', 'v'), m('Average Tenure', 't')] },
+  { name: 'Which countries have the highest regretted attrition?', cat: 'Retention', chart: 'bar', kw: 'regretted attrition countries losing people we want to keep',
+    description: 'Regretted attrition (rolling 12 months) by country.',
+    dimensions: [d('Country', 'c')], measures: [m('Regretted Attrition', 'r'), m('Regretted Attrition vs PY', 'd'), m('Regretted Leavers LTM', 'n')], orderBy: [['r', 'desc']] },
+
+  // ---- Engagement & wellbeing
+  { name: 'How engaged are our people this quarter?', cat: 'Engagement', chart: 'bar', kw: 'engagement engaged enps survey sentiment morale pulse',
+    description: 'Engagement index, eNPS and quarter-on-quarter change by business unit (Qualtrics pulse, Jul–Sep 2026).',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Engagement Index CQ', 'e'), m('Engagement Index QoQ', 'q'), m('Engagement Index vs LY', 'y'), m('eNPS CQ', 'n'), m('Response Rate YTD', 'r')], orderBy: [['e', 'asc']] },
+  { name: 'How has intent to stay changed?', cat: 'Engagement', chart: 'line', kw: 'intent to stay pay fairness career growth trend sentiment',
+    description: 'Intent to stay, pay fairness and career growth favourability by month.',
+    dimensions: [d('Month', 'mo')], measures: [m('Intent to Stay', 'i'), m('Pay Fairness', 'p'), m('Career Growth', 'c')], orderBy: [['mo', 'asc', 'dim']] },
+  { name: 'Which teams report the lowest pay fairness?', cat: 'Engagement', chart: 'table', kw: 'lowest pay fairness teams unhappy compensation sentiment',
+    description: 'Pay fairness and intent to stay by country and department, Jul–Sep 2026.',
+    dimensions: [d('Country', 'c'), d('Department', 'dp')], measures: [m('Pay Fairness CQ', 'p'), m('Pay Fairness vs LY', 'd'), m('Intent to Stay CQ', 'i')], orderBy: [['p', 'asc']] },
+  { name: 'What is our absence rate?', cat: 'Engagement', chart: 'bar', kw: 'absence sickness absenteeism days off wellbeing',
+    description: 'Absence rate Jan–Sep 2026 against the same period last year, by business unit.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Absence Rate YTD', 'a'), m('Absence Rate PY YTD', 'p'), m('Absence Rate YTD vs PY', 'd')], orderBy: [['a', 'desc']] },
+
+  // ---- Workforce cost
+  { name: 'Show me the workforce cost trend for the last eight quarters', cat: 'Workforce cost', chart: 'combo', kw: 'workforce cost trend quarters eight spend over time budget',
+    description: 'Workforce cost and budget by calendar quarter, Q4 2024 – Q3 2026 (SAP S/4HANA cost centres).',
+    dimensions: [d('Quarter', 'q')], measures: [m('Workforce Cost', 'c'), m('Workforce Budget', 'b'), m('Cost vs Budget %', 'v')], orderBy: [['q', 'asc', 'dim']] },
+  { name: 'Which business units are over workforce budget?', cat: 'Workforce cost', chart: 'bar', kw: 'over budget overspend cost pressure plan variance',
+    description: 'Fiscal-year-to-date (Apr–Sep 2026) workforce cost against budget by business unit.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Workforce Cost FYTD', 'c'), m('Workforce Budget FYTD', 'p'), m('Cost vs Budget FYTD', 'v'), m('Cost vs Budget % FYTD', 'pc')], orderBy: [['pc', 'desc']] },
+  { name: 'What makes up our workforce cost?', cat: 'Workforce cost', chart: 'stacked_bar', kw: 'cost components drivers pay contractors overtime recruitment breakdown',
+    description: 'Workforce cost components by business unit (any period; use the Month filter to scope).',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Base Pay', 'bp'), m('Variable Pay', 'vp'), m('Employer On-costs', 'oc'), m('Contractor Cost', 'cc'), m('Overtime Cost', 'ot'), m('Recruitment Spend', 'rs'), m('Learning Spend', 'ls')] },
+  { name: 'How much do we spend on contractors?', cat: 'Workforce cost', chart: 'bar', kw: 'contractors contingent spend borrow agency',
+    description: 'Contractor cost FYTD against last year, and contractor share of workforce cost.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Contractor Cost FYTD', 'c'), m('Contractor Cost PY FYTD', 'p'), m('Contractor Cost FYTD YoY', 'y'), m('Contractor Share YTD', 's')], orderBy: [['c', 'desc']] },
+  { name: 'What does an employee cost by country?', cat: 'Workforce cost', chart: 'bar', kw: 'cost per employee fte country salary cost',
+    description: 'Annualised payroll cost per employee by country, Jan–Sep 2026 vs 2025.',
+    dimensions: [d('Country', 'c')], measures: [m('Payroll Cost per Employee YTD', 'c'), m('Payroll Cost per Employee PY YTD', 'p'), m('Headcount', 'h')], orderBy: [['c', 'desc']] },
+  { name: 'How can we reduce workforce costs without losing critical skills?', cat: 'Workforce cost', chart: 'table', kw: 'reduce cut workforce costs savings without losing critical skills efficiency',
+    description: 'Cost pressure (S/4HANA) beside critical-skill coverage (Talent Intelligence Hub) by business unit: where to cut contractors and overtime, and where not to.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Cost vs Budget % FYTD', 'v'), m('Contractor Cost FYTD', 'c'), m('Overtime Cost FYTD', 'o'), m('Critical Role Share', 'cr'), m('Critical Skills Coverage', 'cs')], orderBy: [['v', 'desc']] },
+
+  // ---- Skills & future workforce
+  { name: 'Which business units have the greatest skills shortages?', cat: 'Skills', chart: 'bar', kw: 'skills shortages gaps business units capability shortage',
+    description: 'Skills gap today and capability gap to 2028 by business unit, with coverage.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Skills Gap Today', 'g'), m('Capability Gap 2028', 'g28'), m('Critical Skills Coverage', 'c'), m('Skills Coverage', 's')], orderBy: [['g28', 'desc']] },
+  { name: 'What is our critical skills coverage?', cat: 'Skills', chart: 'bar', kw: 'critical skills coverage strategic future skills inventory',
+    description: 'Coverage of the strategic skills (AI & ML, cloud, cyber, data engineering, network automation, digital product) now vs a year ago.',
+    dimensions: [d('Skill', 's')], measures: [m('Skills Coverage', 'c'), m('Skills Coverage PY', 'p'), m('Skills Coverage vs PY', 'd'), m('Required FTE', 'r'), m('Proficient Employees', 'e')], filters: [eq('Skill Tier', 'Strategic')], orderBy: [['c', 'asc']] },
+  { name: 'What capability gaps do we face by 2028?', cat: 'Skills', chart: 'bar', kw: 'capability gap 2028 future forecast demand supply strategic workforce planning',
+    description: 'Required FTE in 2028 against projected supply with no intervention, by skill.',
+    dimensions: [d('Skill', 's')], measures: [m('Required FTE 2028', 'r'), m('Projected Supply 2028', 'p'), m('Capability Gap 2028', 'g'), m('Demand Growth to 2028', 'y')], orderBy: [['g', 'desc']] },
+  { name: 'Where are AI and cloud skills shortages most acute?', cat: 'Skills', chart: 'heatmap', kw: 'ai machine learning cloud shortages acute where countries',
+    description: 'Coverage and 2028 shortfall of AI & machine learning and cloud engineering by country.',
+    dimensions: [d('Country', 'c'), d('Skill', 's')], measures: [m('Skills Coverage', 'v'), m('Shortfall 2028', 'g')], filters: [eq('Skill', 'AI & Machine Learning', 'Cloud Engineering')], orderBy: [['g', 'desc']] },
+  { name: 'Who could we reskill into future-critical roles?', cat: 'Skills', chart: 'bar', kw: 'reskill reskilling adjacent skills mobility pathways upskill retrain',
+    description: 'Employees with adjacent skills by reskilling pathway (Opportunity Marketplace), with expected conversions, cost and duration.',
+    dimensions: [d('Reskilling Pathway', 'p')], measures: [m('Adjacent Employees', 'a'), m('Ready-now Employees', 'r'), m('Expected Conversions', 'x'), m('Reskilling Programme Cost', 'c'), m('Average Reskilling Weeks', 'w')], orderBy: [['a', 'desc']] },
+  { name: 'Should we build, buy or borrow future skills?', cat: 'Skills', chart: 'table', kw: 'build buy borrow hire reskill contractors options cloud engineers',
+    description: 'For each strategic skill: the 2028 gap, the adjacent internal pool and the unit cost to build (reskill), buy (hire) or borrow (contract).',
+    dimensions: [d('Skill', 's')], measures: [m('Capability Gap 2028', 'g'), m('Adjacent Employees', 'a'), m('Build Cost per FTE', 'b'), m('Buy Cost per FTE', 'y'), m('Borrow Day Rate', 'r')], filters: [eq('Skill Tier', 'Strategic')], orderBy: [['g', 'desc']] },
+  { name: 'Which skills are declining and free up capacity?', cat: 'Skills', chart: 'bar', kw: 'declining skills surplus redeployment capacity automation legacy',
+    description: 'Declining skills with projected 2028 surplus — the source pool for reskilling.',
+    dimensions: [d('Skill', 's')], measures: [m('Surplus 2028', 'x'), m('Proficient Employees', 'p'), m('Demand Growth to 2028', 'g')], filters: [eq('Skill Tier', 'Declining')], orderBy: [['x', 'desc']] },
+
+  // ---- Mobility & recruiting
+  { name: 'How many internal candidates match our open critical roles?', cat: 'Mobility & recruiting', chart: 'bar', kw: 'internal candidates match open positions critical roles mobility vacancies',
+    description: 'Open critical requisitions, those with an adjacent internal candidate, and the candidate pool, by skill.',
+    dimensions: [d('Skill', 's')], measures: [m('Open Critical Roles', 'o'), m('Critical Roles with Internal Match', 'm'), m('Adjacent Internal Candidates', 'c'), m('Average Days Open', 'd')], orderBy: [['o', 'desc']] },
+  { name: 'How much of our hiring is filled internally?', cat: 'Mobility & recruiting', chart: 'bar', kw: 'internal fill rate internal hiring promote from within',
+    description: 'Internal fill rate Jan–Sep 2026 vs 2025 by business unit.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Internal Fill Rate YTD', 'r'), m('Internal Fill Rate PY YTD', 'p'), m('Internal Fill Rate YTD vs PY', 'd'), m('Filled Requisitions', 'f')], orderBy: [['r', 'asc']] },
+  { name: 'How long does it take to fill roles?', cat: 'Mobility & recruiting', chart: 'bar', kw: 'time to fill days recruitment speed cost per hire',
+    description: 'Average days to fill and cost per hire by seniority.',
+    dimensions: [d('Seniority', 's')], measures: [m('Average Time to Fill YTD', 't'), m('Average Time to Fill PY YTD', 'p'), m('Average Cost per Hire', 'c')] },
+  { name: 'What is our internal mobility rate?', cat: 'Mobility & recruiting', chart: 'bar', kw: 'internal mobility rate moves career movement',
+    description: 'Internal moves ÷ average headcount (rolling 12 months) by business unit.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Internal Mobility Rate', 'r'), m('Internal Mobility Rate PY', 'p'), m('Internal Mobility Rate vs PY', 'd')], orderBy: [['r', 'desc']] },
+  { name: 'What happens if we reduce external hiring by 15%?', cat: 'Mobility & recruiting', chart: 'table', kw: 'reduce external hiring 15% what if freeze cut recruitment',
+    description: 'The governed baseline for a hiring reduction: twelve-month hires, recruitment spend, cost per hire, open roles and internal fill rate by business unit.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('External Hires LTM', 'h'), m('Recruitment Spend FYTD', 's'), m('Average Cost per Hire', 'c'), m('Open Requisitions', 'o'), m('Internal Fill Rate YTD', 'r')], orderBy: [['h', 'desc']] },
+
+  // ---- People actions
+  { name: 'Which people initiatives are in flight and what will they deliver?', cat: 'People actions', chart: 'table', kw: 'initiatives actions programmes in flight deliver roi benefits register',
+    description: 'The action register: status, owner, investment, expected and realised benefit.',
+    dimensions: [d('Initiative', 'i'), d('Initiative Status', 's'), d('Initiative Owner', 'o')], measures: [m('Initiative Investment', 'v'), m('Expected Benefit', 'b'), m('Realised Benefit', 'r'), m('Expected ROI', 'x')], orderBy: [['b', 'desc']] },
+
+  // ---- Cross-source
+  { name: 'Which segments combine high attrition, low engagement and cost pressure?', cat: 'Cross-source', chart: 'table', kw: 'segments hotspots combine attrition engagement cost pressure risk',
+    description: 'Country × business unit joined across SuccessFactors (attrition), Qualtrics (intent to stay), S/4HANA (cost vs budget), Talent Intelligence Hub (skills) and Recruiting (open critical roles).',
+    dimensions: [d('Country', 'c'), d('Business Unit', 'b')], measures: [m('Voluntary Attrition', 'va'), m('Voluntary Attrition vs PY', 'vd'), m('Intent to Stay CQ', 'i'), m('Cost vs Budget % FYTD', 'cb'), m('Critical Skills Coverage', 'cs'), m('Open Critical Roles', 'o')], orderBy: [['vd', 'desc']] },
+
+  // ---- Time intelligence
+  { name: 'How does this quarter compare with the last?', cat: 'Time intelligence', chart: 'table', kw: 'this quarter last quarter qoq compare cq pq',
+    description: 'Jul–Sep 2026 vs Apr–Jun 2026 leavers and hires by business unit.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Voluntary Leavers CQ', 'v'), m('Voluntary Leavers PQ', 'vp'), m('Voluntary Leavers QoQ', 'vq'), m('External Hires CQ', 'h'), m('External Hires PQ', 'hp'), m('External Hires QoQ', 'hq')], orderBy: [['vq', 'desc']] },
+  { name: 'How do the last twelve months compare with the year before?', cat: 'Time intelligence', chart: 'table', kw: 'last twelve months ltm year before prior compare rolling',
+    description: 'Oct 2025–Sep 2026 vs Oct 2024–Sep 2025 leavers and hires by business unit.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Voluntary Leavers LTM', 'v'), m('Voluntary Leavers Prior LTM', 'vp'), m('Voluntary Leavers LTM YoY', 'vy'), m('External Hires LTM', 'h'), m('External Hires Prior LTM', 'hp'), m('External Hires LTM YoY', 'hy')], orderBy: [['vy', 'desc']] },
+  { name: 'How is the fiscal year tracking against last year?', cat: 'Time intelligence', chart: 'table', kw: 'fiscal year fytd tracking last year fy27',
+    description: 'FY27 to date (Apr–Sep 2026) vs FY26 to date: workforce cost, hires and leavers by business unit.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Workforce Cost FYTD', 'c'), m('Workforce Cost PY FYTD', 'cp'), m('Workforce Cost FYTD YoY', 'cy'), m('External Hires FYTD', 'h'), m('External Hires PY FYTD', 'hp'), m('Voluntary Leavers FYTD', 'v'), m('Voluntary Leavers PY FYTD', 'vp')], orderBy: [['cy', 'desc']] },
+
+  // ---- Diversity & inclusion (privacy-safe measures blank any group under 10 people)
+  { name: 'How is gender representation changing by level?', cat: 'Diversity & inclusion', chart: 'table', kw: 'gender women representation diversity balance level pipeline female leadership dei',
+    description: 'Women as a share of employees by level at 30 Sep 2026 and a year earlier (SuccessFactors EC, aggregated).',
+    dimensions: [d('Seniority', 's')], measures: [m('Women Representation', 'w'), m('Women Representation PY', 'wp'), m('Women Representation vs PY', 'wd'), m('Women Share of Promotions', 'pr'), m('Women Share of Hires', 'h')], orderBy: [['w', 'desc']] },
+  { name: 'Where is the gender pay gap largest?', cat: 'Diversity & inclusion', chart: 'bar', kw: 'gender pay gap equal pay women men salary difference',
+    description: 'Mean gender pay gap on base pay by business unit (privacy-safe: blank where a group has fewer than 10 people).',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Gender Pay Gap (privacy-safe)', 'g'), m('Women Representation', 'w'), m('Women in Leadership', 'wl')], orderBy: [['g', 'desc']] },
+  { name: 'Do women leave faster than men?', cat: 'Diversity & inclusion', chart: 'bar', kw: 'women leave faster attrition gender equity turnover female retention',
+    description: 'Voluntary attrition (LTM) by level and gender, privacy-safe.',
+    dimensions: [d('Seniority', 's'), d('Gender', 'g')], measures: [m('DEI Voluntary Attrition (privacy-safe)', 'a')], orderBy: [['a', 'desc']] },
+
+  // ---- Succession
+  { name: 'Which critical roles have no ready successor?', cat: 'Succession', chart: 'table', kw: 'succession successor critical roles ready now cover key person bench',
+    description: 'Critical roles, ready-now coverage and uncovered at-risk roles by business unit (SuccessFactors Succession & Development).',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Critical Roles', 'r'), m('Ready-now Coverage', 'c'), m('Uncovered At-risk Roles', 'u'), m('Roles without Successor', 'n'), m('Bench Strength', 'bs')], orderBy: [['u', 'desc']] },
+  { name: 'How has succession coverage changed in the last year?', cat: 'Succession', chart: 'bar', kw: 'succession coverage change year improved worse talent review',
+    description: 'Ready-now succession coverage by business unit, now vs the talent review a year ago.',
+    dimensions: [d('Business Unit', 'b')], measures: [m('Ready-now Coverage', 'c'), m('Ready-now Coverage PY', 'cp'), m('Ready-now Coverage vs PY', 'cd')], orderBy: [['cd', 'asc']] },
+  { name: 'Where is key-person risk concentrated?', cat: 'Succession', chart: 'table', kw: 'key person risk concentration single point failure impact loss',
+    description: 'Critical roles by key-person risk and impact of loss.',
+    dimensions: [d('Key Person Risk', 'k'), d('Impact of Loss', 'i')], measures: [m('Critical Roles', 'r'), m('Ready-now Coverage', 'c')], orderBy: [['r', 'desc']] },
+
+  // ---- Workforce planning
+  { name: 'What is the workforce baseline by function for planning?', cat: 'Workforce planning', chart: 'table', kw: 'workforce plan planning baseline function demand restructuring fy28 future',
+    description: 'Headcount, attrition, payroll per employee, open critical roles and the 2028 skills shortfall by function group: the starting point of the FY28 plan.',
+    dimensions: [d('Function Group', 'f')], measures: [m('Headcount', 'h'), m('Voluntary Attrition', 'va'), m('Payroll Cost per Employee YTD', 'p'), m('Open Critical Roles', 'o'), m('Shortfall 2028', 's')], orderBy: [['h', 'desc']] },
+
+  // ---- Data operations
+  { name: 'Which data feeds are failing or late?', cat: 'Data operations', chart: 'table', kw: 'data feeds failing late refresh pipeline integration status fresh stale error',
+    description: 'Every integration pipeline with today’s failures, the seven-day clean-run rate and SLA attainment.',
+    dimensions: [d('Pipeline Source', 's'), d('Pipeline', 'p')], measures: [m('Failed Runs Today', 'f'), m('Run Success Rate 7d', 'r'), m('Pipeline SLA Attainment', 'sla'), m('Rows Loaded', 'rows')], orderBy: [['f', 'desc']] },
+  { name: 'Which data issues are open and what do they affect?', cat: 'Data operations', chart: 'table', kw: 'data issues open errors quality affect impacted kpi triage',
+    description: 'Open and in-progress data issues with severity, category, owner and the KPI they affect.',
+    dimensions: [d('Issue ID', 'id'), d('Issue Severity', 'sv'), d('Issue Category', 'c'), d('Impacted KPI', 'k'), d('Issue Owner', 'o')], measures: [m('Records Affected', 'r'), m('Issue Age Hours', 'a')],
+    filters: [eq('Issue Status', 'Open', 'In progress')], orderBy: [['a', 'desc']] },
+];
+
+/** The stored dimensions this file uses, for tools that need to check them. */
+export const questionDimensions = () => [...new Set(QUESTIONS.flatMap((q) => [...q.dimensions.map((x) => x.name), ...(q.filters ?? []).map((f) => f.dimension)]))];

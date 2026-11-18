@@ -1,0 +1,158 @@
+:root {
+  --bg: #F4F6F9; --card: #FFFFFF; --ink: #1B2A3A; --muted: #5C6B7A; --line: #E1E6EC;
+  --gov: #2F6FED; --gov-soft: #E8EFFD; --duck: #C77A00; --duck-soft: #FFF3DC; --mix: #6B4FD8; --mix-soft: #EFEBFD;
+  --good: #1E8E5A; --bad: #C7362F; --code: #0F1B2A;
+  --font-family: Roboto, Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--ink); font: 14px/1.4 var(--font-family); overflow: hidden; }
+.viz-surface, .viz-surface * { font-family: var(--font-family) !important; }
+/* Table indicator arrows are Material Icons ligatures: keep their own font, or they show as text. */
+.viz-surface .material-icons, .viz-surface [class*="material-icons"], .viz-surface [data-testid="indicator-icon"], .viz-surface [data-testid="indicator-icon"] * { font-family: 'Material Icons' !important; }
+.boot { padding: 40px; color: var(--muted); }
+
+/* One screen: header, bar, KPIs and a 3 × 2 chart grid share the viewport. */
+.page { height: 100vh; display: flex; flex-direction: column; min-width: 0; }
+
+header.top { display: flex; align-items: flex-start; gap: 16px; padding: 10px 20px 4px; }
+header.top .titles { flex: 1; min-width: 0; }
+header.top h1 { margin: 0; font-size: 19px; font-weight: 700; }
+header.top p { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+header.top a { color: var(--gov); }
+.legend { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 11px; color: var(--muted); }
+.tag { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 500; white-space: nowrap; }
+.tag.gov { background: var(--gov-soft); color: var(--gov); }
+.tag.duck { background: var(--duck-soft); color: #8A5500; }
+.tag.mix { background: var(--mix-soft); color: var(--mix); }
+.legend .ro { flex-basis: 100%; text-align: right; font-size: 11px; }
+.tag.demo { background: #F1EEE8; color: #6B5B3E; border: 1px dashed #B8A98A; }
+
+.hero { margin: 4px 20px 6px; padding: 7px 12px; background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--mix); border-radius: 8px; font-size: 13px; }
+.hero b { font-weight: 700; }
+
+.bar { display: flex; align-items: center; gap: 10px; padding: 6px 20px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: rgba(244, 246, 249, .97); position: sticky; top: 0; z-index: 5; }
+.tabs { display: flex; gap: 2px; }
+.tab { border: 1px solid transparent; background: none; padding: 5px 12px; font: inherit; font-weight: 500; color: var(--muted); cursor: pointer; border-radius: 6px; }
+.tab[aria-selected="true"] { background: var(--card); border-color: var(--line); color: var(--ink); }
+.tab span { font-size: 11px; background: var(--line); border-radius: 999px; padding: 0 6px; margin-left: 4px; }
+.filter-slot { width: 190px; height: 32px; flex: none; position: relative; }
+#chips { display: flex; gap: 6px; flex-wrap: nowrap; overflow: hidden; flex: 1; min-width: 0; }
+.chip { border: 1px solid var(--gov); background: var(--gov-soft); color: var(--ink); border-radius: 999px; padding: 3px 10px; font: inherit; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.chip.duck { border-color: var(--duck); background: var(--duck-soft); }
+.chip b { font-weight: 500; }
+.none { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; }
+.none .short { display: none; }
+.btn { border: 1px solid var(--line); background: var(--card); border-radius: 6px; padding: 5px 12px; font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.btn:disabled { opacity: .45; cursor: default; }
+.btn.primary { background: var(--gov); border-color: var(--gov); color: #fff; }
+.btn.small { padding: 2px 8px; font-size: 12px; }
+
+.content { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; padding: 10px 20px 14px; }
+.pane.dash { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; }
+.kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; flex: none; }
+.kpi { background: var(--card); border: 1px solid var(--line); border-top: 3px solid var(--gov); border-radius: 8px; padding: 6px 12px 4px; min-width: 0; display: flex; flex-direction: column; }
+.kpi.duck { border-top-color: var(--duck); } .kpi.mix { border-top-color: var(--mix); }
+.kpi .head { display: flex; justify-content: space-between; gap: 6px; align-items: baseline; }
+.kpi .head { min-height: 30px; }
+.kpi .head span:first-child { color: var(--muted); font-size: 12px; line-height: 15px; overflow-wrap: anywhere; }
+.kpi .value { height: 40px; width: 100%; position: relative; flex: none; }
+.kpi .cmp { font-size: 11px; color: var(--muted); height: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kpi .spark { height: 34px; width: 100%; position: relative; flex: none; }
+
+.grid { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 10px;
+  grid-template-areas: "city occ table" "temp rain band"; }
+.card[data-sql="g-city"] { grid-area: city; } .card[data-sql="g-occ"] { grid-area: occ; } .card[data-sql="g-table"] { grid-area: table; }
+.card[data-sql="d-temp"] { grid-area: temp; } .card[data-sql="d-rain"] { grid-area: rain; } .card[data-sql="d-band"] { grid-area: band; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.card h2 { margin: 0; font-size: 13px; font-weight: 500; display: flex; gap: 8px; align-items: center; }
+.card h2 .q { flex: 1; min-width: 0; }
+.card p { margin: 1px 0 4px; color: var(--muted); font-size: 11px; }
+.card .viz { flex: 1; min-height: 0; position: relative; }
+.card, .kpi { cursor: context-menu; }
+
+/* The offer tab lies over the dashboard, which stays mounted underneath. Off screen it is moved
+   aside with a transform (never display:none), so its charts keep their size and show at once. */
+.pane.plan { position: absolute; inset: 10px 20px 14px; z-index: 2; background: var(--bg); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1.05fr); gap: 10px; }
+.pane.plan.off { transform: translateX(-300vw); pointer-events: none; }
+.plan-col { display: flex; flex-direction: column; gap: 10px; min-height: 0; min-width: 0; }
+.levers { flex: none; }
+.lever { display: grid; grid-template-columns: minmax(0, 1fr) 84px; grid-template-areas: "n o" "r r"; align-items: center; margin: 4px 0 2px; font-size: 12px; }
+.lever .lname { grid-area: n; color: var(--ink); }
+.lever output { grid-area: o; text-align: right; font-weight: 500; color: var(--gov); }
+.lever input { grid-area: r; width: 100%; accent-color: var(--gov); margin: 2px 0; }
+.leverfoot { display: flex; gap: 6px; align-items: center; font-size: 11px; color: var(--muted); margin-top: 4px; }
+.leverfoot #wet-note { flex: 1; min-width: 0; }
+.bvs { flex: 1; min-height: 0; }
+.bvs .sub3 { margin: 8px 0 0; font-size: 12px; font-weight: 500; }
+.key { margin: 2px 0 0 !important; font-size: 11px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 2px 10px; align-items: center; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.sw.good { background: var(--good); } .sw.bad { background: var(--bad); } .sw.gov { background: var(--gov); } .sw.dry { background: #9A8F80; } .sw.wet { background: #0E8C9A; } .sw.duck { background: var(--duck); } .sw.ink { background: var(--ink); }
+.bvs .viz.bridge { flex: 1; min-height: 120px; position: relative; }
+.bvs-grid { display: grid; grid-template-columns: 96px minmax(0, 1fr) minmax(0, 1fr); gap: 4px 10px; align-items: center; font-size: 12px; }
+.bvs-grid > b { font-weight: 500; color: var(--muted); font-size: 12px; }
+.bvs-grid .rowl { color: var(--muted); }
+.bvs-grid .num { height: 46px; position: relative; border-top: 1px solid var(--line); padding-top: 2px; }
+.bvs-grid .num .viz { position: absolute; inset: 2px 0 0; }
+.verdict { margin: 8px 0 0 !important; color: var(--ink) !important; font-size: 13px !important; line-height: 1.4; }
+.offers { gap: 4px; }
+.offers .fallback { font-size: 11px; background: #F7F5F1; border-left: 3px solid #B8A98A; padding: 4px 8px; border-radius: 4px; }
+.who select, .flagform select { font: inherit; font-size: 12px; padding: 3px 4px; border: 1px solid var(--line); border-radius: 6px; background: #fff; min-width: 0; }
+.who { font-size: 12px; color: var(--muted); }
+.flagform { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.flagform select { flex: 1 1 90px; }
+.flagform .btn { flex: 1 0 auto; }
+.msg { font-size: 12px; min-height: 17px; color: var(--muted); }
+.msg.ok { color: var(--good); } .msg.no { color: var(--bad); }
+.flags, .audit { list-style: none; margin: 0; padding: 0; overflow: auto; min-height: 0; }
+.flags { flex: 1 1 40%; }
+.audit { flex: 1 1 45%; font-size: 11px; color: var(--muted); }
+.flags li { border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; margin-bottom: 5px; font-size: 12px; }
+.flags li.empty, .audit li.empty { border: 0; color: var(--muted); font-size: 12px; padding: 2px 0; }
+.flags .fl1 { display: flex; gap: 6px; align-items: center; }
+.flags .fl2 { color: var(--muted); font-size: 11px; margin-top: 2px; }
+.flags .fl3 { display: flex; gap: 6px; margin-top: 4px; }
+.pill { margin-left: auto; font-size: 10px; padding: 1px 7px; border-radius: 999px; background: var(--line); text-transform: capitalize; }
+.pill.approved { background: #E3F4EC; color: var(--good); } .pill.rejected { background: #FBE7E6; color: var(--bad); } .pill.proposed { background: var(--gov-soft); color: var(--gov); }
+.audithead { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-top: 4px; border-top: 1px solid var(--line); padding-top: 4px; }
+.audit li { padding: 2px 0; border-bottom: 1px solid #F0F2F5; }
+.audit li.refused em { color: var(--bad); font-style: normal; }
+.audit .t { font-variant-numeric: tabular-nums; }
+
+/* The Queries tab lies over the dashboard, which stays mounted underneath (never display:none). */
+.log { position: absolute; inset: 10px 20px 14px; z-index: 4; background: var(--code); color: #D6E2F0; border-radius: 10px; padding: 12px 18px; overflow: auto; }
+.log[hidden] { display: none; }
+.lognote { color: #8FA3B8; font-size: 12px; margin: 0 0 8px; }
+.lognote b { color: #fff; font-weight: 500; }
+#sqllog { list-style: none; margin: 0; padding: 0; }
+#sqllog li { border-top: 1px solid #22344A; padding: 8px 0; }
+#sqllog .meta { display: flex; gap: 8px; align-items: baseline; font-size: 12px; color: #8FA3B8; }
+#sqllog .meta b { color: #fff; font-weight: 500; flex: 1; min-width: 0; }
+#sqllog .src { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; background: #9CC2FF; color: var(--code); }
+#sqllog li.duck .src { background: #FFC766; }
+#sqllog pre { margin: 4px 0 0; white-space: pre-wrap; font: 12px/1.4 ui-monospace, Consolas, monospace; }
+
+.pop { position: fixed; inset: 0; z-index: 50; background: rgba(15, 27, 42, .45); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.pop[hidden] { display: none; }
+.popbox { background: var(--code); color: #D6E2F0; border-radius: 12px; width: min(860px, 100%); max-height: 86vh; overflow: auto; padding: 14px 18px 18px; }
+.pophead { display: flex; gap: 10px; align-items: center; }
+.pophead b { color: #fff; font-size: 15px; flex: 1; }
+.pophead button { border: 1px solid #34485F; background: #1A2B3F; color: #D6E2F0; border-radius: 6px; padding: 4px 10px; font: inherit; cursor: pointer; }
+.popbody h3 { margin: 12px 0 4px; font-size: 12px; font-weight: 500; color: #8FA3B8; text-transform: uppercase; letter-spacing: .04em; }
+.popbody pre { margin: 0; white-space: pre-wrap; font: 12px/1.45 ui-monospace, Consolas, monospace; background: #0A1420; border-radius: 8px; padding: 10px 12px; }
+.popbody p { margin: 4px 0; font-size: 12px; color: #8FA3B8; }
+
+/* Below 1320px the city table needs more than a third of the row: it spans three of four columns,
+   and the four smaller charts share the row beneath. */
+@media (max-width: 1320px) {
+  .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "city table table table" "occ temp rain band"; }
+}
+@media (max-width: 1200px) {
+  header.top p.sub { display: none; }
+  .kpi .head .tag { display: none; }
+  .none .long { display: none; } .none .short { display: inline; }
+  /* Give the city table the room its seven columns need; the two charts beside it share the rest. */
+  .filter-slot { width: 150px; }
+  .card h2 { font-size: 12px; }
+  .bvs-grid { grid-template-columns: 78px minmax(0, 1fr) minmax(0, 1fr); }
+}

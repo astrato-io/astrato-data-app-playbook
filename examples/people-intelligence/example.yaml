@@ -1,0 +1,96 @@
+slug: people-intelligence
+title: People Intelligence
+company: Northwind Telecom (fictional telecom group)
+layer: people-intelligence
+summary: >-
+  A telecom group's Group CHRO, and a regional HR director, an HR business partner and a business-unit
+  leader who each see a narrower slice of the same app, decide where attrition, workforce cost and
+  skills risk sit and which retention, reskilling and restructuring interventions to fund and
+  approve. Thirteen tabs on one governed layer of 20 joined HR views: workforce, retention,
+  succession, privacy-safe diversity, skills, two simulators, an approvals register, a self-service
+  custom report builder, an assistant over stored business questions and data operations.
+industry: telecom
+function: hr
+persona: Group CHRO (also regional HR director, HR business partner, business-unit leader)
+archetype: workbench
+look: >-
+  light; white cards on a grey page (#F5F5F6), one blue accent (#2B5CE6 / #1B3FA8), charcoal ink
+  (#25282B), red (#D92D20) only for bad news; Inter for the UI, Roboto inside charts, Material Icons;
+  white left nav with sections and a "Viewing as" persona picker at the foot; top bar with
+  "Illustrative data" and "Governed · live query" badges, Export and an "Ask People Intelligence"
+  button; sticky scope-and-selections bar; every card captioned with its stored business question;
+  dense KPI strips; a bottom tab bar and floating ask button on phones
+tabs:
+  - My People Home — what needs my attention today in my scope: headline KPIs, a written briefing, attrition hotspots, cost against budget?
+  - Workforce Explorer — how are headcount, movement, cost, absence and engagement moving, and where is the workforce, by any segment?
+  - Talent & Retention — where is attrition rising, among whom, why, and what does it cost? (with a structured investigation of one segment)
+  - Talent & Succession Risk — which critical roles have no ready-now successor, and where does key-person risk meet a high impact of loss?
+  - Diversity & Inclusion — how do representation, pay, promotion and attrition differ by gender and level, with every cell under 10 people blanked?
+  - Skills & Future Workforce — where are the 2028 capability gaps, who has adjacent skills, and should we build, buy or borrow?
+  - Workforce Simulator — what would a retention intervention, or an FY28 demand and restructuring plan, do to attrition, headcount and cost?
+  - People Actions — which interventions are proposed, awaiting my approval or delivering, and what did they return?
+  - Custom report — any governed dimensions and measures as a table, bar, scatter, heat map or pivot, bookmarked, shared as a link and exported
+  - Question library — the stored business questions behind the assistant, each runnable as a native table
+  - Data operations — is every source feed fresh, which pipeline runs failed, and who is fixing which data issue?
+  - Data & governance — how the data flows from source systems to the semantic layer, and what each role may see and do
+  - Capability tour — ten capabilities, each with a "Show me" that opens the place and persona that shows it
+patterns:
+  - governed-business-questions
+  - kpi-sparkline-comparison
+  - selection-bar
+  - table-sparklines
+  - role-switcher
+  - what-if-parameters
+  - in-app-calc-engine
+  - writeback-workflow
+  - xlsx-export
+  - preload-tabs
+  - query-scheduler
+  - report-builder
+charts: [kpi, sparkline, bar, stacked-bar, line, combo, scatter, pie, heatmap, sankey, table, table-sparklines, pivot]
+interactions: [click-to-filter, selection-bar, drill-down, tabs, role-switcher, sliders, search, compare, deep-link, chat, drag-reorder]
+workflows: [maker-checker-approval, data-issue-triage, scenario-submission, saved-views]
+writeback: true
+exports: [xlsx]
+objects: 213  # rendered in the staging smoke test across 13 tabs: the 210 catalogue objects (42 KPI values, 32 filters, charts, tables, sparklines and comparison rows) are declared in src/catalogue.js, the rest are ad-hoc; compile-check covers 217 (the 210 plus the custom report's 7 starter reports)
+start_here:
+  - project/src/app.js — personas and scope, governed query helper, lazy per-page compile with a vSpec cache, selection bar, drill-down, mounting, ad-hoc objects, writeback
+  - project/src/builder.js — the custom report builder: state → tile spec, chip bar, field panel, sort/filter popovers, bookmarks, share link, Excel
+  - project/src/catalogue.js — every native object declared as data (three-object KPI cards, switchable and drillable charts, tables with sparkline columns)
+  - project/src/actions.js — the People Actions register: maker–checker approval with every step written back as an event
+capabilities:
+  - report-builder — project/src/builder.js:80
+  - assistant — project/src/assistant.js:32
+  - writeback-workflow — project/src/actions.js:51
+  - what-if — project/src/simulator.js:37
+  - excel-export — project/src/export.js:9
+  - saved-views — project/src/builder.js:222
+  - role-switcher — project/src/app.js:680
+  - drill-down — project/src/app.js:488
+  - narrative-headline — project/src/home.js:16
+  - map — project/src/basemap.js:37
+stealable:
+  - "Custom report builder: a pure function turns the report state (visual, ordered fields, sort, filters, row limit) into an ad-hoc tile spec for a table, bar, scatter, heat map or pivot, so the offline compile check runs it too — project/src/builder.js:59"
+  - "Ad-hoc native objects at run time: a small spec becomes a tile definition with the persona scope merged into its filters, then is compiled, themed and mounted in its own selection group; the assistant, investigation, question library, simulators and report builder all use it — project/src/adhoc.js:14"
+  - "One link, four data scopes: each persona's row scope is a static filter on every native object and every governed query, and objects a role is not cleared for are never mounted, so never queried — project/src/app.js:374"
+  - "KPI card = native number + native sparkline in a time-series twin group (a month click never narrows the page) + one-row comparison table — project/src/catalogue.js:98"
+  - "Lazy per-page compile against only the fields each object references, with the compiled and themed vSpec cached per device under a hash of its definition — project/src/app.js:178"
+  - "Workflow steps written back as audit events through app.writeback, with a labelled browser fallback where the runtime cannot write — project/src/app.js:598"
+  - "Query lanes with 429 backoff, a session cache, and no caching for the views the app writes to — project/src/throttle.js:134"
+  - "A raster basemap laid under a scatter whose axes are pinned to a lon/lat extent, so the bubbles land on their countries — project/src/basemap.js:37"
+caveats:
+  - "Mock data: 20 views over MOCK_DATA PEOPLE_* tables, fixed at 30 Sep 2026. The source systems shown on the Data & governance and Data operations tabs are part of the mock architecture. The app names no company on screen; it is branded \"People Intelligence · Group HR\"."
+  - "Persona scope is an app-side static filter, not row-level security: anyone who can open the layer can query outside their scope. Enforce access in the semantic layer before copying this for real data."
+  - "Writeback inserts events only: People Actions steps and data-issue triage insert rows into Action Events, saved scenarios into Saved Scenarios. The action records and issue states themselves live in localStorage (people-actions-v2, people-issues-v1) over the governed seed. No smoke check exercises writeback (src/checks.js:9)."
+  - "The custom report's table splits its width equally between columns (src/app.js:585), so long values truncate. Its Excel export always asks for at least 2,000 rows whatever the Rows setting, and writes a pivot as a flat table."
+  - "Currency comparison rows in KPI cards clip to a red \"+\"."
+  - "On visualizations 0.9 a combo's secondary-axis layer does not move when the card narrows; objects are clipped to their card in CSS (src/pi.css:658) rather than fixed."
+  - "The simulators' elasticities and costs are illustrative constants listed on screen (src/simulator.js:27, src/plan.js:27), not fitted. The assistant matches stored questions by keyword overlap, not a language model."
+  - "Of the layer's 229 stored questions, 61 are copied into src/questions.js for the assistant and the library; the other 168 back the catalogue's objects and are shown as card captions, but the objects are declared against layer measures in catalogue.js rather than generated from the questions."
+  - "All 13 tabs preload, one page at a time after the first: landing-ready 9.4 s in staging, every object settled in about 101 s, so the smoke test needs --settle-ms 180000 --check-ms 120000."
+  - "Inert leftovers: throttle.js's header describes a timetable and a prefetch.js, and its RENAMES comment describes renames the empty list does not do; prefetchSelections (throttle.js) and compileTiles (dashboard.js) are unused; palette names call the blue accent \"red\" (catalogue.js, pi.css); comments cite tools/questions.mjs, chart-questions.mjs and entities.mjs, which are not included in this repo."
+  - "Not shipped: the mock-data generator and the layer-authoring scripts. layers/people-intelligence/schema/ddl.sql gives the tables; recreate the layer from layer.json."
+  - "Web fonts load from a public font CDN and basemap tiles from a public tile service at run time."
+  - "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite. Checked in staging with the kit smoke test at 1440, 1280 and 1024 (213 objects rendered across 13 tabs, 9 app checks), compile-check 217/217 and vite build."
+  - No screenshots are shipped yet.
+  - astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too.

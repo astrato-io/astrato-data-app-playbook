@@ -1,0 +1,15 @@
+{
+  "name": "astrato-data-app-playbook",
+  "private": true,
+  "type": "module",
+  "description": "The Astrato Data App Playbook: a standard, a verification kit and reference Astrato Data Apps with their semantic layers, indexed for coding agents.",
+  "license": "MIT",
+  "scripts": {
+    "catalog": "node tools/catalog.mjs",
+    "scan": "node tools/scan.mjs",
+    "check": "node tools/catalog.mjs --check && node tools/scan.mjs"
+  },
+  "devDependencies": {
+    "yaml": "^2.8.1"
+  }
+}

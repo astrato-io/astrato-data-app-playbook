@@ -1,0 +1,22 @@
+{
+  "name": "agency-reporting",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Client reporting for a digital-marketing agency (mock data) as an Astrato App: Google Ads, Meta, GA4 and Search Console in one governed layer, explained drivers, a budget planner and a report workflow.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "compile-check": "node ../../../kit/verify/compile-check.mjs tools/compile-adapter.mjs"
+  },
+  "dependencies": {
+    "@astrato-io/app-runtime": "^0.8.0",
+    "@astrato-io/visualizations": "^0.9.0",
+    "@fontsource/roboto": "^5.3.0",
+    "vite": "^8.3.8"
+  },
+  "devDependencies": {
+    "jsdom": "^31.0.1"
+  }
+}

@@ -1,0 +1,82 @@
+slug: hotel-weather
+title: Hotel Demand × Weather
+company: None (Harbourline Hotels, a fictional group of twelve US city hotels on synthetic data; the app names no operator)
+layer: harbourline-hotels
+summary: >-
+  The first data-blending example. Governed hotel demand from the semantic layer, real daily weather
+  read from the public Open-Meteo archive by DuckDB-WASM in the browser, and a blend of the two
+  (one stored question's rows joined to the weather on city and night) are all native Astrato
+  objects on ONE selection: a city click, a table row or a temperature band moves all three
+  sources. A hotel revenue manager uses it to decide whether rain moves demand enough to run a
+  discounted wet-night offer: a governed what-if on layer parameters, baseline beside scenario,
+  then a maker–checker flag for a general manager. Scored 46/52 by an independent judge.
+industry: leisure
+function: sales
+persona: Hotel revenue manager, with a general manager who approves offers
+archetype: planner
+look: >-
+  light; a plain white masthead with the title "Hotel demand × weather · Aug–Oct 2026", an
+  Open-Meteo credit and a source key (Governed blue #2F6FED, API amber #C77A00, Blended purple
+  #6B4FD8) that colours every card's tag, top border and series; dry and wet nights get their own
+  pair (stone #9A8F80, rain teal #0E8C9A), green (#1E8E5A) / red (#C7362F) only for good and bad
+  change; a headline sentence in a white band with a purple rule; one bar with three tabs, the City
+  filter, chips, Clear all and an Excel report button; white rounded cards on a cool grey page
+  (#F4F6F9); Roboto from npm, page and charts; card titles are the stored questions (or the
+  question the browser answers); each tab fits one screen at 1440, 1280 and 1024
+tabs:
+  - Weather & demand — does rain move demand? Five KPIs against Aug–Oct 2025 with mini charts (occupancy and room revenue governed, average high and wet city-days from the API, wet-vs-dry nights blended), revenue by city, nightly occupancy, the city table with a by-month sparkline, the daily high with a 7-night average, occupancy on dry and wet nights by city, occupancy by temperature band
+  - Wet-night offer — is an offer worth running? Three levers on the layer's parameters (wet share starts at what the weather shows), baseline beside scenario for revenue and occupancy, a bridge of extra nights against the discount, the gain by city, and city-week flags a revenue manager raises and a general manager approves (browser-only)
+  - Queries — every statement both engines ran, newest first; right-click any card for its SQL
+patterns:
+  - governed-business-questions
+  - kpi-sparkline-comparison
+  - selection-bar
+  - preload-tabs
+  - what-if-parameters
+  - query-scheduler
+  - table-sparklines
+  - role-switcher
+  - xlsx-export
+charts: [kpi, sparkline, bar, line, waterfall, table, table-sparklines]
+interactions: [click-to-filter, selection-bar, tabs, sliders, compare, role-switcher]
+workflows: [maker-checker-approval]
+writeback: false
+exports: [xlsx]
+objects: 23  # 13 governed (KPIs, mini charts, charts, table, the offer tab's numbers, bridge and gain bars) + the City filter, 5 API (DuckDB on the weather), 4 blended (DuckDB on governed rows joined to the weather)
+score: { total: 46, max: 52, judged: 2026-11-18, by: independent judge, file: SCORE.md }
+start_here:
+  - project/src/app.js — boot, the governed runtime on a scoped selection service, the extract copied into DuckDB, the second runtime on the DuckDB engine, auto-apply, the headline, the levers, the offer tab's mirrored group, the SQL pop-up, 12 self-checks
+  - project/src/duck.js — DuckDB-WASM in the page: the weather from the API with rain and temperature bands, the governed rows, the blend
+  - project/src/duck-engine.js — an engine.getData answered by DuckDB SQL, so native objects run on API and blended data with the app's own selection service
+  - project/src/selection-scope.js — the governed objects' view of the one selection group, hiding the browser-only weather keys
+  - project/src/tiles.js — every object as data (source, stored question or browser question, measures, presentation), the levers
+capabilities:
+  - data-blending — project/src/duck.js:71
+  - what-if — project/src/app.js:420
+  - narrative-headline — project/src/app.js:395
+  - simulated-workflow — project/src/offers.js:45
+  - role-switcher — project/src/app.js:130
+  - excel-export — project/src/export.js:22
+stealable:
+  - "The blend: the rows of ONE stored question (city × night, this autumn and last) are copied into DuckDB beside the weather and joined on city and date, so every demand figure in it is governed — project/src/app.js:297"
+  - "A second visualization runtime on a DuckDB engine: native charts on API data, with the app's real selection service, so they click, filter and follow chips like governed ones — project/src/app.js:313"
+  - "engine.getData over DuckDB: dimension and measure names map to SQL, dates go back as epoch ms, and the group's applied selections become the WHERE (keys it does not know are ignored) — project/src/duck-engine.js:123"
+  - "Scoped selection service for the governed runtime: it hides the browser-only weather keys, emits only when the governed view changes, and adds hidden band selections back on a governed click — project/src/selection-scope.js:46"
+  - "Pending selections from chart clicks and range drags are applied after 250 ms of quiet, and an empty range list is dropped before it reaches the engine — project/src/app.js:245"
+  - "Levers set the layer's measure parameters on the mounted offer tiles with setMeasureDefinedParameter through applyRuntimeOperations, only while the tab shows — project/src/app.js:420"
+  - "Right-click a card for its SQL: governed SQL from an MCP dry run of the stored question (tools/governed-sql.mjs), browser SQL from the last statement that chart ran — project/src/app.js:593"
+  - "Independent check of the blend outside the browser: the same stored question over MCP and the same Open-Meteo request, joined in plain JavaScript — project/tools/verify-blend.mjs:1"
+  - "Query lanes with 429 retry and a session cache keyed by the exact request — project/src/throttle.js:32"
+caveats:
+  - "Synthetic hotels, real weather: twelve fictional hotels of the fictional Harbourline Hotels group in twelve US cities, Aug–Oct 2026 against Aug–Oct 2025; the weather is fetched live from the public Open-Meteo archive on every load (weather data by Open-Meteo.com, CC BY 4.0), so the app needs the network."
+  - "The 9 API and blended objects have no stored question: the weather never reaches the warehouse, so the bands, wet/dry flags, 7-night average and weather comparisons are DuckDB SQL (src/duck-engine.js:38). The blended ones sit on one stored question's rows. The judge scored A3 at 1."
+  - "Blended Occupancy is an unweighted average of city-night occupancy (src/duck-engine.js:31) under the governed name; the extract could carry rooms available to weight it. Only the Excel Notes sheet says so. The verdict percentage on the offer tab is app arithmetic."
+  - "A drag along the occupancy chart's date axis selects the labelled tick nights (9 scattered nights for a five-week drag), not the range; a drag in the plot area or a point click selects nothing. The waterfall ignores clicks without a label."
+  - "The city table shows 5 of 12 rows and scrolls inside its card; the waterfall legend wraps; at 1024 the city bar axis drops every other name."
+  - "First real selections settled in 3.6–5.6 s; repeats in 0.9 s. The smoke's own check 7 failed: its repeat sent one governed query."
+  - "Empty and thin selections: Phoenix with under 15 °C empties the weather objects, but the KPIs say 'No comparison: no rows last autumn' and the headline still reports occupancy for the selection, since governed figures ignore weather bands. Wet/dry claims have no minimum sample (Denver: 'Rain helped demand' on one wet city-day)."
+  - "The offer flags are not written back: flags and audit trail live in localStorage (key hotel-weather.offer-flags.v1, src/offers.js:16), and the card says so. The layer already has Action Events and Scenarios writeback views."
+  - "The layer is larger than the app: it was built for a wider hotel commercial-planning app (channel mix, acquisition cost, opportunities, scenarios, actions). The app uses 10 of its 28 stored questions."
+  - "Checked by the judge: 23 objects rendered with 0 console errors and 0 failed requests through the kit smoke (1440, 1280, 1024; 11 of 12 app checks) and real mouse input; the KPIs reconciled with MCP unfiltered and with City = Boston, and the Excel figures with City = Austin. Not published, so no live smoke."
+  - Runs on @astrato-io/visualizations 0.9.0, app-runtime 0.9.0 and @duckdb/duckdb-wasm 1.32 with Vite.
+  - astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too.

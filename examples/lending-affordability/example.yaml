@@ -1,0 +1,62 @@
+slug: lending-affordability
+title: Affordability & lending decisions
+company: Keystone Home Finance (fictional UK lender)
+layer: keystone-lending
+summary: >-
+  A retail credit-risk lead checks applicants' income against expenses, moves four affordability
+  thresholds to see how many applications would pass and which rule bites, and works an
+  underwriter-proposes, approver-decides (maker–checker) queue for open applications.
+industry: lending
+function: risk
+persona: Head of Retail Credit Risk
+archetype: workbench
+look: >-
+  light; deep purple brand with a gradient masthead, white cards with a purple top
+  rule, Roboto, sticky filter rail with tabs; kanban lanes whose cards carry green/amber/red
+  Pass/Marginal/Fail edges; modal applicant file
+tabs:
+  - Overview — how do applicants' income and expenses move month to month, by region and income band, and where does approval land by credit band and product?
+  - Thresholds — if we change max DTI, min disposable, min credit score and max expense share (with a +3% stress test), how many applications pass and how many breach each rule?
+  - Decisions — which open applications await a proposal or a sign-off, does each pass the thresholds in view, and how are underwriters performing?
+patterns:
+  - governed-business-questions
+  - kpi-sparkline-comparison
+  - selection-bar
+  - what-if-parameters
+  - preload-tabs
+  - role-switcher
+  - drawer-detail
+charts: [line, bar, stacked-bar, table, kpi, sparkline]
+interactions: [click-to-filter, selection-bar, tabs, sliders, compare, role-switcher, search, drawer]
+workflows: [maker-checker-approval]
+writeback: false
+exports: []
+objects: 47  # approx.: 41 mounted at load (6 headline values, 6 sparklines, 6 MoM change rows, 5 overview charts/tables, 10 policy/rule KPIs, 2 policy bars, 2 workflow objects, 3 filter dropdowns, 1 filter bar) + 6 QoQ change rows mounted on first QoQ click
+start_here:
+  - project/src/app.js — bootstrap, tab shell, sliders written as range selections, filter bar, mount queue, audit-trail query
+  - project/src/dashboard.js — every object declared from a stored business question; the selection groups (main, policy, one per rule, workflow)
+  - project/src/workflow.js — decision board, applicant file, maker–checker rules (four-eyes, mandates, escalation)
+  - project/tools/questions.mjs — the 12 business questions and the sync that copies them into src/questions.js
+capabilities:
+  - what-if — project/src/app.js:208
+  - simulated-workflow — project/src/workflow.js:175
+  - record-drawer — project/src/workflow.js:118
+stealable:
+  - "Threshold sliders without in-app maths: each slider writes a `between` range selection into a policy group, and each rule has its own selection group holding only its breach range, so governed counts show passers and per-rule breaches — project/src/app.js:227"
+  - "Every object built from a stored business question: the question owns dimensions, measures, order and period comparison; the tile adds only type, colours and display names — project/src/dashboard.js:75"
+  - "Business questions synced into the app as data, since an Astrato App cannot read them at runtime — project/tools/questions.mjs:111"
+  - "KPI change row: a one-row table on the month/quarter question with an inter-record growth or diff calculation (offset 1), LIMIT 1, and a two-segment coloured indicator where 'up' is good or bad per measure — project/src/dashboard.js:158"
+  - "Maker–checker in the browser: underwriter proposes, a different approver with a large enough mandate approves, rejects or returns, otherwise escalates; actions layered over seeded state in localStorage — project/src/workflow.js:175"
+  - "Table column formats on visualizations 0.8: the two format operations address a column by its exact name, unlike every other column operation — project/src/theme.js:79"
+  - "The playbook's selection test as code the smoke test runs: select a value, check the KPI moved, clear, check it returned — project/src/app.js:573"
+caveats:
+  - No screenshots in this repo, and no data: bring your own tables shaped like the layer's schema/ddl.sql.
+  - Workflow actions are not written back. Proposals, decisions and escalations live in localStorage (key lending-affordability-workflow-v1) on top of the seeded stage/proposal/audit trail; post them to your own backend to persist.
+  - KPI values are one-row tables over the "All Applications" one-value dimension (headline question), not number objects, so they narrow with selections.
+  - The decision board, applicant file and Pass/Marginal/Fail badges are page chrome over one getData of every application row (limit 3000; the sample has 2,400). assess() compares stored per-application ratios with the slider values in the browser; it does not scale to a real book.
+  - The rule-breach ranges use epsilon bounds (e.g. DTI > max + 1e-6, score <= min - 1) to express strict inequalities as `between` ranges.
+  - The latest month (Sep 2026) is partly open, so MoM approval-rate change compares a partial month with a whole one. Data is fixed to a 30 Sep 2026 snapshot.
+  - Runs on the public packages (@astrato-io/visualizations and app-runtime 0.8.0, Vite). Ported from 0.6 in 2026-11 and checked in headless Chrome with kit/verify/smoke.mjs; the tile builders still set explicit formats, which the 0.8 docs advise leaving to the layer.
+  - One selection re-queries every object on every tab (about 76 queries): all tabs share the main selection group. Do not copy that; see patterns/preload-tabs.md.
+  - The overview tab scrolls sideways by 24px at 1440 wide.
+  - astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too.

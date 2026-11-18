@@ -1,0 +1,4729 @@
+{
+  "fileVersion": 3,
+  "name": "Hospital ER Operations",
+  "datasource": "00000000-0000-0000-0000-000000000000",
+  "locale": {
+    "number": {
+      "decimalSep": ".",
+      "thousandSep": ","
+    },
+    "formats": {
+      "date": "yyyy-mm-dd",
+      "time": "hh:mm:ss",
+      "money": "$#,###.00",
+      "number": "#,##0.00",
+      "datetime": "yyyy-mm-dd hh:mm:ss",
+      "numberInt": "#,##0"
+    },
+    "calendar": {
+      "dayNames": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "monthNames": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      "dayNamesAbbr": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ],
+      "monthNamesAbbr": [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+      ]
+    },
+    "timezone": "Europe/London"
+  },
+  "views": {
+    "ER Visits": {
+      "fields": {
+        "Er Day": {
+          "source": "ER_DAY",
+          "dataType": "date"
+        },
+        "Er Date": {
+          "source": "ER_DATE",
+          "dataType": "timestamp"
+        },
+        "Er Hour": {
+          "source": "ER_HOUR",
+          "dataType": "int"
+        },
+        "Er Week": {
+          "source": "ER_WEEK",
+          "dataType": "date"
+        },
+        "Er Year": {
+          "source": "ER_YEAR",
+          "dataType": "int"
+        },
+        "Age Band": {
+          "source": "AGE_BAND",
+          "dataType": "string"
+        },
+        "Er Month": {
+          "source": "ER_MONTH",
+          "dataType": "date"
+        },
+        "Er Quarter": {
+          "source": "ER_QUARTER",
+          "dataType": "date"
+        },
+        "Patient ID": {
+          "source": "PATIENT_ID",
+          "dataType": "string"
+        },
+        "Admin Label": {
+          "source": "ADMIN_LABEL",
+          "dataType": "string"
+        },
+        "Patient Age": {
+          "source": "PATIENT_AGE",
+          "dataType": "int"
+        },
+        "Weekday Num": {
+          "source": "WEEKDAY_NUM",
+          "dataType": "int"
+        },
+        "Gender Label": {
+          "source": "GENDER_LABEL",
+          "dataType": "string"
+        },
+        "Has Referral": {
+          "source": "HAS_REFERRAL",
+          "dataType": "int"
+        },
+        "Patient Race": {
+          "source": "PATIENT_RACE",
+          "dataType": "string"
+        },
+        "Weekday Name": {
+          "source": "WEEKDAY_NAME",
+          "dataType": "string"
+        },
+        "Admin Flag Num": {
+          "source": "ADMIN_FLAG_NUM",
+          "dataType": "int"
+        },
+        "Patient Gender": {
+          "source": "PATIENT_GENDER",
+          "dataType": "string"
+        },
+        "Patient Waittime": {
+          "source": "PATIENT_WAITTIME",
+          "dataType": "int"
+        },
+        "Patient Last Name": {
+          "source": "PATIENT_LAST_NAME",
+          "dataType": "string"
+        },
+        "Patient Sat Score": {
+          "source": "PATIENT_SAT_SCORE",
+          "dataType": "int"
+        },
+        "Patient Admin Flag": {
+          "source": "PATIENT_ADMIN_FLAG",
+          "dataType": "boolean"
+        },
+        "Department Referral": {
+          "source": "DEPARTMENT_REFERRAL",
+          "dataType": "string"
+        },
+        "Patient First Initial": {
+          "source": "PATIENT_FIRST_INITIAL",
+          "dataType": "string"
+        }
+      },
+      "source": {
+        "type": "table",
+        "table": "HOSPITAL_ER_V",
+        "schema": "MOCK_DATA",
+        "database": "ASTRATO_GALLERY",
+        "objectType": "VIEW"
+      },
+      "description": "One row per emergency-room visit."
+    },
+    "Er Wait Flag Events": {
+      "fields": {
+        "Note": {
+          "source": "note",
+          "dataType": "string"
+        },
+        "Actor": {
+          "source": "actor",
+          "dataType": "string"
+        },
+        "Action": {
+          "source": "action",
+          "dataType": "string"
+        },
+        "Flag ID": {
+          "source": "flag_id",
+          "dataType": "string"
+        },
+        "Event At": {
+          "source": "event_at",
+          "dataType": "timestamp"
+        },
+        "Event ID": {
+          "source": "event_id",
+          "dataType": "string"
+        },
+        "To Status": {
+          "source": "to_status",
+          "dataType": "string"
+        },
+        "Actor Role": {
+          "source": "actor_role",
+          "dataType": "string"
+        },
+        "From Status": {
+          "source": "from_status",
+          "dataType": "string"
+        }
+      },
+      "source": {
+        "type": "table",
+        "table": "ER_WAIT_FLAG_EVENTS",
+        "schema": "ASTRATO",
+        "database": "ASTRATO_GALLERY",
+        "objectType": "BASE TABLE"
+      }
+    },
+    "Er Wait Flags": {
+      "fields": {
+        "Note": {
+          "source": "note",
+          "dataType": "string"
+        },
+        "Issue": {
+          "source": "issue",
+          "dataType": "string"
+        },
+        "Owner": {
+          "source": "owner",
+          "dataType": "string"
+        },
+        "Scope": {
+          "source": "scope",
+          "dataType": "string"
+        },
+        "Status": {
+          "source": "status",
+          "dataType": "string"
+        },
+        "Flag ID": {
+          "source": "flag_id",
+          "dataType": "string"
+        },
+        "Weekday": {
+          "source": "weekday",
+          "dataType": "string"
+        },
+        "Due Date": {
+          "source": "due_date",
+          "dataType": "date"
+        },
+        "Time Band": {
+          "source": "time_band",
+          "dataType": "string"
+        },
+        "Created At": {
+          "source": "created_at",
+          "dataType": "timestamp"
+        },
+        "Created By": {
+          "source": "created_by",
+          "dataType": "string"
+        },
+        "Department": {
+          "source": "department",
+          "dataType": "string"
+        },
+        "Updated At": {
+          "source": "updated_at",
+          "dataType": "timestamp"
+        },
+        "Updated By": {
+          "source": "updated_by",
+          "dataType": "string"
+        }
+      },
+      "source": {
+        "type": "table",
+        "table": "ER_WAIT_FLAGS",
+        "schema": "ASTRATO",
+        "database": "ASTRATO_GALLERY",
+        "objectType": "BASE TABLE"
+      }
+    }
+  },
+  "joins": [],
+  "dimensions": {
+    "Admission Status": {
+      "kind": "field",
+      "reference": {
+        "view": "ER Visits",
+        "field": "Admin Label"
+      },
+      "resultType": "string",
+      "description": "Whether the visit ended in admission or not."
+    },
+    "Age Band": {
+      "kind": "field",
+      "reference": {
+        "view": "ER Visits",
+        "field": "Age Band"
+      },
+      "resultType": "string",
+      "description": "Ten-year patient age band, 0-9 through 70-79."
+    },
+    "All Visits": {
+      "kind": "mapping",
+      "groups": [
+        {
+          "value": "All visits",
+          "filter": {
+            "f1": {
+              "operator": "set",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Patient ID"
+                  }
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        }
+      ],
+      "default": {
+        "value": "All visits",
+        "dataType": "string"
+      },
+      "reference": {
+        "view": "ER Visits",
+        "field": "Patient ID"
+      },
+      "resultType": "string",
+      "description": "One value, \"All visits\", for every ER visit. A single category to stack a breakdown along, such as a 100% bar of admitted versus not admitted."
+    },
+    "Arrival Date": {
+      "kind": "field",
+      "reference": {
+        "view": "ER Visits",
+        "field": "Er Day"
+      },
+      "resultType": "date",
+      "description": "Calendar date the patient arrived at the ER."
+    },
+    "Arrival Day": {
+      "kind": "mapping",
+      "groups": [
+        {
+          "value": "Mon",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Weekday Num"
+                  }
+                },
+                {
+                  "value": 1,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "​Tue",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Weekday Num"
+                  }
+                },
+                {
+                  "value": 2,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "​​Wed",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Weekday Num"
+                  }
+                },
+                {
+                  "value": 3,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "​​​Thu",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Weekday Num"
+                  }
+                },
+                {
+                  "value": 4,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "​​​​Fri",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Weekday Num"
+                  }
+                },
+                {
+                  "value": 5,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "​​​​​Sat",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Weekday Num"
+                  }
+                },
+                {
+                  "value": 6,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "​​​​​​Sun",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Weekday Num"
+                  }
+                },
+                {
+                  "value": 0,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        }
+      ],
+      "reference": {
+        "view": "ER Visits",
+        "field": "Weekday Num"
+      },
+      "resultType": "string",
+      "description": "Weekday of the arrival as a short name (Mon ... Sun). Sorts Monday first: each later day carries invisible zero-width spaces in front of its name."
+    },
+    "Arrival Month": {
+      "kind": "field",
+      "reference": {
+        "view": "ER Visits",
+        "field": "Er Month"
+      },
+      "resultType": "date",
+      "description": "Month of the ER arrival."
+    },
+    "Arrival Quarter": {
+      "kind": "field",
+      "reference": {
+        "view": "ER Visits",
+        "field": "Er Quarter"
+      },
+      "resultType": "date",
+      "description": "Quarter of the ER arrival."
+    },
+    "Arrival Week": {
+      "kind": "field",
+      "reference": {
+        "view": "ER Visits",
+        "field": "Er Week"
+      },
+      "resultType": "date",
+      "description": "Monday-starting week of the ER arrival."
+    },
+    "Department Referral": {
+      "kind": "field",
+      "reference": {
+        "view": "ER Visits",
+        "field": "Department Referral"
+      },
+      "resultType": "string",
+      "description": "Hospital department the patient was referred on to, or None."
+    },
+    "Event Action": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flag Events",
+        "field": "Action"
+      },
+      "resultType": "string",
+      "description": "What they did: raised, started, resolved, closed, reopened, reassigned."
+    },
+    "Event Actor": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flag Events",
+        "field": "Actor"
+      },
+      "resultType": "string",
+      "description": "Who made the change."
+    },
+    "Event Flag ID": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flag Events",
+        "field": "Flag ID"
+      },
+      "resultType": "string",
+      "description": "The flag an audit event belongs to."
+    },
+    "Event From Status": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flag Events",
+        "field": "From Status"
+      },
+      "resultType": "string",
+      "description": "Flag status before the event."
+    },
+    "Event Note": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flag Events",
+        "field": "Note"
+      },
+      "resultType": "string",
+      "description": "The reason or note given with the change."
+    },
+    "Event Role": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flag Events",
+        "field": "Actor Role"
+      },
+      "resultType": "string",
+      "description": "The role they acted in."
+    },
+    "Event Time": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flag Events",
+        "field": "Event At"
+      },
+      "resultType": "timestamp",
+      "description": "When the audit event happened (UTC)."
+    },
+    "Event To Status": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flag Events",
+        "field": "To Status"
+      },
+      "resultType": "string",
+      "description": "Flag status after the event."
+    },
+    "Flag Department": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flags",
+        "field": "Department"
+      },
+      "resultType": "string",
+      "description": "Department the flag concerns, or \"Any\"."
+    },
+    "Flag Due Date": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flags",
+        "field": "Due Date"
+      },
+      "resultType": "date",
+      "description": "Date the owner is due to report back."
+    },
+    "Flag ID": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flags",
+        "field": "Flag ID"
+      },
+      "resultType": "string",
+      "description": "Identifier of a waiting-time flag."
+    },
+    "Flag Issue": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flags",
+        "field": "Issue"
+      },
+      "resultType": "string",
+      "description": "What the duty manager saw."
+    },
+    "Flag Owner": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flags",
+        "field": "Owner"
+      },
+      "resultType": "string",
+      "description": "The named person who owns the follow-up."
+    },
+    "Flag Raised At": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flags",
+        "field": "Created At"
+      },
+      "resultType": "timestamp",
+      "description": "When the flag was raised (UTC)."
+    },
+    "Flag Raised By": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flags",
+        "field": "Created By"
+      },
+      "resultType": "string",
+      "description": "Who raised the flag."
+    },
+    "Flag Scope": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flags",
+        "field": "Scope"
+      },
+      "resultType": "string",
+      "description": "What the flag is about: a time slot or a department."
+    },
+    "Flag Status": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flags",
+        "field": "Status"
+      },
+      "resultType": "string",
+      "description": "Open, In progress, Resolved (owner done, awaiting sign-off) or Closed (signed off by the ED operations lead)."
+    },
+    "Flag Time Band": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flags",
+        "field": "Time Band"
+      },
+      "resultType": "string",
+      "description": "Three-hour arrival band of the flagged time slot, or \"Any\"."
+    },
+    "Flag Updated At": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flags",
+        "field": "Updated At"
+      },
+      "resultType": "timestamp",
+      "description": "When the flag last changed (UTC)."
+    },
+    "Flag Weekday": {
+      "kind": "field",
+      "reference": {
+        "view": "Er Wait Flags",
+        "field": "Weekday"
+      },
+      "resultType": "string",
+      "description": "Weekday of the flagged time slot, or \"Any\"."
+    },
+    "Gender": {
+      "kind": "field",
+      "reference": {
+        "view": "ER Visits",
+        "field": "Gender Label"
+      },
+      "resultType": "string",
+      "description": "Patient gender: Male, Female or Non-Conforming."
+    },
+    "Hour of Day": {
+      "kind": "field",
+      "reference": {
+        "view": "ER Visits",
+        "field": "Er Hour"
+      },
+      "resultType": "int",
+      "description": "Hour of the day the patient arrived, 0-23."
+    },
+    "Period": {
+      "kind": "mapping",
+      "groups": [
+        {
+          "value": "2019-04",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2019-04-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2019-05",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2019-05-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2019-06",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2019-06-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2019-07",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2019-07-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2019-08",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2019-08-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2019-09",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2019-09-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2019-10",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2019-10-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2019-11",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2019-11-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2019-12",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2019-12-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2020-01",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2020-01-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2020-02",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2020-02-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2020-03",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2020-03-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2020-04",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2020-04-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2020-05",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2020-05-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2020-06",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2020-06-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2020-07",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2020-07-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2020-08",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2020-08-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2020-09",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2020-09-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2020-10",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Month"
+                  }
+                },
+                {
+                  "value": "2020-10-01",
+                  "dataType": "date"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        }
+      ],
+      "reference": {
+        "view": "ER Visits",
+        "field": "Er Month"
+      },
+      "resultType": "string",
+      "description": "Arrival month as a sortable YYYY-MM label, for picking one period."
+    },
+    "Race": {
+      "kind": "field",
+      "reference": {
+        "view": "ER Visits",
+        "field": "Patient Race"
+      },
+      "resultType": "string",
+      "description": "Patient self-reported race."
+    },
+    "Race Group": {
+      "kind": "mapping",
+      "groups": [
+        {
+          "value": "African American",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Patient Race"
+                  }
+                },
+                {
+                  "value": "African American",
+                  "dataType": "string"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "Asian",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Patient Race"
+                  }
+                },
+                {
+                  "value": "Asian",
+                  "dataType": "string"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "Declined to Identify",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Patient Race"
+                  }
+                },
+                {
+                  "value": "Declined to Identify",
+                  "dataType": "string"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "Native Am./Alaska Native",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Patient Race"
+                  }
+                },
+                {
+                  "value": "Native American/Alaska Native",
+                  "dataType": "string"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "Pacific Islander",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Patient Race"
+                  }
+                },
+                {
+                  "value": "Pacific Islander",
+                  "dataType": "string"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "Two or More Races",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Patient Race"
+                  }
+                },
+                {
+                  "value": "Two or More Races",
+                  "dataType": "string"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "White",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Patient Race"
+                  }
+                },
+                {
+                  "value": "White",
+                  "dataType": "string"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        }
+      ],
+      "reference": {
+        "view": "ER Visits",
+        "field": "Patient Race"
+      },
+      "resultType": "string",
+      "description": "Patient self-reported race with labels short enough for chart axes (Native American/Alaska Native shortened)."
+    },
+    "Review Month": {
+      "kind": "periodAxis",
+      "periodAxis": {
+        "level": "month",
+        "period": "monthToDate",
+        "sources": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Er Day"
+            }
+          }
+        ],
+        "periodEnd": "latest"
+      },
+      "resultType": "date",
+      "description": "Time axis for the morning review: the latest month in the data to its latest day (1-30 Oct 2020 in this extract), compared with the same days of the month before."
+    },
+    "Time Band": {
+      "kind": "mapping",
+      "groups": [
+        {
+          "value": "00-03h",
+          "filter": {
+            "f1": {
+              "operator": "between",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Hour"
+                  }
+                },
+                {
+                  "value": 0,
+                  "dataType": "int"
+                },
+                {
+                  "value": 2,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "03-06h",
+          "filter": {
+            "f1": {
+              "operator": "between",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Hour"
+                  }
+                },
+                {
+                  "value": 3,
+                  "dataType": "int"
+                },
+                {
+                  "value": 5,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "06-09h",
+          "filter": {
+            "f1": {
+              "operator": "between",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Hour"
+                  }
+                },
+                {
+                  "value": 6,
+                  "dataType": "int"
+                },
+                {
+                  "value": 8,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "09-12h",
+          "filter": {
+            "f1": {
+              "operator": "between",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Hour"
+                  }
+                },
+                {
+                  "value": 9,
+                  "dataType": "int"
+                },
+                {
+                  "value": 11,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "12-15h",
+          "filter": {
+            "f1": {
+              "operator": "between",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Hour"
+                  }
+                },
+                {
+                  "value": 12,
+                  "dataType": "int"
+                },
+                {
+                  "value": 14,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "15-18h",
+          "filter": {
+            "f1": {
+              "operator": "between",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Hour"
+                  }
+                },
+                {
+                  "value": 15,
+                  "dataType": "int"
+                },
+                {
+                  "value": 17,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "18-21h",
+          "filter": {
+            "f1": {
+              "operator": "between",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Hour"
+                  }
+                },
+                {
+                  "value": 18,
+                  "dataType": "int"
+                },
+                {
+                  "value": 20,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "21-24h",
+          "filter": {
+            "f1": {
+              "operator": "between",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Er Hour"
+                  }
+                },
+                {
+                  "value": 21,
+                  "dataType": "int"
+                },
+                {
+                  "value": 23,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        }
+      ],
+      "reference": {
+        "view": "ER Visits",
+        "field": "Er Hour"
+      },
+      "resultType": "string",
+      "description": "Arrival time in eight 3-hour bands on the 24-hour clock (00-03h is midnight to 3am); labels sort in time order."
+    },
+    "Wait Band": {
+      "kind": "mapping",
+      "groups": [
+        {
+          "value": "10-19 min",
+          "filter": {
+            "f1": {
+              "operator": "between",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Patient Waittime"
+                  }
+                },
+                {
+                  "value": 10,
+                  "dataType": "int"
+                },
+                {
+                  "value": 19,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "20-29 min",
+          "filter": {
+            "f1": {
+              "operator": "between",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Patient Waittime"
+                  }
+                },
+                {
+                  "value": 20,
+                  "dataType": "int"
+                },
+                {
+                  "value": 29,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "30-39 min",
+          "filter": {
+            "f1": {
+              "operator": "between",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Patient Waittime"
+                  }
+                },
+                {
+                  "value": 30,
+                  "dataType": "int"
+                },
+                {
+                  "value": 39,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "40-49 min",
+          "filter": {
+            "f1": {
+              "operator": "between",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Patient Waittime"
+                  }
+                },
+                {
+                  "value": 40,
+                  "dataType": "int"
+                },
+                {
+                  "value": 49,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "50-60 min",
+          "filter": {
+            "f1": {
+              "operator": "between",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Patient Waittime"
+                  }
+                },
+                {
+                  "value": 50,
+                  "dataType": "int"
+                },
+                {
+                  "value": 60,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        }
+      ],
+      "reference": {
+        "view": "ER Visits",
+        "field": "Patient Waittime"
+      },
+      "resultType": "string",
+      "description": "Minutes waited before being seen, in 10-minute bands (waits run from 10 to 60 minutes). Labels sort in order."
+    },
+    "Wait Target": {
+      "kind": "mapping",
+      "groups": [
+        {
+          "value": "Exceeded Target",
+          "filter": {
+            "f1": {
+              "operator": "greaterThan",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Patient Waittime"
+                  }
+                },
+                {
+                  "value": 30,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        }
+      ],
+      "default": {
+        "value": "Within Target",
+        "dataType": "string"
+      },
+      "reference": {
+        "view": "ER Visits",
+        "field": "Patient Waittime"
+      },
+      "resultType": "string",
+      "description": "Whether the patient was seen within the 30-minute target."
+    },
+    "Weekday": {
+      "kind": "field",
+      "reference": {
+        "view": "ER Visits",
+        "field": "Weekday Name"
+      },
+      "resultType": "string",
+      "description": "Day of the week the patient arrived."
+    },
+    "Weekday Short": {
+      "kind": "mapping",
+      "groups": [
+        {
+          "value": "1 Mon",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Weekday Num"
+                  }
+                },
+                {
+                  "value": 1,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "2 Tue",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Weekday Num"
+                  }
+                },
+                {
+                  "value": 2,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "3 Wed",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Weekday Num"
+                  }
+                },
+                {
+                  "value": 3,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "4 Thu",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Weekday Num"
+                  }
+                },
+                {
+                  "value": 4,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "5 Fri",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Weekday Num"
+                  }
+                },
+                {
+                  "value": 5,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "6 Sat",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Weekday Num"
+                  }
+                },
+                {
+                  "value": 6,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "7 Sun",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "ER Visits",
+                    "field": "Weekday Num"
+                  }
+                },
+                {
+                  "value": 0,
+                  "dataType": "int"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        }
+      ],
+      "reference": {
+        "view": "ER Visits",
+        "field": "Weekday Num"
+      },
+      "resultType": "string",
+      "description": "Weekday of the arrival, numbered so it sorts Monday first (1 Mon ... 7 Sun)."
+    }
+  },
+  "measures": {
+    "Admission Rate": {
+      "description": "Share of ER visits that resulted in admission (average of the 0/1 admission flag).",
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Admin Flag Num"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0%"
+      }
+    },
+    "Admitted Patients": {
+      "description": "Number of visits that resulted in the patient being admitted.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Admin Flag Num"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Avg Patient Age": {
+      "description": "Average age of attending patients.",
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient Age"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Avg Satisfaction": {
+      "description": "Average patient satisfaction score (1-10), across the visits where a score was recorded.",
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient Sat Score"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Avg Satisfaction Change vs Last Month": {
+      "description": "Average satisfaction score (1-10, visits with a score), change: latest month to date minus the same days of the month before, on the Review Month axis (latest month to date compared with the same days of the month before).",
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient Sat Score"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "+0.0;-0.0;0.0"
+      },
+      "periodComparison": {
+        "type": "diff",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Avg Satisfaction Last Month": {
+      "description": "Average satisfaction score (1-10, visits with a score), for the same days of the month before, on the Review Month axis (latest month to date compared with the same days of the month before).",
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient Sat Score"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      },
+      "periodComparison": {
+        "type": "value",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Avg Satisfaction This Month": {
+      "description": "Average satisfaction score (1-10, visits with a score), for the latest month to date, on the Review Month axis (latest month to date compared with the same days of the month before).",
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient Sat Score"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      },
+      "periodComparison": {
+        "type": "current",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Avg Wait Time": {
+      "description": "Average minutes a patient waits before being seen.",
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient Waittime"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Avg Wait Time Change vs Last Month": {
+      "description": "Average minutes waited before being seen, change: latest month to date minus the same days of the month before, on the Review Month axis (latest month to date compared with the same days of the month before).",
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient Waittime"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "+0.0;-0.0;0.0"
+      },
+      "periodComparison": {
+        "type": "diff",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Avg Wait Time Last Month": {
+      "description": "Average minutes waited before being seen, for the same days of the month before, on the Review Month axis (latest month to date compared with the same days of the month before).",
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient Waittime"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      },
+      "periodComparison": {
+        "type": "value",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Avg Wait Time This Month": {
+      "description": "Average minutes waited before being seen, for the latest month to date, on the Review Month axis (latest month to date compared with the same days of the month before).",
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient Waittime"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      },
+      "periodComparison": {
+        "type": "current",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "CSAT Responses": {
+      "description": "Number of visits with a recorded satisfaction score.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient Sat Score"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Flag Events": {
+      "description": "Number of audit events recorded against flags.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Er Wait Flag Events",
+              "field": "Event ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Flags Awaiting Sign-off": {
+      "description": "Flags the owner has marked Resolved and the ED operations lead has not yet closed.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Er Wait Flags",
+              "field": "Flag ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Er Wait Flags",
+                  "field": "Status"
+                }
+              },
+              {
+                "value": "Resolved",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Flags Raised": {
+      "description": "Number of waiting-time flags raised by duty managers.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Er Wait Flags",
+              "field": "Flag ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Open Flags": {
+      "description": "Flags not yet resolved: status Open or In progress.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Er Wait Flags",
+              "field": "Flag ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "inList",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Er Wait Flags",
+                  "field": "Status"
+                }
+              },
+              {
+                "value": "Open",
+                "dataType": "string"
+              },
+              {
+                "value": "In progress",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Overdue Flags": {
+      "description": "Open or in-progress flags whose due date is before today.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Er Wait Flags",
+              "field": "Flag ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "inList",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Er Wait Flags",
+                  "field": "Status"
+                }
+              },
+              {
+                "value": "Open",
+                "dataType": "string"
+              },
+              {
+                "value": "In progress",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "lessThan",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Er Wait Flags",
+                  "field": "Due Date"
+                }
+              },
+              {
+                "date": {
+                  "kind": "predefinedValue",
+                  "value": "today"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Patients": {
+      "description": "Count of ER patient visits, one row per visit.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Patients Change vs Last Month": {
+      "description": "ER visits, change: latest month to date minus the same days of the month before, on the Review Month axis (latest month to date compared with the same days of the month before).",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "+#,##0;-#,##0;0"
+      },
+      "periodComparison": {
+        "type": "diff",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Patients Change vs Last Month Guarded": {
+      "description": "ER visits, change on the same days of the month before (Review Month axis); empty when the month before has no visits, so the earliest month shows no invented change.",
+      "resultType": "int",
+      "expression": "IF({m1} = 0 OR {m1} IS NULL, NULL, {m2})",
+      "m1": {
+        "reference": {
+          "measure": "Patients Last Month"
+        }
+      },
+      "m2": {
+        "reference": {
+          "measure": "Patients Change vs Last Month"
+        }
+      },
+      "format": {
+        "pattern": "+#,##0;-#,##0;0"
+      }
+    },
+    "Patients Last Month": {
+      "description": "ER visits, for the same days of the month before, on the Review Month axis (latest month to date compared with the same days of the month before).",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      },
+      "periodComparison": {
+        "type": "value",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Patients Over Target": {
+      "description": "Number of ER visits that waited longer than the target (30 minutes unless the Target Minutes parameter is set).",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "greaterThan",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "ER Visits",
+                  "field": "Patient Waittime"
+                }
+              },
+              {
+                "reference": {
+                  "parameter": "Target Minutes"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      },
+      "parameters": {
+        "Target Minutes": {
+          "default": 30,
+          "dataType": "int"
+        }
+      }
+    },
+    "Patients Over Target Change vs Last Month": {
+      "description": "Visits that waited longer than 30 minutes change: latest month to date minus the same days of the month before, on the Review Month axis.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "greaterThan",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "ER Visits",
+                  "field": "Patient Waittime"
+                }
+              },
+              {
+                "value": 30,
+                "dataType": "int"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+#,##0;-#,##0;0"
+      },
+      "periodComparison": {
+        "type": "diff",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Patients Over Target Last Month": {
+      "description": "Visits that waited longer than 30 minutes for the same days of the month before, on the Review Month axis.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "greaterThan",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "ER Visits",
+                  "field": "Patient Waittime"
+                }
+              },
+              {
+                "value": 30,
+                "dataType": "int"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      },
+      "periodComparison": {
+        "type": "value",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Patients Over Target This Month": {
+      "description": "Visits that waited longer than 30 minutes for the latest month to date, on the Review Month axis.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "greaterThan",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "ER Visits",
+                  "field": "Patient Waittime"
+                }
+              },
+              {
+                "value": 30,
+                "dataType": "int"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      },
+      "periodComparison": {
+        "type": "current",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Patients This Month": {
+      "description": "ER visits, for the latest month to date, on the Review Month axis (latest month to date compared with the same days of the month before).",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      },
+      "periodComparison": {
+        "type": "current",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Referral Rate": {
+      "description": "Share of ER visits referred on to a hospital department.",
+      "resultType": "float",
+      "expression": "{m1}/{m2}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Has Referral"
+            }
+          }
+        ]
+      },
+      "m2": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0%"
+      }
+    },
+    "Referred Patients": {
+      "description": "Number of visits referred on to a hospital department.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Has Referral"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Satisfaction Rank Basis": {
+      "description": "Average satisfaction score (1-10), identical to Avg Satisfaction; a separate item so a table can rank by it beside the score column.",
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient Sat Score"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Seen Within 30 per 100 Visits": {
+      "description": "Visits seen within 30 minutes per 100 visits: the same figure as Seen Within Target % on a 0-100 scale. Used where a table ranks by it next to the percentage column (a table column format applies to every column of the same measure).",
+      "resultType": "float",
+      "expression": "{m1}*100/{m2}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "lessThanOrEqual",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "ER Visits",
+                  "field": "Patient Waittime"
+                }
+              },
+              {
+                "value": 30,
+                "dataType": "int"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Seen Within Target %": {
+      "description": "Share of ER visits seen within the waiting-time target (30 minutes unless the Target Minutes parameter is set): visits waiting no longer than the target divided by all visits. Ratio of counts, so it re-weights correctly under any selection.",
+      "resultType": "float",
+      "expression": "{m1}/{m2}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "lessThanOrEqual",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "ER Visits",
+                  "field": "Patient Waittime"
+                }
+              },
+              {
+                "reference": {
+                  "parameter": "Target Minutes"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0%"
+      },
+      "parameters": {
+        "Target Minutes": {
+          "default": 30,
+          "dataType": "int"
+        }
+      }
+    },
+    "Seen Within Target % Change vs Last Month": {
+      "description": "Share of visits seen within 30 minutes, change: latest month to date minus the same days of the month before, on the Review Month axis (latest month to date compared with the same days of the month before).",
+      "resultType": "float",
+      "expression": "{m1}/{m2}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "lessThanOrEqual",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "ER Visits",
+                  "field": "Patient Waittime"
+                }
+              },
+              {
+                "value": 30,
+                "dataType": "int"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "+0.0%;-0.0%;0.0%"
+      },
+      "periodComparison": {
+        "type": "diff",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Seen Within Target % Last Month": {
+      "description": "Share of visits seen within 30 minutes, for the same days of the month before, on the Review Month axis (latest month to date compared with the same days of the month before).",
+      "resultType": "float",
+      "expression": "{m1}/{m2}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "lessThanOrEqual",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "ER Visits",
+                  "field": "Patient Waittime"
+                }
+              },
+              {
+                "value": 30,
+                "dataType": "int"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0%"
+      },
+      "periodComparison": {
+        "type": "value",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Seen Within Target % This Month": {
+      "description": "Share of visits seen within 30 minutes, for the latest month to date, on the Review Month axis (latest month to date compared with the same days of the month before).",
+      "resultType": "float",
+      "expression": "{m1}/{m2}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "lessThanOrEqual",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "ER Visits",
+                  "field": "Patient Waittime"
+                }
+              },
+              {
+                "value": 30,
+                "dataType": "int"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0%"
+      },
+      "periodComparison": {
+        "type": "current",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Seen Within Target pts Change vs Last Month": {
+      "description": "Change in the share of visits seen within 30 minutes, in percentage points: latest month to date minus the same days of the month before (Review Month axis).",
+      "resultType": "float",
+      "expression": "{m1}/{m2}*100",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "lessThanOrEqual",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "ER Visits",
+                  "field": "Patient Waittime"
+                }
+              },
+              {
+                "value": 30,
+                "dataType": "int"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "+0.0\" pts\";-0.0\" pts\";0.0\" pts\""
+      },
+      "periodComparison": {
+        "type": "diff",
+        "reference": {
+          "dimension": "Review Month"
+        }
+      }
+    },
+    "Share of Over-Target Patients": {
+      "description": "This row's share of all visits that waited longer than 30 minutes in the current selection: over-target visits in the row divided by over-target visits across the whole result.",
+      "resultType": "float",
+      "expression": "{m1}/{m2}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "greaterThan",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "ER Visits",
+                  "field": "Patient Waittime"
+                }
+              },
+              {
+                "value": 30,
+                "dataType": "int"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "scope": "total",
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "greaterThan",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "ER Visits",
+                  "field": "Patient Waittime"
+                }
+              },
+              {
+                "value": 30,
+                "dataType": "int"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "0.0%"
+      }
+    },
+    "Share of Patients": {
+      "description": "Share of all patient visits in the current selection that fall in this row: visits in the row divided by visits across the whole result.",
+      "resultType": "float",
+      "expression": "{m1} / {m2}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ]
+      },
+      "m2": {
+        "scope": "total",
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "ER Visits",
+              "field": "Patient ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0%"
+      }
+    },
+    "Waited Over Target % This Month": {
+      "description": "Share of visits that waited longer than 30 minutes, for the latest month to date on the Review Month axis: 1 minus Seen Within Target % This Month. For the headline sentence.",
+      "resultType": "float",
+      "expression": "1 - {m1}",
+      "m1": {
+        "reference": {
+          "measure": "Seen Within Target % This Month"
+        }
+      },
+      "format": {
+        "pattern": "0.0%"
+      }
+    }
+  },
+  "udfs": {},
+  "businessQuestions": {
+    "Are patients seen within 30 minutes more satisfied?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "dimension": "t"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Avg Satisfaction"
+          }
+        }
+      ],
+      "question": "Are patients seen within 30 minutes more satisfied?",
+      "categories": [
+        "ED Wait Watch",
+        "sat"
+      ],
+      "dimensions": [
+        {
+          "key": "t",
+          "reference": {
+            "dimension": "Wait Target"
+          }
+        }
+      ],
+      "description": "Average satisfaction score of visits seen within 30 minutes against those that waited longer.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "At which hours of arrival do most patients wait over 30 minutes?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "h"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Patients Over Target"
+          }
+        }
+      ],
+      "question": "At which hours of arrival do most patients wait over 30 minutes?",
+      "categories": [
+        "ED Wait Watch",
+        "when"
+      ],
+      "dimensions": [
+        {
+          "key": "h",
+          "reference": {
+            "dimension": "Hour of Day"
+          }
+        }
+      ],
+      "description": "Visits that waited longer than 30 minutes, by hour of arrival (0-23).",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Do satisfaction and the 30-minute target move together month by month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "s",
+          "reference": {
+            "measure": "Avg Satisfaction"
+          }
+        },
+        {
+          "key": "w",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        }
+      ],
+      "question": "Do satisfaction and the 30-minute target move together month by month?",
+      "categories": [
+        "ED Wait Watch",
+        "sat"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Arrival Month"
+          }
+        }
+      ],
+      "description": "Average satisfaction (left axis) and share seen within 30 minutes (right axis) by arrival month.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "Do some age groups wait longer than others?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "a"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        }
+      ],
+      "question": "Do some age groups wait longer than others?",
+      "categories": [
+        "ED Wait Watch",
+        "who"
+      ],
+      "dimensions": [
+        {
+          "key": "a",
+          "reference": {
+            "dimension": "Age Band"
+          }
+        }
+      ],
+      "description": "Share of visits seen within 30 minutes by ten-year age band.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Do some patient groups by race wait longer than others?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "measure": "v"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        }
+      ],
+      "question": "Do some patient groups by race wait longer than others?",
+      "categories": [
+        "ED Wait Watch",
+        "who"
+      ],
+      "dimensions": [
+        {
+          "key": "r",
+          "reference": {
+            "dimension": "Race Group"
+          }
+        }
+      ],
+      "description": "Share of visits seen within 30 minutes by self-reported race, worst first.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Do women, men and non-conforming patients wait alike?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "measure": "v"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        }
+      ],
+      "question": "Do women, men and non-conforming patients wait alike?",
+      "categories": [
+        "ED Wait Watch",
+        "who"
+      ],
+      "dimensions": [
+        {
+          "key": "g",
+          "reference": {
+            "dimension": "Gender"
+          }
+        }
+      ],
+      "description": "Share of visits seen within 30 minutes by gender. Non-Conforming covers only 24 visits.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "How do the waiting-time flags split by status?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "s"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Flags Raised"
+          }
+        }
+      ],
+      "question": "How do the waiting-time flags split by status?",
+      "categories": [
+        "ED Wait Watch",
+        "flags"
+      ],
+      "dimensions": [
+        {
+          "key": "s",
+          "reference": {
+            "dimension": "Flag Status"
+          }
+        }
+      ],
+      "description": "Flags raised by duty managers, by status (Open, In progress, Resolved, Closed): the mini bar beside the flag counts.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "How does each department perform against the 30-minute target?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "n"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "rk",
+          "reference": {
+            "measure": "Seen Within 30 per 100 Visits"
+          },
+          "advancedCalculation": {
+            "rank": {
+              "direction": "ascending"
+            }
+          }
+        },
+        {
+          "key": "n",
+          "reference": {
+            "measure": "Patients"
+          }
+        },
+        {
+          "key": "o",
+          "reference": {
+            "measure": "Patients Over Target"
+          }
+        },
+        {
+          "key": "sh",
+          "reference": {
+            "measure": "Share of Over-Target Patients"
+          }
+        },
+        {
+          "key": "w",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        },
+        {
+          "key": "a",
+          "reference": {
+            "measure": "Avg Wait Time"
+          }
+        },
+        {
+          "key": "s",
+          "reference": {
+            "measure": "Avg Satisfaction"
+          }
+        },
+        {
+          "key": "sp",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        }
+      ],
+      "question": "How does each department perform against the 30-minute target?",
+      "categories": [
+        "ED Wait Watch",
+        "who"
+      ],
+      "dimensions": [
+        {
+          "key": "d",
+          "reference": {
+            "dimension": "Department Referral"
+          }
+        }
+      ],
+      "description": "Each referral department: visits, visits over 30 minutes and their share of all over-target visits, share seen within 30 minutes and its rank (1 = worst), average wait and satisfaction, with the monthly trend of the share seen within 30 minutes.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "How does each time band perform against the 30-minute target?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "t"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "rk",
+          "reference": {
+            "measure": "Seen Within 30 per 100 Visits"
+          },
+          "advancedCalculation": {
+            "rank": {
+              "direction": "ascending"
+            }
+          }
+        },
+        {
+          "key": "n",
+          "reference": {
+            "measure": "Patients"
+          }
+        },
+        {
+          "key": "o",
+          "reference": {
+            "measure": "Patients Over Target"
+          }
+        },
+        {
+          "key": "sh",
+          "reference": {
+            "measure": "Share of Over-Target Patients"
+          }
+        },
+        {
+          "key": "w",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        },
+        {
+          "key": "a",
+          "reference": {
+            "measure": "Avg Wait Time"
+          }
+        },
+        {
+          "key": "sp",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        }
+      ],
+      "question": "How does each time band perform against the 30-minute target?",
+      "categories": [
+        "ED Wait Watch",
+        "when"
+      ],
+      "dimensions": [
+        {
+          "key": "t",
+          "reference": {
+            "dimension": "Time Band"
+          }
+        }
+      ],
+      "description": "Each three-hour arrival band: visits, visits over 30 minutes and their share of all over-target visits, share seen within 30 minutes and its rank (1 = worst), average wait, with the monthly trend of the share seen within 30 minutes.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "How does satisfaction change with the time a patient waited?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "b"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Avg Satisfaction"
+          }
+        }
+      ],
+      "question": "How does satisfaction change with the time a patient waited?",
+      "categories": [
+        "ED Wait Watch",
+        "sat"
+      ],
+      "dimensions": [
+        {
+          "key": "b",
+          "reference": {
+            "dimension": "Wait Band"
+          }
+        }
+      ],
+      "description": "Average satisfaction score (1-10) by minutes waited, in 10-minute bands. Only visits with a recorded score (about 27%) count.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "How has patient satisfaction moved month by month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Avg Satisfaction"
+          }
+        }
+      ],
+      "question": "How has patient satisfaction moved month by month?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Arrival Month"
+          }
+        }
+      ],
+      "description": "Satisfaction by arrival month, every month on record.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How has the average wait moved month by month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Avg Wait Time"
+          }
+        }
+      ],
+      "question": "How has the average wait moved month by month?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Arrival Month"
+          }
+        }
+      ],
+      "description": "Average wait by arrival month, every month on record.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How has the share of patients seen within 30 minutes moved month by month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        }
+      ],
+      "question": "How has the share of patients seen within 30 minutes moved month by month?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Arrival Month"
+          }
+        }
+      ],
+      "description": "Seen within 30 min by arrival month, every month on record.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How long did patients wait on average this month?": {
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Avg Wait Time This Month"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Avg Wait Time Change vs Last Month"
+          }
+        }
+      ],
+      "question": "How long did patients wait on average this month?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [],
+      "description": "Average wait: the latest month to date (the Review Month axis, read as of the latest day in the data), with its change on the same days of the month before.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How many open flags are past their due date?": {
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Overdue Flags"
+          }
+        }
+      ],
+      "question": "How many open flags are past their due date?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [],
+      "description": "Open or in-progress flags whose due date is before today.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How many patients came to the ED each month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Patients"
+          }
+        }
+      ],
+      "question": "How many patients came to the ED each month?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Arrival Month"
+          }
+        }
+      ],
+      "description": "Visits by arrival month, every month on record.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How many patients came to the ED this month?": {
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Patients This Month"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Patients Change vs Last Month"
+          }
+        }
+      ],
+      "question": "How many patients came to the ED this month?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [],
+      "description": "Visits: the latest month to date (the Review Month axis, read as of the latest day in the data), with its change on the same days of the month before.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How many patients would wait longer than a different waiting-time target?": {
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Patients Over Target"
+          }
+        }
+      ],
+      "question": "How many patients would wait longer than a different waiting-time target?",
+      "categories": [
+        "ED Wait Watch",
+        "when"
+      ],
+      "dimensions": [],
+      "description": "Patients Over Target with its Target Minutes parameter set by the app (default 30).",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How many resolved flags await the lead's sign-off?": {
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Flags Awaiting Sign-off"
+          }
+        }
+      ],
+      "question": "How many resolved flags await the lead's sign-off?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [],
+      "description": "Flags the owner marked Resolved that the ED operations lead has not yet closed.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How many waiting-time flags are still open?": {
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Open Flags"
+          }
+        }
+      ],
+      "question": "How many waiting-time flags are still open?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [],
+      "description": "Flags with status Open or In progress.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How satisfied were patients this month?": {
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Avg Satisfaction This Month"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Avg Satisfaction Change vs Last Month"
+          }
+        }
+      ],
+      "question": "How satisfied were patients this month?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [],
+      "description": "Satisfaction: the latest month to date (the Review Month axis, read as of the latest day in the data), with its change on the same days of the month before.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "Is the share of patients seen within 30 minutes improving?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        },
+        {
+          "key": "ma",
+          "reference": {
+            "measure": "Seen Within Target %"
+          },
+          "advancedCalculation": {
+            "movingCalculation": {
+              "aggregate": "AVG",
+              "windowEnd": 0,
+              "windowBegin": -2
+            }
+          }
+        }
+      ],
+      "question": "Is the share of patients seen within 30 minutes improving?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Arrival Month"
+          }
+        }
+      ],
+      "description": "Share of ER visits seen within 30 minutes, by arrival month, with its 3-month moving average.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "On which weekdays are the fewest patients seen within 30 minutes?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "w"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        }
+      ],
+      "question": "On which weekdays are the fewest patients seen within 30 minutes?",
+      "categories": [
+        "ED Wait Watch",
+        "when"
+      ],
+      "dimensions": [
+        {
+          "key": "w",
+          "reference": {
+            "dimension": "Arrival Day"
+          }
+        }
+      ],
+      "description": "Share of visits seen within 30 minutes by weekday of arrival.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "What has happened to each waiting-time flag, and who did it?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "dimension": "at"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "n",
+          "reference": {
+            "measure": "Flag Events"
+          }
+        }
+      ],
+      "question": "What has happened to each waiting-time flag, and who did it?",
+      "categories": [
+        "ED Wait Watch",
+        "flags"
+      ],
+      "dimensions": [
+        {
+          "key": "at",
+          "reference": {
+            "dimension": "Event Time"
+          }
+        },
+        {
+          "key": "id",
+          "reference": {
+            "dimension": "Event Flag ID"
+          }
+        },
+        {
+          "key": "ac",
+          "reference": {
+            "dimension": "Event Action"
+          }
+        },
+        {
+          "key": "who",
+          "reference": {
+            "dimension": "Event Actor"
+          }
+        },
+        {
+          "key": "ro",
+          "reference": {
+            "dimension": "Event Role"
+          }
+        },
+        {
+          "key": "fr",
+          "reference": {
+            "dimension": "Event From Status"
+          }
+        },
+        {
+          "key": "to",
+          "reference": {
+            "dimension": "Event To Status"
+          }
+        },
+        {
+          "key": "nt",
+          "reference": {
+            "dimension": "Event Note"
+          }
+        }
+      ],
+      "description": "The audit trail: every change to a flag, who made it, in which role, the status before and after, and the note given.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "What share of patients are seen within 30 minutes?": {
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        }
+      ],
+      "question": "What share of patients are seen within 30 minutes?",
+      "categories": [
+        "ED Wait Watch",
+        "when"
+      ],
+      "dimensions": [],
+      "description": "Share of visits seen within the 30-minute target, the governed baseline for the target what-if.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "What share of patients were seen within 30 minutes this month, and how many points did it move?": {
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Seen Within Target % This Month"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Seen Within Target pts Change vs Last Month"
+          }
+        }
+      ],
+      "question": "What share of patients were seen within 30 minutes this month, and how many points did it move?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [],
+      "description": "Seen within 30 min: the latest month to date (the Review Month axis, read as of the latest day in the data), with its change in percentage points on the same days of the month before.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "What share of patients were seen within 30 minutes this month?": {
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Seen Within Target % This Month"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Seen Within Target % Change vs Last Month"
+          }
+        }
+      ],
+      "question": "What share of patients were seen within 30 minutes this month?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [],
+      "description": "Seen within 30 min: the latest month to date (the Review Month axis, read as of the latest day in the data), with its change on the same days of the month before.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "What share of patients would be seen within a different waiting-time target?": {
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        }
+      ],
+      "question": "What share of patients would be seen within a different waiting-time target?",
+      "categories": [
+        "ED Wait Watch",
+        "when"
+      ],
+      "dimensions": [],
+      "description": "Seen Within Target % with its Target Minutes parameter set by the app (default 30).",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "Which departments drove the change in visits waiting over 30 minutes since the month before?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "od"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "od",
+          "reference": {
+            "measure": "Patients Over Target Change vs Last Month"
+          }
+        },
+        {
+          "key": "o1",
+          "reference": {
+            "measure": "Patients Over Target This Month"
+          }
+        },
+        {
+          "key": "o0",
+          "reference": {
+            "measure": "Patients Over Target Last Month"
+          }
+        },
+        {
+          "key": "wd",
+          "reference": {
+            "measure": "Seen Within Target pts Change vs Last Month"
+          }
+        },
+        {
+          "key": "sp",
+          "reference": {
+            "measure": "Patients Over Target"
+          }
+        }
+      ],
+      "question": "Which departments drove the change in visits waiting over 30 minutes since the month before?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [
+        {
+          "key": "d",
+          "reference": {
+            "dimension": "Department Referral"
+          }
+        }
+      ],
+      "description": "A bridge of the month-on-month change: for each referral department, visits that waited over 30 minutes in the latest month to date and on the same days of the month before, and the change (the department changes add up to the total change), with the change in the share seen within 30 minutes in points and the monthly trend of over-30 visits.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        },
+        {
+          "type": "waterfall"
+        }
+      ]
+    },
+    "Which departments drove this month's change in patients waiting over 30 minutes?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "od"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "od",
+          "reference": {
+            "measure": "Patients Over Target Change vs Last Month"
+          }
+        },
+        {
+          "key": "o1",
+          "reference": {
+            "measure": "Patients Over Target This Month"
+          }
+        },
+        {
+          "key": "o0",
+          "reference": {
+            "measure": "Patients Over Target Last Month"
+          }
+        },
+        {
+          "key": "w1",
+          "reference": {
+            "measure": "Seen Within Target % This Month"
+          }
+        },
+        {
+          "key": "wd",
+          "reference": {
+            "measure": "Seen Within Target pts Change vs Last Month"
+          }
+        },
+        {
+          "key": "sp",
+          "reference": {
+            "measure": "Patients Over Target"
+          }
+        }
+      ],
+      "question": "Which departments drove this month's change in patients waiting over 30 minutes?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [
+        {
+          "key": "d",
+          "reference": {
+            "dimension": "Department Referral"
+          }
+        }
+      ],
+      "description": "Drivers of the month-on-month change: for each referral department, visits that waited over 30 minutes in the latest month to date and on the same days of the month before, the change (the parts add up to the total change), the share seen within 30 minutes and its change in points, with the monthly trend of over-30 visits.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "Which departments see the fewest patients within 30 minutes?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "measure": "v"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        }
+      ],
+      "question": "Which departments see the fewest patients within 30 minutes?",
+      "categories": [
+        "ED Wait Watch",
+        "who"
+      ],
+      "dimensions": [
+        {
+          "key": "d",
+          "reference": {
+            "dimension": "Department Referral"
+          }
+        }
+      ],
+      "description": "Share of visits seen within 30 minutes by the department the patient was referred on to (\"None\" = not referred), worst first.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Which departments' patients are least satisfied, and how long did they wait?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "measure": "s"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "rk",
+          "reference": {
+            "measure": "Satisfaction Rank Basis"
+          },
+          "advancedCalculation": {
+            "rank": {
+              "direction": "ascending"
+            }
+          }
+        },
+        {
+          "key": "s",
+          "reference": {
+            "measure": "Avg Satisfaction"
+          }
+        },
+        {
+          "key": "r",
+          "reference": {
+            "measure": "CSAT Responses"
+          }
+        },
+        {
+          "key": "a",
+          "reference": {
+            "measure": "Avg Wait Time"
+          }
+        },
+        {
+          "key": "w",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        },
+        {
+          "key": "sp",
+          "reference": {
+            "measure": "Avg Satisfaction"
+          }
+        }
+      ],
+      "question": "Which departments' patients are least satisfied, and how long did they wait?",
+      "categories": [
+        "ED Wait Watch",
+        "sat"
+      ],
+      "dimensions": [
+        {
+          "key": "d",
+          "reference": {
+            "dimension": "Department Referral"
+          }
+        }
+      ],
+      "description": "Each referral department: average satisfaction and its rank (1 = least satisfied), scores recorded, average wait and share seen within 30 minutes, with the monthly satisfaction trend.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "Which waiting-time flags have been raised, who owns them and when are they due?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "dimension": "id"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "od",
+          "reference": {
+            "measure": "Overdue Flags"
+          }
+        }
+      ],
+      "question": "Which waiting-time flags have been raised, who owns them and when are they due?",
+      "categories": [
+        "ED Wait Watch",
+        "flags"
+      ],
+      "dimensions": [
+        {
+          "key": "id",
+          "reference": {
+            "dimension": "Flag ID"
+          }
+        },
+        {
+          "key": "st",
+          "reference": {
+            "dimension": "Flag Status"
+          }
+        },
+        {
+          "key": "dp",
+          "reference": {
+            "dimension": "Flag Department"
+          }
+        },
+        {
+          "key": "wd",
+          "reference": {
+            "dimension": "Flag Weekday"
+          }
+        },
+        {
+          "key": "tb",
+          "reference": {
+            "dimension": "Flag Time Band"
+          }
+        },
+        {
+          "key": "is",
+          "reference": {
+            "dimension": "Flag Issue"
+          }
+        },
+        {
+          "key": "ow",
+          "reference": {
+            "dimension": "Flag Owner"
+          }
+        },
+        {
+          "key": "du",
+          "reference": {
+            "dimension": "Flag Due Date"
+          }
+        },
+        {
+          "key": "by",
+          "reference": {
+            "dimension": "Flag Raised By"
+          }
+        }
+      ],
+      "description": "Every flag a duty manager raised: what it covers, the named owner, the due date and its status. Overdue = 1 when an open flag is past its due date.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "Which weekday and arrival slots miss the 30-minute target most?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "t"
+          }
+        },
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "w"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        }
+      ],
+      "question": "Which weekday and arrival slots miss the 30-minute target most?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [
+        {
+          "key": "t",
+          "reference": {
+            "dimension": "Time Band"
+          }
+        },
+        {
+          "key": "w",
+          "reference": {
+            "dimension": "Arrival Day"
+          }
+        }
+      ],
+      "description": "Share of visits seen within 30 minutes for each weekday and three-hour arrival band. Darker is worse.",
+      "preferredCharts": [
+        {
+          "type": "heatmap"
+        }
+      ]
+    },
+    "Which weekday and time slots miss the 30-minute target most?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "t"
+          }
+        },
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "w"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        }
+      ],
+      "question": "Which weekday and time slots miss the 30-minute target most?",
+      "categories": [
+        "ED Wait Watch",
+        "board"
+      ],
+      "dimensions": [
+        {
+          "key": "t",
+          "reference": {
+            "dimension": "Time Band"
+          }
+        },
+        {
+          "key": "w",
+          "reference": {
+            "dimension": "Weekday Short"
+          }
+        }
+      ],
+      "description": "Share of visits seen within 30 minutes for each weekday and three-hour arrival band. Darker is worse.",
+      "preferredCharts": [
+        {
+          "type": "heatmap"
+        }
+      ]
+    },
+    "Which weekdays see the fewest patients within 30 minutes?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "w"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Seen Within Target %"
+          }
+        }
+      ],
+      "question": "Which weekdays see the fewest patients within 30 minutes?",
+      "categories": [
+        "ED Wait Watch",
+        "when"
+      ],
+      "dimensions": [
+        {
+          "key": "w",
+          "reference": {
+            "dimension": "Weekday Short"
+          }
+        }
+      ],
+      "description": "Share of visits seen within 30 minutes by weekday of arrival.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Who owns the open waiting-time flags?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "v"
+          }
+        }
+      ],
+      "defaults": {
+        "hideZeroValues": true
+      },
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Open Flags"
+          }
+        }
+      ],
+      "question": "Who owns the open waiting-time flags?",
+      "categories": [
+        "ED Wait Watch",
+        "flags"
+      ],
+      "dimensions": [
+        {
+          "key": "o",
+          "reference": {
+            "dimension": "Flag Owner"
+          }
+        }
+      ],
+      "description": "Open and in-progress flags by named owner.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    }
+  },
+  "layout": {},
+  "engineProperties": {
+    "csvSourcedTables": [
+      "ASTRATO.ER_WAIT_FLAG_EVENTS",
+      "ASTRATO.ER_WAIT_FLAGS"
+    ]
+  }
+}

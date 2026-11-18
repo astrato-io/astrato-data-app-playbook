@@ -1,0 +1,5167 @@
+version: 0.1.1
+name: UK University Rankings 2027
+datasets:
+  - name: UNI_FACT
+    source: '"ASTRATO_GALLERY"."MOCK_DATA"."UNI_FACT"'
+    description: One row per university, UK league-table style 2027 edition (130 universities).
+    fields:
+      - name: Town
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"TOWN"'
+        dimension: {}
+      - name: Guide
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"GUIDE"'
+      - name: London
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LONDON_FLAG"'
+        dimension: {}
+      - name: Nation
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"NATION"'
+        dimension: {}
+      - name: Movement
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"MOVEMENT"'
+        dimension: {}
+      - name: Rank 2025
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"RANK_2025"'
+      - name: Rank 2026
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"RANK_2026"'
+      - name: Rank 2027
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"RANK"'
+        dimension: {}
+      - name: Rank Band
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"RANK_BAND"'
+        dimension: {}
+      - name: University
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"NAME"'
+        dimension: {}
+      - name: Rank Change
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"RANK_CHANGE"'
+      - name: Total Score
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"TOTAL"'
+      - name: University ID
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"UNI_ID"'
+      - name: Continuation %
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CONTINUATION"'
+      - name: University Key
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"KEY"'
+      - name: Firsts / 2:1s %
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"FIRSTS"'
+      - name: Specialist Rank
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SI_RANK"'
+      - name: Specialist Table
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SI_TABLE"'
+      - name: University Group
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"UNI_GROUP"'
+        dimension: {}
+      - name: Rank 2027 (Label)
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"RANK_RAW"'
+      - name: Research Quality %
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"RESEARCH"'
+      - name: Teaching Quality %
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"TEACHING"'
+      - name: University (Short)
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SHORT"'
+        dimension: {}
+      - name: Graduate Prospects %
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"PROSPECTS"'
+      - name: Student Experience %
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"EXPERIENCE"'
+      - name: Subject Wins (Count)
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SUBJECT_WINS"'
+      - name: Subject Top-10s (Count)
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SUBJECT_TOP10S"'
+      - name: Entry Standards (UCAS pts)
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"ENTRY"'
+      - name: Total Score (2027)
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"TOTAL"'
+        dimension: {}
+        description: >-
+          2027 Total Score as a dimension, for range selections (what-if: universities between our score and our score
+          plus a gain).
+        ai_context:
+          instructions: >-
+            2027 Total Score as a dimension, for range selections (what-if: universities between our score and our score
+            plus a gain).
+  - name: UNI_HISTORY_FACT
+    source: '"ASTRATO_GALLERY"."MOCK_DATA"."UNI_HISTORY_FACT"'
+    description: 'One row per university per edition: historic overall rank.'
+    fields:
+      - name: Edition
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"EDITION"'
+        dimension: {}
+      - name: Source Type
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SOURCE_TYPE"'
+      - name: Edition Date
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"EDITION_DATE"'
+      - name: Edition Label
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"EDITION_LABEL"'
+        dimension: {}
+      - name: Historic Rank
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"HIST_RANK"'
+      - name: History Nation
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"NATION"'
+        dimension: {}
+      - name: In Top 10 Flag
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"IN_TOP10"'
+      - name: History University
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"NAME"'
+        dimension: {}
+      - name: History University ID
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"UNI_ID"'
+      - name: History University Group
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"UNI_GROUP"'
+        dimension: {}
+      - name: History University (Short)
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SHORT"'
+        dimension: {}
+  - name: UNI_SUBJECT_FACT
+    source: '"ASTRATO_GALLERY"."MOCK_DATA"."UNI_SUBJECT_FACT"'
+    description: Top-10 places per subject table, 2027 edition.
+    fields:
+      - name: Subject
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SUBJECT"'
+        dimension: {}
+      - name: Subject Rank
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SUBJECT_RANK"'
+      - name: Subject Score
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"S_SCORE"'
+      - name: Subject Nation
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"NATION"'
+        dimension: {}
+      - name: Subject Win Flag
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"IS_WIN"'
+      - name: Subject Research %
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"S_RESEARCH"'
+      - name: Subject Teaching %
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"S_TEACHING"'
+      - name: Subject University
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"NAME"'
+        dimension: {}
+      - name: Subject Prospects %
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"S_PROSPECTS"'
+      - name: Subject Experience %
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"S_EXPERIENCE"'
+      - name: Subject Overall Rank
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"OVERALL_RANK"'
+      - name: Subject University ID
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"UNI_ID"'
+      - name: Subject Entry (UCAS pts)
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"S_ENTRY"'
+      - name: Subject University Group
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"UNI_GROUP"'
+        dimension: {}
+      - name: Subject University (Short)
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SHORT"'
+        dimension: {}
+relationships:
+  - name: relationship_1_UNI_HISTORY_FACT_to_UNI_FACT
+    from: UNI_HISTORY_FACT
+    to: UNI_FACT
+    from_columns:
+      - History University ID
+    to_columns:
+      - University ID
+  - name: relationship_2_UNI_SUBJECT_FACT_to_UNI_FACT
+    from: UNI_SUBJECT_FACT
+    to: UNI_FACT
+    from_columns:
+      - Subject University ID
+    to_columns:
+      - University ID
+metrics:
+  - name: Avg Continuation
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_CONTINUATION")
+    description: Average Continuation % across universities.
+    ai_context:
+      instructions: Average Continuation % across universities.
+  - name: Avg Entry Points
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_ENTRY")
+    description: Average Entry Standards (UCAS pts) across universities.
+    ai_context:
+      instructions: Average Entry Standards (UCAS pts) across universities.
+  - name: Avg Experience
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_EXPERIENCE")
+    description: Average Student Experience % across universities.
+    ai_context:
+      instructions: Average Student Experience % across universities.
+  - name: Avg Firsts
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_FIRSTS")
+    description: Average Firsts / 2:1s % across universities.
+    ai_context:
+      instructions: Average Firsts / 2:1s % across universities.
+  - name: Avg Graduate Prospects
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_PROSPECTS")
+    description: Average Graduate Prospects % across universities.
+    ai_context:
+      instructions: Average Graduate Prospects % across universities.
+  - name: Avg Historic Rank
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v2_HIST_RANK")
+    description: >-
+      Average overall rank of the universities in the selection in each edition (history view; lower is better). Use by
+      Edition.
+    ai_context:
+      instructions: >-
+        Average overall rank of the universities in the selection in each edition (history view; lower is better). Use
+        by Edition.
+  - name: Avg Places Gained
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Avg Places Gained uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   CASE WHEN COALESCE((AVG("v1_RANK_2026")), (AVG("v1_RANK"))) IS NULL THEN NULL ELSE
+            COALESCE((AVG("v1_RANK_2026")), 0) - COALESCE((AVG("v1_RANK")), 0) END AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_RANK_2026", "v1_RANK"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_FACT
+
+            --       v1.RANK_2026 AS "v1_RANK_2026",
+
+            --       v1.RANK AS "v1_RANK"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: 'Average places climbed 2026 to 2027: Avg Rank 2026 minus Avg Rank 2027. Positive is good.'
+    ai_context:
+      instructions: 'Average places climbed 2026 to 2027: Avg Rank 2026 minus Avg Rank 2027. Positive is good.'
+  - name: Avg Rank 2025
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_RANK_2025")
+    description: Average 2025 overall rank of the same universities (lower is better).
+    ai_context:
+      instructions: Average 2025 overall rank of the same universities (lower is better).
+  - name: Avg Rank 2026
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_RANK_2026")
+    description: Average 2026 overall rank of the same universities (lower is better).
+    ai_context:
+      instructions: Average 2026 overall rank of the same universities (lower is better).
+  - name: Avg Rank 2027
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_RANK")
+    description: Average 2027 overall rank of the universities in the selection (lower is better).
+    ai_context:
+      instructions: Average 2027 overall rank of the universities in the selection (lower is better).
+  - name: Avg Research
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_RESEARCH")
+    description: Average Research Quality % across universities.
+    ai_context:
+      instructions: Average Research Quality % across universities.
+  - name: Avg Subject Score
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v3_S_SCORE")
+    description: Average subject-table score.
+    ai_context:
+      instructions: Average subject-table score.
+  - name: Avg Teaching
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_TEACHING")
+    description: Average Teaching Quality % across universities.
+    ai_context:
+      instructions: Average Teaching Quality % across universities.
+  - name: Avg Total Score
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_TOTAL")
+    description: Average Total Score across universities.
+    ai_context:
+      instructions: Average Total Score across universities.
+  - name: Best Rank
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: MIN("v1_RANK")
+    description: Best (lowest) 2027 overall rank in the selection. Never sum ranks.
+    ai_context:
+      instructions: Best (lowest) 2027 overall rank in the selection. Never sum ranks.
+  - name: Climbers
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Climbers uses advanced semantics that Apache Ossie cannot represent as
+            one reusable metric expression. The engine-generated query below is context for people and AI agents; it is
+            not directly executable as this metric.
+
+            -- SELECT
+
+            --   COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_RANK_CHANGE" > 0
+
+            --     THEN "v1_UNI_ID"
+
+            --     END
+
+            --   ) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_UNI_ID", "v1_RANK_CHANGE"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_FACT
+
+            --       v1.UNI_ID AS "v1_UNI_ID",
+
+            --       v1.RANK_CHANGE AS "v1_RANK_CHANGE"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Universities that rose vs 2026.
+    ai_context:
+      instructions: Universities that rose vs 2026.
+  - name: Climbers 2026
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Climbers 2026 uses advanced semantics that Apache Ossie cannot represent
+            as one reusable metric expression. The engine-generated query below is context for people and AI agents; it
+            is not directly executable as this metric.
+
+            -- SELECT
+
+            --   COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_RANK_2026" < "v1_RANK_2025"
+
+            --     THEN "v1_UNI_ID"
+
+            --     END
+
+            --   ) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_UNI_ID", "v1_RANK_2026", "v1_RANK_2025"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_FACT
+
+            --       v1.UNI_ID AS "v1_UNI_ID",
+
+            --       v1.RANK_2026 AS "v1_RANK_2026",
+
+            --       v1.RANK_2025 AS "v1_RANK_2025"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: 'Universities that rose from 2025 to 2026 (Rank 2026 better than Rank 2025): last year''s Climbers.'
+    ai_context:
+      instructions: 'Universities that rose from 2025 to 2026 (Rank 2026 better than Rank 2025): last year''s Climbers.'
+  - name: Climbers Change
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Climbers Change uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   CASE WHEN COALESCE((COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_RANK_CHANGE" > 0
+
+            --     THEN "v1_UNI_ID"
+
+            --     END
+
+            --   )), (COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_RANK_2026" < "v1_RANK_2025"
+
+            --     THEN "v1_UNI_ID"
+
+            --     END
+
+            --   ))) IS NULL THEN NULL ELSE COALESCE((COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_RANK_CHANGE" > 0
+
+            --     THEN "v1_UNI_ID"
+
+            --     END
+
+            --   )), 0) - COALESCE((COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_RANK_2026" < "v1_RANK_2025"
+
+            --     THEN "v1_UNI_ID"
+
+            --     END
+
+            --   )), 0) END AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_UNI_ID", "v1_RANK_CHANGE", "v1_RANK_2026", "v1_RANK_2025"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_FACT
+
+            --       v1.UNI_ID AS "v1_UNI_ID",
+
+            --       v1.RANK_CHANGE AS "v1_RANK_CHANGE",
+
+            --       v1.RANK_2026 AS "v1_RANK_2026",
+
+            --       v1.RANK_2025 AS "v1_RANK_2025"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Climbers this year minus climbers last year (2026 to 2027 vs 2025 to 2026). Positive is good.
+    ai_context:
+      instructions: Climbers this year minus climbers last year (2026 to 2027 vs 2025 to 2026). Positive is good.
+  - name: Entry vs Set Average
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Entry vs Set Average uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   CASE WHEN COALESCE(AVG("v1_ENTRY"), AVG("v1_ENTRY")) IS NULL THEN NULL ELSE COALESCE(AVG("v1_ENTRY"),
+            0) - COALESCE(AVG("v1_ENTRY"), 0) END AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_ENTRY"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_FACT
+
+            --       v1.ENTRY AS "v1_ENTRY"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: >-
+      Entry Standards (UCAS points) minus the average of every university in the current selection. Positive = ahead of
+      the set.
+    ai_context:
+      instructions: >-
+        Entry Standards (UCAS points) minus the average of every university in the current selection. Positive = ahead
+        of the set.
+  - name: Experience vs Set Average
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Experience vs Set Average uses advanced semantics that Apache Ossie
+            cannot represent as one reusable metric expression. The engine-generated query below is context for people
+            and AI agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   CASE WHEN COALESCE(AVG("v1_EXPERIENCE"), AVG("v1_EXPERIENCE")) IS NULL THEN NULL ELSE
+            COALESCE(AVG("v1_EXPERIENCE"), 0) - COALESCE(AVG("v1_EXPERIENCE"), 0) END AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_EXPERIENCE"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_FACT
+
+            --       v1.EXPERIENCE AS "v1_EXPERIENCE"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: >-
+      Student Experience % minus the average of every university in the current selection (points). Positive = ahead of
+      the set.
+    ai_context:
+      instructions: >-
+        Student Experience % minus the average of every university in the current selection (points). Positive = ahead
+        of the set.
+  - name: Fallers
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Fallers uses advanced semantics that Apache Ossie cannot represent as one
+            reusable metric expression. The engine-generated query below is context for people and AI agents; it is not
+            directly executable as this metric.
+
+            -- SELECT
+
+            --   COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_RANK_CHANGE" < 0
+
+            --     THEN "v1_UNI_ID"
+
+            --     END
+
+            --   ) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_UNI_ID", "v1_RANK_CHANGE"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_FACT
+
+            --       v1.UNI_ID AS "v1_UNI_ID",
+
+            --       v1.RANK_CHANGE AS "v1_RANK_CHANGE"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Universities that fell vs 2026.
+    ai_context:
+      instructions: Universities that fell vs 2026.
+  - name: Fallers 2026
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Fallers 2026 uses advanced semantics that Apache Ossie cannot represent
+            as one reusable metric expression. The engine-generated query below is context for people and AI agents; it
+            is not directly executable as this metric.
+
+            -- SELECT
+
+            --   COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_RANK_2026" > "v1_RANK_2025"
+
+            --     THEN "v1_UNI_ID"
+
+            --     END
+
+            --   ) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_UNI_ID", "v1_RANK_2026", "v1_RANK_2025"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_FACT
+
+            --       v1.UNI_ID AS "v1_UNI_ID",
+
+            --       v1.RANK_2026 AS "v1_RANK_2026",
+
+            --       v1.RANK_2025 AS "v1_RANK_2025"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: 'Universities that fell from 2025 to 2026 (Rank 2026 worse than Rank 2025): last year''s Fallers.'
+    ai_context:
+      instructions: 'Universities that fell from 2025 to 2026 (Rank 2026 worse than Rank 2025): last year''s Fallers.'
+  - name: Fallers Change
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Fallers Change uses advanced semantics that Apache Ossie cannot represent
+            as one reusable metric expression. The engine-generated query below is context for people and AI agents; it
+            is not directly executable as this metric.
+
+            -- SELECT
+
+            --   CASE WHEN COALESCE((COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_RANK_CHANGE" < 0
+
+            --     THEN "v1_UNI_ID"
+
+            --     END
+
+            --   )), (COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_RANK_2026" > "v1_RANK_2025"
+
+            --     THEN "v1_UNI_ID"
+
+            --     END
+
+            --   ))) IS NULL THEN NULL ELSE COALESCE((COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_RANK_CHANGE" < 0
+
+            --     THEN "v1_UNI_ID"
+
+            --     END
+
+            --   )), 0) - COALESCE((COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_RANK_2026" > "v1_RANK_2025"
+
+            --     THEN "v1_UNI_ID"
+
+            --     END
+
+            --   )), 0) END AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_UNI_ID", "v1_RANK_CHANGE", "v1_RANK_2026", "v1_RANK_2025"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_FACT
+
+            --       v1.UNI_ID AS "v1_UNI_ID",
+
+            --       v1.RANK_CHANGE AS "v1_RANK_CHANGE",
+
+            --       v1.RANK_2026 AS "v1_RANK_2026",
+
+            --       v1.RANK_2025 AS "v1_RANK_2025"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Fallers this year minus fallers last year. Negative is good.
+    ai_context:
+      instructions: Fallers this year minus fallers last year. Negative is good.
+  - name: Historic Rank
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: MIN("v2_HIST_RANK")
+    description: Overall rank in an edition (MIN; never sum).
+    ai_context:
+      instructions: Overall rank in an edition (MIN; never sum).
+  - name: Places Gained Since 2025
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Places Gained Since 2025 uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   CASE WHEN COALESCE((MIN(
+
+            --     CASE WHEN -- FILTER
+
+            --       "v2_EDITION" = 2025
+
+            --     THEN "v2_HIST_RANK"
+
+            --     END
+
+            --   )), (MIN(
+
+            --     CASE WHEN -- FILTER
+
+            --       "v2_EDITION" = 2027
+
+            --     THEN "v2_HIST_RANK"
+
+            --     END
+
+            --   ))) IS NULL THEN NULL ELSE COALESCE((MIN(
+
+            --     CASE WHEN -- FILTER
+
+            --       "v2_EDITION" = 2025
+
+            --     THEN "v2_HIST_RANK"
+
+            --     END
+
+            --   )), 0) - COALESCE((MIN(
+
+            --     CASE WHEN -- FILTER
+
+            --       "v2_EDITION" = 2027
+
+            --     THEN "v2_HIST_RANK"
+
+            --     END
+
+            --   )), 0) END AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v2_HIST_RANK", "v2_EDITION"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_HISTORY_FACT
+
+            --       v2.HIST_RANK AS "v2_HIST_RANK",
+
+            --       v2.EDITION AS "v2_EDITION"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_HISTORY_FACT AS v2
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Rank in 2025 minus rank in 2027 (history view). Positive = climbed. Per university only.
+    ai_context:
+      instructions: Rank in 2025 minus rank in 2027 (history view). Positive = climbed. Per university only.
+  - name: Projected Rank at Score
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Projected Rank at Score uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   (COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_TOTAL" > 572
+
+            --     THEN "v1_UNI_ID"
+
+            --     END
+
+            --   ) + 1) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_UNI_ID", "v1_TOTAL"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_FACT
+
+            --       v1.UNI_ID AS "v1_UNI_ID",
+
+            --       v1.TOTAL AS "v1_TOTAL"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: >-
+      The overall rank a university would hold with the 2027 Total Score given by parameter 'score' (default 572):
+      universities scoring strictly above it, plus one. Ties are not broken.
+    ai_context:
+      instructions: >-
+        The overall rank a university would hold with the 2027 Total Score given by parameter 'score' (default 572):
+        universities scoring strictly above it, plus one. Ties are not broken.
+  - name: Prospects vs Set Average
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Prospects vs Set Average uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   CASE WHEN COALESCE(AVG("v1_PROSPECTS"), AVG("v1_PROSPECTS")) IS NULL THEN NULL ELSE
+            COALESCE(AVG("v1_PROSPECTS"), 0) - COALESCE(AVG("v1_PROSPECTS"), 0) END AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_PROSPECTS"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_FACT
+
+            --       v1.PROSPECTS AS "v1_PROSPECTS"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: >-
+      Graduate Prospects % minus the average of every university in the current selection (points). Positive = ahead of
+      the set.
+    ai_context:
+      instructions: >-
+        Graduate Prospects % minus the average of every university in the current selection (points). Positive = ahead
+        of the set.
+  - name: Rank (value)
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: MIN("v1_RANK")
+    description: 2027 overall rank for a single university (MIN).
+    ai_context:
+      instructions: 2027 overall rank for a single university (MIN).
+  - name: Rank 2026 (value)
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: MIN("v1_RANK_2026")
+    description: 2026 overall rank for a single university (MIN; never sum).
+    ai_context:
+      instructions: 2026 overall rank for a single university (MIN; never sum).
+  - name: Rank Change (value)
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v1_RANK_CHANGE")
+    description: Places moved vs 2026 (positive = climbed). Use per university only.
+    ai_context:
+      instructions: Places moved vs 2026 (positive = climbed). Use per university only.
+  - name: Rank in 2025 Edition
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Rank in 2025 Edition uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   MIN(
+
+            --     CASE WHEN -- FILTER
+
+            --       "v2_EDITION" = 2025
+
+            --     THEN "v2_HIST_RANK"
+
+            --     END
+
+            --   ) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v2_HIST_RANK", "v2_EDITION"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_HISTORY_FACT
+
+            --       v2.HIST_RANK AS "v2_HIST_RANK",
+
+            --       v2.EDITION AS "v2_EDITION"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_HISTORY_FACT AS v2
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Overall rank in the 2025 edition (history view, MIN; one university at a time).
+    ai_context:
+      instructions: Overall rank in the 2025 edition (history view, MIN; one university at a time).
+  - name: Rank in 2027 Edition
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Rank in 2027 Edition uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   MIN(
+
+            --     CASE WHEN -- FILTER
+
+            --       "v2_EDITION" = 2027
+
+            --     THEN "v2_HIST_RANK"
+
+            --     END
+
+            --   ) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v2_HIST_RANK", "v2_EDITION"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_HISTORY_FACT
+
+            --       v2.HIST_RANK AS "v2_HIST_RANK",
+
+            --       v2.EDITION AS "v2_EDITION"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_HISTORY_FACT AS v2
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Overall rank in the 2027 edition (history view, MIN; one university at a time).
+    ai_context:
+      instructions: Overall rank in the 2027 edition (history view, MIN; one university at a time).
+  - name: Research vs Set Average
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Research vs Set Average uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   CASE WHEN COALESCE(AVG("v1_RESEARCH"), AVG("v1_RESEARCH")) IS NULL THEN NULL ELSE
+            COALESCE(AVG("v1_RESEARCH"), 0) - COALESCE(AVG("v1_RESEARCH"), 0) END AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_RESEARCH"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_FACT
+
+            --       v1.RESEARCH AS "v1_RESEARCH"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: >-
+      Research Quality % minus the average of every university in the current selection (points). Positive = ahead of
+      the set.
+    ai_context:
+      instructions: >-
+        Research Quality % minus the average of every university in the current selection (points). Positive = ahead of
+        the set.
+  - name: Score Gap to Benchmark
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Score Gap to Benchmark uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   (AVG("v1_TOTAL") - COALESCE(572, 0)) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_TOTAL"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_FACT
+
+            --       v1.TOTAL AS "v1_TOTAL"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: >-
+      Average 2027 Total Score minus the benchmark score (parameter 'benchmark', default 572 = Kent's 2027 total).
+      Positive = scores above the benchmark university. The app sets the benchmark to the chosen university's score.
+    ai_context:
+      instructions: >-
+        Average 2027 Total Score minus the benchmark score (parameter 'benchmark', default 572 = Kent's 2027 total).
+        Positive = scores above the benchmark university. The app sets the benchmark to the chosen university's score.
+  - name: Subject Rank (value)
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: MIN("v3_SUBJECT_RANK")
+    description: Rank within a subject table (MIN).
+    ai_context:
+      instructions: Rank within a subject table (MIN).
+  - name: Subject Titles
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v3_IS_WIN")
+    description: Subject tables where the university ranks 1st.
+    ai_context:
+      instructions: Subject tables where the university ranks 1st.
+  - name: Subject Top-10 Places
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v1_SUBJECT_TOP10S")
+    description: Subject-table top-10 places held.
+    ai_context:
+      instructions: Subject-table top-10 places held.
+  - name: Subject Wins
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v1_SUBJECT_WINS")
+    description: Subject tables topped by the university.
+    ai_context:
+      instructions: Subject tables topped by the university.
+  - name: Top-10 Appearances
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v2_IN_TOP10")
+    description: Editions in which the university was top 10.
+    ai_context:
+      instructions: Editions in which the university was top 10.
+  - name: Top-10 Places
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: COUNT("v3_UNI_ID")
+    description: Top-10 places in subject tables (rows).
+    ai_context:
+      instructions: Top-10 places in subject tables (rows).
+  - name: Total Score Max
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: MAX("v1_TOTAL")
+    description: Highest 2027 total score in the selection.
+    ai_context:
+      instructions: Highest 2027 total score in the selection.
+  - name: Universities
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: COUNT(DISTINCT "v1_UNI_ID")
+    description: Distinct universities in the 2027 table.
+    ai_context:
+      instructions: Distinct universities in the 2027 table.
+  - name: Universities Scoring Above
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Universities Scoring Above uses advanced semantics that Apache Ossie
+            cannot represent as one reusable metric expression. The engine-generated query below is context for people
+            and AI agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_TOTAL" > 572
+
+            --     THEN "v1_UNI_ID"
+
+            --     END
+
+            --   ) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_UNI_ID", "v1_TOTAL"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN UNI_FACT
+
+            --       v1.UNI_ID AS "v1_UNI_ID",
+
+            --       v1.TOTAL AS "v1_TOTAL"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: >-
+      Universities whose 2027 Total Score is above the parameter 'score' (default 572). With the chosen university's
+      score plus a gain, this is how many would still rank above it.
+    ai_context:
+      instructions: >-
+        Universities whose 2027 Total Score is above the parameter 'score' (default 572). With the chosen university's
+        score plus a gain, this is how many would still rank above it.
+custom_extensions:
+  - vendor_name: COMMON
+    data: |-
+      {
+        "datasourceDriver": "snowflake",
+        "diagnostics": [
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Avg Places Gained",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Climbers",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Climbers 2026",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Climbers Change",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Entry vs Set Average",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Experience vs Set Average",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Fallers",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Fallers 2026",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Fallers Change",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Places Gained Since 2025",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Projected Rank at Score",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Prospects vs Set Average",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Rank in 2025 Edition",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Rank in 2027 Edition",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Research vs Set Average",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Score Gap to Benchmark",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Universities Scoring Above",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          }
+        ],
+        "document": {
+          "businessQuestions": {
+            "Biggest climbers": {
+              "categories": [
+                "UK University Rankings 2027"
+              ],
+              "defaults": {
+                "ranking": {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "c"
+                  }
+                },
+                "topN": 10
+              },
+              "description": "Top 10 universities by places gained vs 2026.",
+              "dimensions": [
+                {
+                  "key": "u",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "c",
+                  "reference": {
+                    "measure": "Rank Change (value)"
+                  }
+                },
+                {
+                  "key": "r",
+                  "reference": {
+                    "measure": "Rank (value)"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "c"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ],
+              "question": "Biggest climbers"
+            },
+            "Biggest fallers": {
+              "categories": [
+                "UK University Rankings 2027"
+              ],
+              "defaults": {
+                "ranking": {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "c"
+                  }
+                },
+                "topN": 10
+              },
+              "description": "Top 10 universities by places lost vs 2026.",
+              "dimensions": [
+                {
+                  "key": "u",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "c",
+                  "reference": {
+                    "measure": "Rank Change (value)"
+                  }
+                },
+                {
+                  "key": "r",
+                  "reference": {
+                    "measure": "Rank (value)"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "measure": "c"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ],
+              "question": "Biggest fallers"
+            },
+            "Does each university's research quality track its total score?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "One point per university: Research Quality % against 2027 total score.",
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "research",
+                  "reference": {
+                    "measure": "Avg Research"
+                  }
+                },
+                {
+                  "key": "total",
+                  "reference": {
+                    "measure": "Avg Total Score"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "scatter"
+                }
+              ]
+            },
+            "Does research quality track the total score?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                },
+                {
+                  "key": "band",
+                  "reference": {
+                    "dimension": "Rank Band"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "research",
+                  "reference": {
+                    "measure": "Avg Research"
+                  }
+                },
+                {
+                  "key": "total",
+                  "reference": {
+                    "measure": "Avg Total Score"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "scatter"
+                }
+              ]
+            },
+            "How did our rivals move this year?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Universities in the selection by movement since 2026.",
+              "dimensions": [
+                {
+                  "key": "mv",
+                  "reference": {
+                    "dimension": "Movement"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "n",
+                  "reference": {
+                    "measure": "Universities"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "mv"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "How do university groups compare?": {
+              "categories": [
+                "UK University Rankings 2027"
+              ],
+              "description": "Average quality metrics by university group.",
+              "dimensions": [
+                {
+                  "key": "g",
+                  "reference": {
+                    "dimension": "University Group"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "n",
+                  "reference": {
+                    "measure": "Universities"
+                  }
+                },
+                {
+                  "key": "s",
+                  "reference": {
+                    "measure": "Avg Total Score"
+                  }
+                },
+                {
+                  "key": "t",
+                  "reference": {
+                    "measure": "Avg Teaching"
+                  }
+                },
+                {
+                  "key": "e",
+                  "reference": {
+                    "measure": "Avg Experience"
+                  }
+                },
+                {
+                  "key": "r",
+                  "reference": {
+                    "measure": "Avg Research"
+                  }
+                },
+                {
+                  "key": "en",
+                  "reference": {
+                    "measure": "Avg Entry Points"
+                  }
+                },
+                {
+                  "key": "p",
+                  "reference": {
+                    "measure": "Avg Graduate Prospects"
+                  }
+                },
+                {
+                  "key": "f",
+                  "reference": {
+                    "measure": "Avg Firsts"
+                  }
+                },
+                {
+                  "key": "c",
+                  "reference": {
+                    "measure": "Avg Continuation"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "s"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "table"
+                }
+              ],
+              "question": "How do university groups compare?"
+            },
+            "How far is each rank band behind the band above?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Band average minus the average of the band above it, per measure (inter-record diff). Negative = behind.",
+              "dimensions": [
+                {
+                  "key": "band",
+                  "reference": {
+                    "dimension": "Rank Band"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "diff",
+                      "offset": -1
+                    }
+                  },
+                  "key": "research",
+                  "reference": {
+                    "measure": "Avg Research"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "diff",
+                      "offset": -1
+                    }
+                  },
+                  "key": "entry",
+                  "reference": {
+                    "measure": "Avg Entry Points"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "diff",
+                      "offset": -1
+                    }
+                  },
+                  "key": "prospects",
+                  "reference": {
+                    "measure": "Avg Graduate Prospects"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "diff",
+                      "offset": -1
+                    }
+                  },
+                  "key": "firsts",
+                  "reference": {
+                    "measure": "Avg Firsts"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "diff",
+                      "offset": -1
+                    }
+                  },
+                  "key": "teaching",
+                  "reference": {
+                    "measure": "Avg Teaching"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "diff",
+                      "offset": -1
+                    }
+                  },
+                  "key": "experience",
+                  "reference": {
+                    "measure": "Avg Experience"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "band"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "How far is each rival from the rivals' average on entry standards?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "advancedCalculation": {
+                    "compareToTotal": {
+                      "aggregate": "AVG",
+                      "comparison": "diff"
+                    }
+                  },
+                  "key": "gap",
+                  "reference": {
+                    "measure": "Avg Entry Points"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "gap"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "How far is each rival from the rivals' average on graduate prospects?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Graduate Prospects % minus the average of the universities in the selection (points), from the stored measure Prospects vs Set Average. Positive = ahead.",
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "gap",
+                  "reference": {
+                    "measure": "Prospects vs Set Average"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "gap"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "How far is each rival from the rivals' average on research quality?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "advancedCalculation": {
+                    "compareToTotal": {
+                      "aggregate": "AVG",
+                      "comparison": "diff"
+                    }
+                  },
+                  "key": "gap",
+                  "reference": {
+                    "measure": "Avg Research"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "gap"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "How far is each rival from the rivals' average on student experience?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Student Experience % minus the average of the universities in the selection (points), from the stored measure Experience vs Set Average. Positive = ahead.",
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "gap",
+                  "reference": {
+                    "measure": "Experience vs Set Average"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "gap"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "How has each university's rank moved by edition?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Overall rank per edition (sparkline source).",
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "History University (Short)"
+                  }
+                },
+                {
+                  "key": "ed",
+                  "reference": {
+                    "dimension": "Edition"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "rank",
+                  "reference": {
+                    "measure": "Historic Rank"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "ed"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "line"
+                }
+              ]
+            },
+            "How has our rank moved by edition?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Overall rank in each edition (2025-2027). The app narrows it to the chosen university. Lower is better.",
+              "dimensions": [
+                {
+                  "key": "ed",
+                  "reference": {
+                    "dimension": "Edition"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "rank",
+                  "reference": {
+                    "measure": "Historic Rank"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "ed"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "line"
+                }
+              ]
+            },
+            "How has the rival set's average rank moved by edition?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Average overall rank of the universities in the selection in each edition, with a two-edition moving average. Lower is better.",
+              "dimensions": [
+                {
+                  "key": "ed",
+                  "reference": {
+                    "dimension": "Edition"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "avg",
+                  "reference": {
+                    "measure": "Avg Historic Rank"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "movingCalculation": {
+                      "aggregate": "AVG",
+                      "showIfNotEnoughValues": false,
+                      "windowBegin": -1,
+                      "windowEnd": 0
+                    }
+                  },
+                  "key": "ma",
+                  "reference": {
+                    "measure": "Avg Historic Rank"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "ed"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "line"
+                }
+              ]
+            },
+            "How have our rivals' ranks moved since 2025?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "History University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "r25",
+                  "reference": {
+                    "measure": "Rank in 2025 Edition"
+                  }
+                },
+                {
+                  "key": "r27",
+                  "reference": {
+                    "measure": "Rank in 2027 Edition"
+                  }
+                },
+                {
+                  "key": "gain",
+                  "reference": {
+                    "measure": "Places Gained Since 2025"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "measure": "r27"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "table"
+                }
+              ]
+            },
+            "How many points of total score separate each rival from us?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Each university's 2027 Total Score minus ours (benchmark parameter, set by the app to the chosen university's score). Positive = scores above us.",
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "gap",
+                  "reference": {
+                    "measure": "Score Gap to Benchmark"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "gap"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "How many universities climbed, vs last year?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Universities that rose 2026 to 2027, against those that rose 2025 to 2026.",
+              "dimensions": [],
+              "measures": [
+                {
+                  "key": "now",
+                  "reference": {
+                    "measure": "Climbers"
+                  }
+                },
+                {
+                  "key": "before",
+                  "reference": {
+                    "measure": "Climbers 2026"
+                  }
+                },
+                {
+                  "key": "chg",
+                  "reference": {
+                    "measure": "Climbers Change"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "kpi"
+                }
+              ]
+            },
+            "How many universities fell, vs last year?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Universities that fell 2026 to 2027, against those that fell 2025 to 2026.",
+              "dimensions": [],
+              "measures": [
+                {
+                  "key": "now",
+                  "reference": {
+                    "measure": "Fallers"
+                  }
+                },
+                {
+                  "key": "before",
+                  "reference": {
+                    "measure": "Fallers 2026"
+                  }
+                },
+                {
+                  "key": "chg",
+                  "reference": {
+                    "measure": "Fallers Change"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "kpi"
+                }
+              ]
+            },
+            "How many universities sit in each rank band?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "dimensions": [
+                {
+                  "key": "band",
+                  "reference": {
+                    "dimension": "Rank Band"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "n",
+                  "reference": {
+                    "measure": "Universities"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "band"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "How many universities would still score above us after the gain?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Universities whose 2027 Total Score is above our score plus the what-if gain (parameter score). Our projected rank is this plus one.",
+              "dimensions": [],
+              "measures": [
+                {
+                  "key": "n",
+                  "reference": {
+                    "measure": "Universities Scoring Above"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "kpi"
+                }
+              ]
+            },
+            "How many universities would still score above us?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Universities in the selection; the what-if narrows it to totals above our score plus the gain.",
+              "dimensions": [],
+              "measures": [
+                {
+                  "key": "n",
+                  "reference": {
+                    "measure": "Universities"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "kpi"
+                }
+              ]
+            },
+            "How many universities would we overtake?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Universities in the selection. The app narrows it to Total Score above ours and at most ours plus the gain.",
+              "dimensions": [],
+              "measures": [
+                {
+                  "key": "n",
+                  "reference": {
+                    "measure": "Universities"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "kpi"
+                }
+              ]
+            },
+            "Subject titles by university": {
+              "categories": [
+                "UK University Rankings 2027"
+              ],
+              "defaults": {
+                "ranking": {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "t"
+                  }
+                },
+                "topN": 10
+              },
+              "description": "Top 10 universities by number of subject tables topped (2027).",
+              "dimensions": [
+                {
+                  "key": "u",
+                  "reference": {
+                    "dimension": "Subject University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "t",
+                  "reference": {
+                    "measure": "Subject Titles"
+                  }
+                },
+                {
+                  "key": "p",
+                  "reference": {
+                    "measure": "Top-10 Places"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "t"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ],
+              "question": "Subject titles by university"
+            },
+            "Teaching vs research by university": {
+              "categories": [
+                "UK University Rankings 2027"
+              ],
+              "description": "Teaching quality against research quality for every university.",
+              "dimensions": [
+                {
+                  "key": "u",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                },
+                {
+                  "key": "g",
+                  "reference": {
+                    "dimension": "University Group"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "t",
+                  "reference": {
+                    "measure": "Avg Teaching"
+                  }
+                },
+                {
+                  "key": "r",
+                  "reference": {
+                    "measure": "Avg Research"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "scatter"
+                }
+              ],
+              "question": "Teaching vs research by university"
+            },
+            "Top 10 rank history": {
+              "categories": [
+                "UK University Rankings 2027"
+              ],
+              "description": "Overall rank by edition for universities while in the top 10 (Historic Rank <= 10).",
+              "dimensions": [
+                {
+                  "key": "e",
+                  "reference": {
+                    "dimension": "Edition"
+                  }
+                },
+                {
+                  "key": "u",
+                  "reference": {
+                    "dimension": "History University (Short)"
+                  }
+                }
+              ],
+              "filters": {
+                "expression": "{t}",
+                "t": {
+                  "arguments": [
+                    {
+                      "reference": {
+                        "field": "Historic Rank",
+                        "view": "UNI_HISTORY_FACT"
+                      }
+                    },
+                    {
+                      "value": 10
+                    }
+                  ],
+                  "operator": "lessThanOrEqual"
+                }
+              },
+              "measures": [
+                {
+                  "key": "r",
+                  "reference": {
+                    "measure": "Historic Rank"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "e"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "line"
+                }
+              ],
+              "question": "Top 10 rank history"
+            },
+            "Top 10 universities 2027": {
+              "categories": [
+                "UK University Rankings 2027"
+              ],
+              "defaults": {
+                "ranking": {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "r"
+                  }
+                },
+                "topN": 10
+              },
+              "description": "Overall top 10 of the 2027 table by rank, with total score.",
+              "dimensions": [
+                {
+                  "key": "u",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "r",
+                  "reference": {
+                    "measure": "Rank (value)"
+                  }
+                },
+                {
+                  "key": "s",
+                  "reference": {
+                    "measure": "Avg Total Score"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "measure": "r"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "table"
+                }
+              ],
+              "question": "Top 10 universities 2027"
+            },
+            "Universities by nation": {
+              "categories": [
+                "UK University Rankings 2027"
+              ],
+              "description": "Count of ranked universities per UK nation.",
+              "dimensions": [
+                {
+                  "key": "n",
+                  "reference": {
+                    "dimension": "Nation"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "u",
+                  "reference": {
+                    "measure": "Universities"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "u"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ],
+              "question": "Universities by nation"
+            },
+            "What is the average rank in view, 2027 vs 2026?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Average overall rank of the universities in the current selection this year and last; places gained is positive when the group climbed.",
+              "dimensions": [],
+              "measures": [
+                {
+                  "key": "r27",
+                  "reference": {
+                    "measure": "Avg Rank 2027"
+                  }
+                },
+                {
+                  "key": "r26",
+                  "reference": {
+                    "measure": "Avg Rank 2026"
+                  }
+                },
+                {
+                  "key": "gain",
+                  "reference": {
+                    "measure": "Avg Places Gained"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "kpi"
+                }
+              ]
+            },
+            "What rank would a higher total score buy us?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Projected overall rank at our 2027 Total Score plus the what-if gain (parameter score), against every university in the 2027 table.",
+              "dimensions": [],
+              "measures": [
+                {
+                  "key": "proj",
+                  "reference": {
+                    "measure": "Projected Rank at Score"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "kpi"
+                }
+              ]
+            },
+            "Where did this year's climbers sit?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "dimensions": [
+                {
+                  "key": "band",
+                  "reference": {
+                    "dimension": "Rank Band"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "n",
+                  "reference": {
+                    "measure": "Climbers"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "band"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "Where did this year's fallers sit?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "dimensions": [
+                {
+                  "key": "band",
+                  "reference": {
+                    "dimension": "Rank Band"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "n",
+                  "reference": {
+                    "measure": "Fallers"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "band"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "Where do we rank this year, and how far have we moved?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "2027 overall rank, places moved since 2026 (positive = climbed) and the 2026 rank. The app narrows it to the chosen university.",
+              "dimensions": [],
+              "measures": [
+                {
+                  "key": "rank",
+                  "reference": {
+                    "measure": "Rank (value)"
+                  }
+                },
+                {
+                  "key": "chg",
+                  "reference": {
+                    "measure": "Rank Change (value)"
+                  }
+                },
+                {
+                  "key": "r26",
+                  "reference": {
+                    "measure": "Rank 2026 (value)"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "kpi"
+                }
+              ]
+            },
+            "Where does each rival rank on each measure?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Rank of each university within the selection on each component (1 = best).",
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "rank",
+                  "reference": {
+                    "measure": "Rank (value)"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "rank": {
+                      "direction": "descending"
+                    }
+                  },
+                  "key": "research",
+                  "reference": {
+                    "measure": "Avg Research"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "rank": {
+                      "direction": "descending"
+                    }
+                  },
+                  "key": "entry",
+                  "reference": {
+                    "measure": "Avg Entry Points"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "rank": {
+                      "direction": "descending"
+                    }
+                  },
+                  "key": "prospects",
+                  "reference": {
+                    "measure": "Avg Graduate Prospects"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "rank": {
+                      "direction": "descending"
+                    }
+                  },
+                  "key": "firsts",
+                  "reference": {
+                    "measure": "Avg Firsts"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "rank": {
+                      "direction": "descending"
+                    }
+                  },
+                  "key": "continuation",
+                  "reference": {
+                    "measure": "Avg Continuation"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "rank": {
+                      "direction": "descending"
+                    }
+                  },
+                  "key": "experience",
+                  "reference": {
+                    "measure": "Avg Experience"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "rank": {
+                      "direction": "descending"
+                    }
+                  },
+                  "key": "teaching",
+                  "reference": {
+                    "measure": "Avg Teaching"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "measure": "rank"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "table"
+                }
+              ]
+            },
+            "Which rivals have the highest entry standards?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "entry",
+                  "reference": {
+                    "measure": "Avg Entry Points"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "entry"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "Which rivals score highest on research quality?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "research",
+                  "reference": {
+                    "measure": "Avg Research"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "research"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "Which universities would we overtake?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "League rows with rank, total score and the points they sit above us. The app narrows it to Total Score between our score and our score plus the gain.",
+              "dimensions": [
+                {
+                  "key": "rank",
+                  "reference": {
+                    "dimension": "Rank 2027"
+                  }
+                },
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "total",
+                  "reference": {
+                    "measure": "Avg Total Score"
+                  }
+                },
+                {
+                  "key": "gap",
+                  "reference": {
+                    "measure": "Score Gap to Benchmark"
+                  }
+                },
+                {
+                  "key": "chg",
+                  "reference": {
+                    "measure": "Rank Change (value)"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "rank"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "table"
+                }
+              ]
+            },
+            "Who is ahead of the rival set on entry standards, and by how much?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Entry Standards (UCAS points) minus the average of the universities in the selection, from the stored measure Entry vs Set Average. Positive = ahead.",
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "gap",
+                  "reference": {
+                    "measure": "Entry vs Set Average"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "gap"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "Who is ahead of the rival set on research quality, and by how much?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Research Quality % minus the average of the universities in the selection (points), from the stored measure Research vs Set Average. Positive = ahead.",
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "gap",
+                  "reference": {
+                    "measure": "Research vs Set Average"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "gap"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "Who moved most among our rivals?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "dimensions": [
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University (Short)"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "chg",
+                  "reference": {
+                    "measure": "Rank Change (value)"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "chg"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ]
+            },
+            "Who sits within 10 places of us, and how do they score?": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "League table rows; the app narrows it to the ranks around the chosen university.",
+              "dimensions": [
+                {
+                  "key": "rank",
+                  "reference": {
+                    "dimension": "Rank 2027"
+                  }
+                },
+                {
+                  "key": "uni",
+                  "reference": {
+                    "dimension": "University"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "r26",
+                  "reference": {
+                    "measure": "Rank 2026 (value)"
+                  }
+                },
+                {
+                  "key": "chg",
+                  "reference": {
+                    "measure": "Rank Change (value)"
+                  }
+                },
+                {
+                  "key": "total",
+                  "reference": {
+                    "measure": "Avg Total Score"
+                  }
+                },
+                {
+                  "key": "research",
+                  "reference": {
+                    "measure": "Avg Research"
+                  }
+                },
+                {
+                  "key": "entry",
+                  "reference": {
+                    "measure": "Avg Entry Points"
+                  }
+                },
+                {
+                  "key": "prospects",
+                  "reference": {
+                    "measure": "Avg Graduate Prospects"
+                  }
+                },
+                {
+                  "key": "experience",
+                  "reference": {
+                    "measure": "Avg Experience"
+                  }
+                },
+                {
+                  "key": "teaching",
+                  "reference": {
+                    "measure": "Avg Teaching"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "rank"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "table"
+                }
+              ]
+            }
+          },
+          "datasource": "00000000-0000-0000-0000-000000000000",
+          "dimensions": {
+            "Edition": {
+              "kind": "field",
+              "reference": {
+                "field": "Edition",
+                "view": "UNI_HISTORY_FACT"
+              },
+              "resultType": "int"
+            },
+            "Edition Label": {
+              "kind": "field",
+              "reference": {
+                "field": "Edition Label",
+                "view": "UNI_HISTORY_FACT"
+              },
+              "resultType": "string"
+            },
+            "History Nation": {
+              "kind": "field",
+              "reference": {
+                "field": "History Nation",
+                "view": "UNI_HISTORY_FACT"
+              },
+              "resultType": "string"
+            },
+            "History University": {
+              "kind": "field",
+              "reference": {
+                "field": "History University",
+                "view": "UNI_HISTORY_FACT"
+              },
+              "resultType": "string"
+            },
+            "History University (Short)": {
+              "kind": "field",
+              "reference": {
+                "field": "History University (Short)",
+                "view": "UNI_HISTORY_FACT"
+              },
+              "resultType": "string"
+            },
+            "History University Group": {
+              "kind": "field",
+              "reference": {
+                "field": "History University Group",
+                "view": "UNI_HISTORY_FACT"
+              },
+              "resultType": "string"
+            },
+            "London": {
+              "kind": "field",
+              "reference": {
+                "field": "London",
+                "view": "UNI_FACT"
+              },
+              "resultType": "string"
+            },
+            "Movement": {
+              "kind": "field",
+              "reference": {
+                "field": "Movement",
+                "view": "UNI_FACT"
+              },
+              "resultType": "string"
+            },
+            "Nation": {
+              "kind": "field",
+              "reference": {
+                "field": "Nation",
+                "view": "UNI_FACT"
+              },
+              "resultType": "string"
+            },
+            "Rank 2027": {
+              "kind": "field",
+              "reference": {
+                "field": "Rank 2027",
+                "view": "UNI_FACT"
+              },
+              "resultType": "int"
+            },
+            "Rank Band": {
+              "kind": "field",
+              "reference": {
+                "field": "Rank Band",
+                "view": "UNI_FACT"
+              },
+              "resultType": "string"
+            },
+            "Subject": {
+              "kind": "field",
+              "reference": {
+                "field": "Subject",
+                "view": "UNI_SUBJECT_FACT"
+              },
+              "resultType": "string"
+            },
+            "Subject Nation": {
+              "kind": "field",
+              "reference": {
+                "field": "Subject Nation",
+                "view": "UNI_SUBJECT_FACT"
+              },
+              "resultType": "string"
+            },
+            "Subject University": {
+              "kind": "field",
+              "reference": {
+                "field": "Subject University",
+                "view": "UNI_SUBJECT_FACT"
+              },
+              "resultType": "string"
+            },
+            "Subject University (Short)": {
+              "kind": "field",
+              "reference": {
+                "field": "Subject University (Short)",
+                "view": "UNI_SUBJECT_FACT"
+              },
+              "resultType": "string"
+            },
+            "Subject University Group": {
+              "kind": "field",
+              "reference": {
+                "field": "Subject University Group",
+                "view": "UNI_SUBJECT_FACT"
+              },
+              "resultType": "string"
+            },
+            "Total Score (2027)": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "2027 Total Score as a dimension, for range selections (what-if: universities between our score and our score plus a gain).",
+              "kind": "field",
+              "reference": {
+                "field": "Total Score",
+                "view": "UNI_FACT"
+              },
+              "resultType": "float"
+            },
+            "Town": {
+              "kind": "field",
+              "reference": {
+                "field": "Town",
+                "view": "UNI_FACT"
+              },
+              "resultType": "string"
+            },
+            "University": {
+              "kind": "field",
+              "reference": {
+                "field": "University",
+                "view": "UNI_FACT"
+              },
+              "resultType": "string"
+            },
+            "University (Short)": {
+              "kind": "field",
+              "reference": {
+                "field": "University (Short)",
+                "view": "UNI_FACT"
+              },
+              "resultType": "string"
+            },
+            "University Group": {
+              "kind": "field",
+              "reference": {
+                "field": "University Group",
+                "view": "UNI_FACT"
+              },
+              "resultType": "string"
+            }
+          },
+          "fileVersion": 3,
+          "joins": [
+            {
+              "cardinality": "many-to-one",
+              "conditions": [
+                {
+                  "arguments": [
+                    {
+                      "reference": {
+                        "field": "History University ID",
+                        "view": "UNI_HISTORY_FACT"
+                      }
+                    },
+                    {
+                      "reference": {
+                        "field": "University ID",
+                        "view": "UNI_FACT"
+                      }
+                    }
+                  ],
+                  "operator": "equals"
+                }
+              ],
+              "views": [
+                "UNI_HISTORY_FACT",
+                "UNI_FACT"
+              ]
+            },
+            {
+              "cardinality": "many-to-one",
+              "conditions": [
+                {
+                  "arguments": [
+                    {
+                      "reference": {
+                        "field": "Subject University ID",
+                        "view": "UNI_SUBJECT_FACT"
+                      }
+                    },
+                    {
+                      "reference": {
+                        "field": "University ID",
+                        "view": "UNI_FACT"
+                      }
+                    }
+                  ],
+                  "operator": "equals"
+                }
+              ],
+              "views": [
+                "UNI_SUBJECT_FACT",
+                "UNI_FACT"
+              ]
+            }
+          ],
+          "layout": {},
+          "locale": {
+            "calendar": {
+              "dayNames": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+              ],
+              "dayNamesAbbr": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+              ],
+              "monthNames": [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+              ],
+              "monthNamesAbbr": [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"
+              ]
+            },
+            "formats": {
+              "date": "yyyy-mm-dd",
+              "datetime": "yyyy-mm-dd hh:mm:ss",
+              "money": "$#,###.00",
+              "number": "#,##0.00",
+              "numberInt": "#,##0",
+              "time": "hh:mm:ss"
+            },
+            "number": {
+              "decimalSep": ".",
+              "thousandSep": ","
+            },
+            "timezone": "Europe/London"
+          },
+          "measures": {
+            "Avg Continuation": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Average Continuation % across universities.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Continuation %",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Entry Points": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Average Entry Standards (UCAS pts) across universities.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Entry Standards (UCAS pts)",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Experience": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Average Student Experience % across universities.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Student Experience %",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Firsts": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Average Firsts / 2:1s % across universities.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Firsts / 2:1s %",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Graduate Prospects": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Average Graduate Prospects % across universities.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Graduate Prospects %",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Historic Rank": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Average overall rank of the universities in the selection in each edition (history view; lower is better). Use by Edition.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Historic Rank",
+                      "view": "UNI_HISTORY_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Places Gained": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Average places climbed 2026 to 2027: Avg Rank 2026 minus Avg Rank 2027. Positive is good.",
+              "expression": "{m1} - {m2}",
+              "format": {
+                "pattern": "+0.0;-0.0;0.0"
+              },
+              "m1": {
+                "reference": {
+                  "measure": "Avg Rank 2026"
+                }
+              },
+              "m2": {
+                "reference": {
+                  "measure": "Avg Rank 2027"
+                }
+              },
+              "resultType": "float"
+            },
+            "Avg Rank 2025": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Average 2025 overall rank of the same universities (lower is better).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Rank 2025",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Rank 2026": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Average 2026 overall rank of the same universities (lower is better).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Rank 2026",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Rank 2027": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Average 2027 overall rank of the universities in the selection (lower is better).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Rank 2027",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Research": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Average Research Quality % across universities.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Research Quality %",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Subject Score": {
+              "categories": [
+                "Subject tables 2027"
+              ],
+              "description": "Average subject-table score.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Subject Score",
+                      "view": "UNI_SUBJECT_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Teaching": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Average Teaching Quality % across universities.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Teaching Quality %",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Total Score": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Average Total Score across universities.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Total Score",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Best Rank": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Best (lowest) 2027 overall rank in the selection. Never sum ranks.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "MIN",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Rank 2027",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Climbers": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Universities that rose vs 2026.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "University ID",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ],
+                "distinct": true,
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Rank Change",
+                          "view": "UNI_FACT"
+                        }
+                      },
+                      {
+                        "dataType": "int",
+                        "value": 0
+                      }
+                    ],
+                    "operator": "greaterThan"
+                  }
+                }
+              },
+              "resultType": "int"
+            },
+            "Climbers 2026": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Universities that rose from 2025 to 2026 (Rank 2026 better than Rank 2025): last year's Climbers.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "University ID",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ],
+                "distinct": true,
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Rank 2026",
+                          "view": "UNI_FACT"
+                        }
+                      },
+                      {
+                        "reference": {
+                          "field": "Rank 2025",
+                          "view": "UNI_FACT"
+                        }
+                      }
+                    ],
+                    "operator": "lessThan"
+                  }
+                }
+              },
+              "resultType": "int"
+            },
+            "Climbers Change": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Climbers this year minus climbers last year (2026 to 2027 vs 2025 to 2026). Positive is good.",
+              "expression": "{m1} - {m2}",
+              "format": {
+                "pattern": "+#,##0;-#,##0;0"
+              },
+              "m1": {
+                "reference": {
+                  "measure": "Climbers"
+                }
+              },
+              "m2": {
+                "reference": {
+                  "measure": "Climbers 2026"
+                }
+              },
+              "resultType": "int"
+            },
+            "Entry vs Set Average": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Entry Standards (UCAS points) minus the average of every university in the current selection. Positive = ahead of the set.",
+              "expression": "{m1} - {m2}",
+              "format": {
+                "pattern": "+0;-0;0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Entry Standards (UCAS pts)",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Entry Standards (UCAS pts)",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ],
+                "scope": "total"
+              },
+              "resultType": "float"
+            },
+            "Experience vs Set Average": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Student Experience % minus the average of every university in the current selection (points). Positive = ahead of the set.",
+              "expression": "{m1} - {m2}",
+              "format": {
+                "pattern": "+0.0;-0.0;0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Student Experience %",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Student Experience %",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ],
+                "scope": "total"
+              },
+              "resultType": "float"
+            },
+            "Fallers": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Universities that fell vs 2026.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "University ID",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ],
+                "distinct": true,
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Rank Change",
+                          "view": "UNI_FACT"
+                        }
+                      },
+                      {
+                        "dataType": "int",
+                        "value": 0
+                      }
+                    ],
+                    "operator": "lessThan"
+                  }
+                }
+              },
+              "resultType": "int"
+            },
+            "Fallers 2026": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Universities that fell from 2025 to 2026 (Rank 2026 worse than Rank 2025): last year's Fallers.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "University ID",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ],
+                "distinct": true,
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Rank 2026",
+                          "view": "UNI_FACT"
+                        }
+                      },
+                      {
+                        "reference": {
+                          "field": "Rank 2025",
+                          "view": "UNI_FACT"
+                        }
+                      }
+                    ],
+                    "operator": "greaterThan"
+                  }
+                }
+              },
+              "resultType": "int"
+            },
+            "Fallers Change": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Fallers this year minus fallers last year. Negative is good.",
+              "expression": "{m1} - {m2}",
+              "format": {
+                "pattern": "+#,##0;-#,##0;0"
+              },
+              "m1": {
+                "reference": {
+                  "measure": "Fallers"
+                }
+              },
+              "m2": {
+                "reference": {
+                  "measure": "Fallers 2026"
+                }
+              },
+              "resultType": "int"
+            },
+            "Historic Rank": {
+              "categories": [
+                "Rank history"
+              ],
+              "description": "Overall rank in an edition (MIN; never sum).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "MIN",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Historic Rank",
+                      "view": "UNI_HISTORY_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Places Gained Since 2025": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Rank in 2025 minus rank in 2027 (history view). Positive = climbed. Per university only.",
+              "expression": "{m1} - {m2}",
+              "format": {
+                "pattern": "+0;-0;0"
+              },
+              "m1": {
+                "reference": {
+                  "measure": "Rank in 2025 Edition"
+                }
+              },
+              "m2": {
+                "reference": {
+                  "measure": "Rank in 2027 Edition"
+                }
+              },
+              "resultType": "int"
+            },
+            "Projected Rank at Score": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "The overall rank a university would hold with the 2027 Total Score given by parameter 'score' (default 572): universities scoring strictly above it, plus one. Ties are not broken.",
+              "expression": "{m1} + {m2}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "University ID",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ],
+                "distinct": true,
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Total Score",
+                          "view": "UNI_FACT"
+                        }
+                      },
+                      {
+                        "reference": {
+                          "parameter": "score"
+                        }
+                      }
+                    ],
+                    "operator": "greaterThan"
+                  }
+                }
+              },
+              "m2": {
+                "value": 1
+              },
+              "parameters": {
+                "score": {
+                  "dataType": "float",
+                  "default": 572
+                }
+              },
+              "resultType": "int"
+            },
+            "Prospects vs Set Average": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Graduate Prospects % minus the average of every university in the current selection (points). Positive = ahead of the set.",
+              "expression": "{m1} - {m2}",
+              "format": {
+                "pattern": "+0.0;-0.0;0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Graduate Prospects %",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Graduate Prospects %",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ],
+                "scope": "total"
+              },
+              "resultType": "float"
+            },
+            "Rank (value)": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "2027 overall rank for a single university (MIN).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "MIN",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Rank 2027",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Rank 2026 (value)": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "2026 overall rank for a single university (MIN; never sum).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "MIN",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Rank 2026",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Rank Change (value)": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Places moved vs 2026 (positive = climbed). Use per university only.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "+0;-0;0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Rank Change",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Rank in 2025 Edition": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Overall rank in the 2025 edition (history view, MIN; one university at a time).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "MIN",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Historic Rank",
+                      "view": "UNI_HISTORY_FACT"
+                    }
+                  }
+                ],
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Edition",
+                          "view": "UNI_HISTORY_FACT"
+                        }
+                      },
+                      {
+                        "dataType": "int",
+                        "value": 2025
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "resultType": "int"
+            },
+            "Rank in 2027 Edition": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Overall rank in the 2027 edition (history view, MIN; one university at a time).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "MIN",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Historic Rank",
+                      "view": "UNI_HISTORY_FACT"
+                    }
+                  }
+                ],
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Edition",
+                          "view": "UNI_HISTORY_FACT"
+                        }
+                      },
+                      {
+                        "dataType": "int",
+                        "value": 2027
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "resultType": "int"
+            },
+            "Research vs Set Average": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Research Quality % minus the average of every university in the current selection (points). Positive = ahead of the set.",
+              "expression": "{m1} - {m2}",
+              "format": {
+                "pattern": "+0.0;-0.0;0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Research Quality %",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Research Quality %",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ],
+                "scope": "total"
+              },
+              "resultType": "float"
+            },
+            "Score Gap to Benchmark": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Average 2027 Total Score minus the benchmark score (parameter 'benchmark', default 572 = Kent's 2027 total). Positive = scores above the benchmark university. The app sets the benchmark to the chosen university's score.",
+              "expression": "{m1} - {m2}",
+              "format": {
+                "pattern": "+0;-0;0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Total Score",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "reference": {
+                  "parameter": "benchmark"
+                }
+              },
+              "parameters": {
+                "benchmark": {
+                  "dataType": "float",
+                  "default": 572
+                }
+              },
+              "resultType": "float"
+            },
+            "Subject Rank (value)": {
+              "categories": [
+                "Subject tables 2027"
+              ],
+              "description": "Rank within a subject table (MIN).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "MIN",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Subject Rank",
+                      "view": "UNI_SUBJECT_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Subject Titles": {
+              "categories": [
+                "Subject tables 2027"
+              ],
+              "description": "Subject tables where the university ranks 1st.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Subject Win Flag",
+                      "view": "UNI_SUBJECT_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Subject Top-10 Places": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Subject-table top-10 places held.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Subject Top-10s (Count)",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Subject Wins": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Subject tables topped by the university.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Subject Wins (Count)",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Top-10 Appearances": {
+              "categories": [
+                "Rank history"
+              ],
+              "description": "Editions in which the university was top 10.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "In Top 10 Flag",
+                      "view": "UNI_HISTORY_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Top-10 Places": {
+              "categories": [
+                "Subject tables 2027"
+              ],
+              "description": "Top-10 places in subject tables (rows).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Subject University ID",
+                      "view": "UNI_SUBJECT_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Total Score Max": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Highest 2027 total score in the selection.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "MAX",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Total Score",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Universities": {
+              "categories": [
+                "Rankings 2027"
+              ],
+              "description": "Distinct universities in the 2027 table.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "University ID",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "int"
+            },
+            "Universities Scoring Above": {
+              "categories": [
+                "Climb planner"
+              ],
+              "description": "Universities whose 2027 Total Score is above the parameter 'score' (default 572). With the chosen university's score plus a gain, this is how many would still rank above it.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "University ID",
+                      "view": "UNI_FACT"
+                    }
+                  }
+                ],
+                "distinct": true,
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Total Score",
+                          "view": "UNI_FACT"
+                        }
+                      },
+                      {
+                        "reference": {
+                          "parameter": "score"
+                        }
+                      }
+                    ],
+                    "operator": "greaterThan"
+                  }
+                }
+              },
+              "parameters": {
+                "score": {
+                  "dataType": "float",
+                  "default": 572
+                }
+              },
+              "resultType": "int"
+            }
+          },
+          "name": "UK University Rankings 2027",
+          "udfs": {},
+          "views": {
+            "UNI_FACT": {
+              "description": "One row per university, UK league-table style 2027 edition (130 universities).",
+              "fields": {
+                "Continuation %": {
+                  "dataType": "float",
+                  "source": "CONTINUATION"
+                },
+                "Entry Standards (UCAS pts)": {
+                  "dataType": "float",
+                  "source": "ENTRY"
+                },
+                "Firsts / 2:1s %": {
+                  "dataType": "float",
+                  "source": "FIRSTS"
+                },
+                "Graduate Prospects %": {
+                  "dataType": "float",
+                  "source": "PROSPECTS"
+                },
+                "Guide": {
+                  "dataType": "string",
+                  "source": "GUIDE"
+                },
+                "London": {
+                  "dataType": "string",
+                  "source": "LONDON_FLAG"
+                },
+                "Movement": {
+                  "dataType": "string",
+                  "source": "MOVEMENT"
+                },
+                "Nation": {
+                  "dataType": "string",
+                  "source": "NATION"
+                },
+                "Rank 2025": {
+                  "dataType": "int",
+                  "source": "RANK_2025"
+                },
+                "Rank 2026": {
+                  "dataType": "int",
+                  "source": "RANK_2026"
+                },
+                "Rank 2027": {
+                  "dataType": "int",
+                  "source": "RANK"
+                },
+                "Rank 2027 (Label)": {
+                  "dataType": "string",
+                  "source": "RANK_RAW"
+                },
+                "Rank Band": {
+                  "dataType": "string",
+                  "source": "RANK_BAND"
+                },
+                "Rank Change": {
+                  "dataType": "int",
+                  "source": "RANK_CHANGE"
+                },
+                "Research Quality %": {
+                  "dataType": "float",
+                  "source": "RESEARCH"
+                },
+                "Specialist Rank": {
+                  "dataType": "int",
+                  "source": "SI_RANK"
+                },
+                "Specialist Table": {
+                  "dataType": "string",
+                  "source": "SI_TABLE"
+                },
+                "Student Experience %": {
+                  "dataType": "float",
+                  "source": "EXPERIENCE"
+                },
+                "Subject Top-10s (Count)": {
+                  "dataType": "int",
+                  "source": "SUBJECT_TOP10S"
+                },
+                "Subject Wins (Count)": {
+                  "dataType": "int",
+                  "source": "SUBJECT_WINS"
+                },
+                "Teaching Quality %": {
+                  "dataType": "float",
+                  "source": "TEACHING"
+                },
+                "Total Score": {
+                  "dataType": "float",
+                  "source": "TOTAL"
+                },
+                "Town": {
+                  "dataType": "string",
+                  "source": "TOWN"
+                },
+                "University": {
+                  "dataType": "string",
+                  "source": "NAME"
+                },
+                "University (Short)": {
+                  "dataType": "string",
+                  "source": "SHORT"
+                },
+                "University Group": {
+                  "dataType": "string",
+                  "source": "UNI_GROUP"
+                },
+                "University ID": {
+                  "dataType": "int",
+                  "source": "UNI_ID"
+                },
+                "University Key": {
+                  "dataType": "string",
+                  "source": "KEY"
+                }
+              },
+              "source": {
+                "database": "ASTRATO_GALLERY",
+                "objectType": "VIEW",
+                "schema": "MOCK_DATA",
+                "table": "UNI_FACT",
+                "type": "table"
+              }
+            },
+            "UNI_HISTORY_FACT": {
+              "description": "One row per university per edition: historic overall rank.",
+              "fields": {
+                "Edition": {
+                  "dataType": "int",
+                  "source": "EDITION"
+                },
+                "Edition Date": {
+                  "dataType": "date",
+                  "source": "EDITION_DATE"
+                },
+                "Edition Label": {
+                  "dataType": "string",
+                  "source": "EDITION_LABEL"
+                },
+                "Historic Rank": {
+                  "dataType": "int",
+                  "source": "HIST_RANK"
+                },
+                "History Nation": {
+                  "dataType": "string",
+                  "source": "NATION"
+                },
+                "History University": {
+                  "dataType": "string",
+                  "source": "NAME"
+                },
+                "History University (Short)": {
+                  "dataType": "string",
+                  "source": "SHORT"
+                },
+                "History University Group": {
+                  "dataType": "string",
+                  "source": "UNI_GROUP"
+                },
+                "History University ID": {
+                  "dataType": "int",
+                  "source": "UNI_ID"
+                },
+                "In Top 10 Flag": {
+                  "dataType": "int",
+                  "source": "IN_TOP10"
+                },
+                "Source Type": {
+                  "dataType": "string",
+                  "source": "SOURCE_TYPE"
+                }
+              },
+              "source": {
+                "database": "ASTRATO_GALLERY",
+                "objectType": "VIEW",
+                "schema": "MOCK_DATA",
+                "table": "UNI_HISTORY_FACT",
+                "type": "table"
+              }
+            },
+            "UNI_SUBJECT_FACT": {
+              "description": "Top-10 places per subject table, 2027 edition.",
+              "fields": {
+                "Subject": {
+                  "dataType": "string",
+                  "source": "SUBJECT"
+                },
+                "Subject Entry (UCAS pts)": {
+                  "dataType": "float",
+                  "source": "S_ENTRY"
+                },
+                "Subject Experience %": {
+                  "dataType": "float",
+                  "source": "S_EXPERIENCE"
+                },
+                "Subject Nation": {
+                  "dataType": "string",
+                  "source": "NATION"
+                },
+                "Subject Overall Rank": {
+                  "dataType": "int",
+                  "source": "OVERALL_RANK"
+                },
+                "Subject Prospects %": {
+                  "dataType": "float",
+                  "source": "S_PROSPECTS"
+                },
+                "Subject Rank": {
+                  "dataType": "int",
+                  "source": "SUBJECT_RANK"
+                },
+                "Subject Research %": {
+                  "dataType": "float",
+                  "source": "S_RESEARCH"
+                },
+                "Subject Score": {
+                  "dataType": "float",
+                  "source": "S_SCORE"
+                },
+                "Subject Teaching %": {
+                  "dataType": "float",
+                  "source": "S_TEACHING"
+                },
+                "Subject University": {
+                  "dataType": "string",
+                  "source": "NAME"
+                },
+                "Subject University (Short)": {
+                  "dataType": "string",
+                  "source": "SHORT"
+                },
+                "Subject University Group": {
+                  "dataType": "string",
+                  "source": "UNI_GROUP"
+                },
+                "Subject University ID": {
+                  "dataType": "int",
+                  "source": "UNI_ID"
+                },
+                "Subject Win Flag": {
+                  "dataType": "int",
+                  "source": "IS_WIN"
+                }
+              },
+              "source": {
+                "database": "ASTRATO_GALLERY",
+                "objectType": "VIEW",
+                "schema": "MOCK_DATA",
+                "table": "UNI_SUBJECT_FACT",
+                "type": "table"
+              }
+            }
+          }
+        },
+        "documentRevision": "16",
+        "exportMode": "permissive",
+        "formatVersion": 1,
+        "measures": {
+          "Avg Continuation": {
+            "compiledSql": "SELECT\n  AVG(\"v1_CONTINUATION\") AS m1\nFROM (\n  SELECT\n    \"v1_CONTINUATION\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.CONTINUATION AS \"v1_CONTINUATION\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Entry Points": {
+            "compiledSql": "SELECT\n  AVG(\"v1_ENTRY\") AS m1\nFROM (\n  SELECT\n    \"v1_ENTRY\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.ENTRY AS \"v1_ENTRY\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Experience": {
+            "compiledSql": "SELECT\n  AVG(\"v1_EXPERIENCE\") AS m1\nFROM (\n  SELECT\n    \"v1_EXPERIENCE\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.EXPERIENCE AS \"v1_EXPERIENCE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Firsts": {
+            "compiledSql": "SELECT\n  AVG(\"v1_FIRSTS\") AS m1\nFROM (\n  SELECT\n    \"v1_FIRSTS\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.FIRSTS AS \"v1_FIRSTS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Graduate Prospects": {
+            "compiledSql": "SELECT\n  AVG(\"v1_PROSPECTS\") AS m1\nFROM (\n  SELECT\n    \"v1_PROSPECTS\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.PROSPECTS AS \"v1_PROSPECTS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Historic Rank": {
+            "compiledSql": "SELECT\n  AVG(\"v2_HIST_RANK\") AS m1\nFROM (\n  SELECT\n    \"v2_HIST_RANK\"\n  FROM (\n    SELECT -- GRAIN UNI_HISTORY_FACT\n      v2.HIST_RANK AS \"v2_HIST_RANK\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_HISTORY_FACT AS v2\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Places Gained": {
+            "compiledSql": "SELECT\n  CASE WHEN COALESCE((AVG(\"v1_RANK_2026\")), (AVG(\"v1_RANK\"))) IS NULL THEN NULL ELSE COALESCE((AVG(\"v1_RANK_2026\")), 0) - COALESCE((AVG(\"v1_RANK\")), 0) END AS m1\nFROM (\n  SELECT\n    \"v1_RANK_2026\", \"v1_RANK\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.RANK_2026 AS \"v1_RANK_2026\",\n      v1.RANK AS \"v1_RANK\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Avg Rank 2025": {
+            "compiledSql": "SELECT\n  AVG(\"v1_RANK_2025\") AS m1\nFROM (\n  SELECT\n    \"v1_RANK_2025\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.RANK_2025 AS \"v1_RANK_2025\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Rank 2026": {
+            "compiledSql": "SELECT\n  AVG(\"v1_RANK_2026\") AS m1\nFROM (\n  SELECT\n    \"v1_RANK_2026\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.RANK_2026 AS \"v1_RANK_2026\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Rank 2027": {
+            "compiledSql": "SELECT\n  AVG(\"v1_RANK\") AS m1\nFROM (\n  SELECT\n    \"v1_RANK\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.RANK AS \"v1_RANK\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Research": {
+            "compiledSql": "SELECT\n  AVG(\"v1_RESEARCH\") AS m1\nFROM (\n  SELECT\n    \"v1_RESEARCH\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.RESEARCH AS \"v1_RESEARCH\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Subject Score": {
+            "compiledSql": "SELECT\n  AVG(\"v3_S_SCORE\") AS m1\nFROM (\n  SELECT\n    \"v3_S_SCORE\"\n  FROM (\n    SELECT -- GRAIN UNI_SUBJECT_FACT\n      v3.S_SCORE AS \"v3_S_SCORE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_SUBJECT_FACT AS v3\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Teaching": {
+            "compiledSql": "SELECT\n  AVG(\"v1_TEACHING\") AS m1\nFROM (\n  SELECT\n    \"v1_TEACHING\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.TEACHING AS \"v1_TEACHING\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Total Score": {
+            "compiledSql": "SELECT\n  AVG(\"v1_TOTAL\") AS m1\nFROM (\n  SELECT\n    \"v1_TOTAL\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.TOTAL AS \"v1_TOTAL\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Best Rank": {
+            "compiledSql": "SELECT\n  MIN(\"v1_RANK\") AS m1\nFROM (\n  SELECT\n    \"v1_RANK\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.RANK AS \"v1_RANK\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Climbers": {
+            "compiledSql": "SELECT\n  COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_RANK_CHANGE\" > 0\n    THEN \"v1_UNI_ID\"\n    END\n  ) AS m1\nFROM (\n  SELECT\n    \"v1_UNI_ID\", \"v1_RANK_CHANGE\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.UNI_ID AS \"v1_UNI_ID\",\n      v1.RANK_CHANGE AS \"v1_RANK_CHANGE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Climbers 2026": {
+            "compiledSql": "SELECT\n  COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_RANK_2026\" < \"v1_RANK_2025\"\n    THEN \"v1_UNI_ID\"\n    END\n  ) AS m1\nFROM (\n  SELECT\n    \"v1_UNI_ID\", \"v1_RANK_2026\", \"v1_RANK_2025\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.UNI_ID AS \"v1_UNI_ID\",\n      v1.RANK_2026 AS \"v1_RANK_2026\",\n      v1.RANK_2025 AS \"v1_RANK_2025\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Climbers Change": {
+            "compiledSql": "SELECT\n  CASE WHEN COALESCE((COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_RANK_CHANGE\" > 0\n    THEN \"v1_UNI_ID\"\n    END\n  )), (COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_RANK_2026\" < \"v1_RANK_2025\"\n    THEN \"v1_UNI_ID\"\n    END\n  ))) IS NULL THEN NULL ELSE COALESCE((COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_RANK_CHANGE\" > 0\n    THEN \"v1_UNI_ID\"\n    END\n  )), 0) - COALESCE((COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_RANK_2026\" < \"v1_RANK_2025\"\n    THEN \"v1_UNI_ID\"\n    END\n  )), 0) END AS m1\nFROM (\n  SELECT\n    \"v1_UNI_ID\", \"v1_RANK_CHANGE\", \"v1_RANK_2026\", \"v1_RANK_2025\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.UNI_ID AS \"v1_UNI_ID\",\n      v1.RANK_CHANGE AS \"v1_RANK_CHANGE\",\n      v1.RANK_2026 AS \"v1_RANK_2026\",\n      v1.RANK_2025 AS \"v1_RANK_2025\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Entry vs Set Average": {
+            "compiledSql": "SELECT\n  CASE WHEN COALESCE(AVG(\"v1_ENTRY\"), AVG(\"v1_ENTRY\")) IS NULL THEN NULL ELSE COALESCE(AVG(\"v1_ENTRY\"), 0) - COALESCE(AVG(\"v1_ENTRY\"), 0) END AS m1\nFROM (\n  SELECT\n    \"v1_ENTRY\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.ENTRY AS \"v1_ENTRY\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Experience vs Set Average": {
+            "compiledSql": "SELECT\n  CASE WHEN COALESCE(AVG(\"v1_EXPERIENCE\"), AVG(\"v1_EXPERIENCE\")) IS NULL THEN NULL ELSE COALESCE(AVG(\"v1_EXPERIENCE\"), 0) - COALESCE(AVG(\"v1_EXPERIENCE\"), 0) END AS m1\nFROM (\n  SELECT\n    \"v1_EXPERIENCE\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.EXPERIENCE AS \"v1_EXPERIENCE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Fallers": {
+            "compiledSql": "SELECT\n  COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_RANK_CHANGE\" < 0\n    THEN \"v1_UNI_ID\"\n    END\n  ) AS m1\nFROM (\n  SELECT\n    \"v1_UNI_ID\", \"v1_RANK_CHANGE\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.UNI_ID AS \"v1_UNI_ID\",\n      v1.RANK_CHANGE AS \"v1_RANK_CHANGE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Fallers 2026": {
+            "compiledSql": "SELECT\n  COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_RANK_2026\" > \"v1_RANK_2025\"\n    THEN \"v1_UNI_ID\"\n    END\n  ) AS m1\nFROM (\n  SELECT\n    \"v1_UNI_ID\", \"v1_RANK_2026\", \"v1_RANK_2025\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.UNI_ID AS \"v1_UNI_ID\",\n      v1.RANK_2026 AS \"v1_RANK_2026\",\n      v1.RANK_2025 AS \"v1_RANK_2025\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Fallers Change": {
+            "compiledSql": "SELECT\n  CASE WHEN COALESCE((COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_RANK_CHANGE\" < 0\n    THEN \"v1_UNI_ID\"\n    END\n  )), (COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_RANK_2026\" > \"v1_RANK_2025\"\n    THEN \"v1_UNI_ID\"\n    END\n  ))) IS NULL THEN NULL ELSE COALESCE((COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_RANK_CHANGE\" < 0\n    THEN \"v1_UNI_ID\"\n    END\n  )), 0) - COALESCE((COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_RANK_2026\" > \"v1_RANK_2025\"\n    THEN \"v1_UNI_ID\"\n    END\n  )), 0) END AS m1\nFROM (\n  SELECT\n    \"v1_UNI_ID\", \"v1_RANK_CHANGE\", \"v1_RANK_2026\", \"v1_RANK_2025\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.UNI_ID AS \"v1_UNI_ID\",\n      v1.RANK_CHANGE AS \"v1_RANK_CHANGE\",\n      v1.RANK_2026 AS \"v1_RANK_2026\",\n      v1.RANK_2025 AS \"v1_RANK_2025\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Historic Rank": {
+            "compiledSql": "SELECT\n  MIN(\"v2_HIST_RANK\") AS m1\nFROM (\n  SELECT\n    \"v2_HIST_RANK\"\n  FROM (\n    SELECT -- GRAIN UNI_HISTORY_FACT\n      v2.HIST_RANK AS \"v2_HIST_RANK\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_HISTORY_FACT AS v2\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Places Gained Since 2025": {
+            "compiledSql": "SELECT\n  CASE WHEN COALESCE((MIN(\n    CASE WHEN -- FILTER\n      \"v2_EDITION\" = 2025\n    THEN \"v2_HIST_RANK\"\n    END\n  )), (MIN(\n    CASE WHEN -- FILTER\n      \"v2_EDITION\" = 2027\n    THEN \"v2_HIST_RANK\"\n    END\n  ))) IS NULL THEN NULL ELSE COALESCE((MIN(\n    CASE WHEN -- FILTER\n      \"v2_EDITION\" = 2025\n    THEN \"v2_HIST_RANK\"\n    END\n  )), 0) - COALESCE((MIN(\n    CASE WHEN -- FILTER\n      \"v2_EDITION\" = 2027\n    THEN \"v2_HIST_RANK\"\n    END\n  )), 0) END AS m1\nFROM (\n  SELECT\n    \"v2_HIST_RANK\", \"v2_EDITION\"\n  FROM (\n    SELECT -- GRAIN UNI_HISTORY_FACT\n      v2.HIST_RANK AS \"v2_HIST_RANK\",\n      v2.EDITION AS \"v2_EDITION\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_HISTORY_FACT AS v2\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Projected Rank at Score": {
+            "compiledSql": "SELECT\n  (COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_TOTAL\" > 572\n    THEN \"v1_UNI_ID\"\n    END\n  ) + 1) AS m1\nFROM (\n  SELECT\n    \"v1_UNI_ID\", \"v1_TOTAL\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.UNI_ID AS \"v1_UNI_ID\",\n      v1.TOTAL AS \"v1_TOTAL\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Prospects vs Set Average": {
+            "compiledSql": "SELECT\n  CASE WHEN COALESCE(AVG(\"v1_PROSPECTS\"), AVG(\"v1_PROSPECTS\")) IS NULL THEN NULL ELSE COALESCE(AVG(\"v1_PROSPECTS\"), 0) - COALESCE(AVG(\"v1_PROSPECTS\"), 0) END AS m1\nFROM (\n  SELECT\n    \"v1_PROSPECTS\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.PROSPECTS AS \"v1_PROSPECTS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Rank (value)": {
+            "compiledSql": "SELECT\n  MIN(\"v1_RANK\") AS m1\nFROM (\n  SELECT\n    \"v1_RANK\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.RANK AS \"v1_RANK\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Rank 2026 (value)": {
+            "compiledSql": "SELECT\n  MIN(\"v1_RANK_2026\") AS m1\nFROM (\n  SELECT\n    \"v1_RANK_2026\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.RANK_2026 AS \"v1_RANK_2026\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Rank Change (value)": {
+            "compiledSql": "SELECT\n  SUM(\"v1_RANK_CHANGE\") AS m1\nFROM (\n  SELECT\n    \"v1_RANK_CHANGE\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.RANK_CHANGE AS \"v1_RANK_CHANGE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Rank in 2025 Edition": {
+            "compiledSql": "SELECT\n  MIN(\n    CASE WHEN -- FILTER\n      \"v2_EDITION\" = 2025\n    THEN \"v2_HIST_RANK\"\n    END\n  ) AS m1\nFROM (\n  SELECT\n    \"v2_HIST_RANK\", \"v2_EDITION\"\n  FROM (\n    SELECT -- GRAIN UNI_HISTORY_FACT\n      v2.HIST_RANK AS \"v2_HIST_RANK\",\n      v2.EDITION AS \"v2_EDITION\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_HISTORY_FACT AS v2\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Rank in 2027 Edition": {
+            "compiledSql": "SELECT\n  MIN(\n    CASE WHEN -- FILTER\n      \"v2_EDITION\" = 2027\n    THEN \"v2_HIST_RANK\"\n    END\n  ) AS m1\nFROM (\n  SELECT\n    \"v2_HIST_RANK\", \"v2_EDITION\"\n  FROM (\n    SELECT -- GRAIN UNI_HISTORY_FACT\n      v2.HIST_RANK AS \"v2_HIST_RANK\",\n      v2.EDITION AS \"v2_EDITION\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_HISTORY_FACT AS v2\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Research vs Set Average": {
+            "compiledSql": "SELECT\n  CASE WHEN COALESCE(AVG(\"v1_RESEARCH\"), AVG(\"v1_RESEARCH\")) IS NULL THEN NULL ELSE COALESCE(AVG(\"v1_RESEARCH\"), 0) - COALESCE(AVG(\"v1_RESEARCH\"), 0) END AS m1\nFROM (\n  SELECT\n    \"v1_RESEARCH\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.RESEARCH AS \"v1_RESEARCH\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Score Gap to Benchmark": {
+            "compiledSql": "SELECT\n  (AVG(\"v1_TOTAL\") - COALESCE(572, 0)) AS m1\nFROM (\n  SELECT\n    \"v1_TOTAL\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.TOTAL AS \"v1_TOTAL\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Subject Rank (value)": {
+            "compiledSql": "SELECT\n  MIN(\"v3_SUBJECT_RANK\") AS m1\nFROM (\n  SELECT\n    \"v3_SUBJECT_RANK\"\n  FROM (\n    SELECT -- GRAIN UNI_SUBJECT_FACT\n      v3.SUBJECT_RANK AS \"v3_SUBJECT_RANK\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_SUBJECT_FACT AS v3\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Subject Titles": {
+            "compiledSql": "SELECT\n  SUM(\"v3_IS_WIN\") AS m1\nFROM (\n  SELECT\n    \"v3_IS_WIN\"\n  FROM (\n    SELECT -- GRAIN UNI_SUBJECT_FACT\n      v3.IS_WIN AS \"v3_IS_WIN\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_SUBJECT_FACT AS v3\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Subject Top-10 Places": {
+            "compiledSql": "SELECT\n  SUM(\"v1_SUBJECT_TOP10S\") AS m1\nFROM (\n  SELECT\n    \"v1_SUBJECT_TOP10S\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.SUBJECT_TOP10S AS \"v1_SUBJECT_TOP10S\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Subject Wins": {
+            "compiledSql": "SELECT\n  SUM(\"v1_SUBJECT_WINS\") AS m1\nFROM (\n  SELECT\n    \"v1_SUBJECT_WINS\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.SUBJECT_WINS AS \"v1_SUBJECT_WINS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Top-10 Appearances": {
+            "compiledSql": "SELECT\n  SUM(\"v2_IN_TOP10\") AS m1\nFROM (\n  SELECT\n    \"v2_IN_TOP10\"\n  FROM (\n    SELECT -- GRAIN UNI_HISTORY_FACT\n      v2.IN_TOP10 AS \"v2_IN_TOP10\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_HISTORY_FACT AS v2\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Top-10 Places": {
+            "compiledSql": "SELECT\n  COUNT(\"v3_UNI_ID\") AS m1\nFROM (\n  SELECT\n    \"v3_UNI_ID\"\n  FROM (\n    SELECT -- GRAIN UNI_SUBJECT_FACT\n      v3.UNI_ID AS \"v3_UNI_ID\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_SUBJECT_FACT AS v3\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Total Score Max": {
+            "compiledSql": "SELECT\n  MAX(\"v1_TOTAL\") AS m1\nFROM (\n  SELECT\n    \"v1_TOTAL\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.TOTAL AS \"v1_TOTAL\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Universities": {
+            "compiledSql": "SELECT\n  COUNT(DISTINCT \"v1_UNI_ID\") AS m1\nFROM (\n  SELECT\n    \"v1_UNI_ID\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.UNI_ID AS \"v1_UNI_ID\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Universities Scoring Above": {
+            "compiledSql": "SELECT\n  COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_TOTAL\" > 572\n    THEN \"v1_UNI_ID\"\n    END\n  ) AS m1\nFROM (\n  SELECT\n    \"v1_UNI_ID\", \"v1_TOTAL\"\n  FROM (\n    SELECT -- GRAIN UNI_FACT\n      v1.UNI_ID AS \"v1_UNI_ID\",\n      v1.TOTAL AS \"v1_TOTAL\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.UNI_FACT AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          }
+        },
+        "namespace": "ASTRATO",
+        "ossieSpecVersion": "0.1.1",
+        "projectionFingerprint": {
+          "algorithm": "SHA-256",
+          "canonicalization": "astrato-stable-json-v1",
+          "value": "57e23a212c43835cc47aacbf950096f0f75b521b6249f352b1b74ced49482b06"
+        },
+        "runtimeVendor": "snowflake"
+      }

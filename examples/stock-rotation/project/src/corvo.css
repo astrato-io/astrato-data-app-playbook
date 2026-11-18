@@ -1,0 +1,31 @@
+/* Corvo palette and headline font, so body text uses Inter. */
+:root { --zo-ink: #2D3246; --zo-slate: #4B4F60; --zo-sage: #DBE4E2; --zo-pale: #EFF1FA; --zo-yellow: #3BB273; }
+body { background: #fff; color: var(--zo-ink); font-family: Inter, sans-serif; }
+.sr-head, .ob-head.sr-head { background: var(--zo-yellow); color: var(--zo-ink); border: 0; display: flex; align-items: center; gap: 24px; }
+.sr-head h1 { font: 700 26px/1.1 Antonio, sans-serif; letter-spacing: .02em; color: var(--zo-ink); text-transform: uppercase; }
+.sr-head p { color: var(--zo-ink); opacity: .75; }
+.sr-head .wf-titles { flex: 1; }
+.sr-mark img { height: 30px; display: block; }
+.sr-role { display: flex; align-items: center; gap: 8px; font: 600 13px Inter, sans-serif; }
+.sr-role select { padding: 6px 10px; border: 1px solid var(--zo-ink); border-radius: 999px; background: #fff; color: var(--zo-ink); font: 500 13px Inter, sans-serif; }
+.sr-head .kx-export { background: var(--zo-ink); color: #fff; border: 0; border-radius: 999px; padding: 8px 16px; }
+.ob-tabs { background: var(--zo-ink); }
+.ob-tabs button { color: #fff; }
+.ob-tabs button.on { color: var(--zo-ink); background: var(--zo-yellow); }
+.ob-card { border-color: var(--zo-sage); box-shadow: none; }
+.wf-btn { background: var(--zo-ink); color: #fff; border: 1px solid var(--zo-ink); border-radius: 999px; }
+.wf-btn.ghost { background: #fff; color: var(--zo-ink); }
+.wf-btn:disabled { opacity: .5; }
+.wf-t th { background: var(--zo-pale); color: var(--zo-ink); }
+.wf-t input { padding: 4px 6px; border: 1px solid var(--zo-sage); border-radius: 6px; font: 13px Inter, sans-serif; }
+.sr-n { width: 76px; text-align: right; }
+.sr-ref { width: 120px; }
+.sr-fefo { margin-left: 4px; padding: 1px 7px; border-radius: 999px; background: var(--zo-yellow); color: var(--zo-ink); font-size: 11px; font-weight: 600; white-space: nowrap; }
+.sr-acts { white-space: nowrap; }
+.wf-pill.wf-stockout-risk, .wf-pill.wf-delayed, .wf-pill.wf-quarantine, .wf-pill.wf-rejected { background: #FDE5E2; color: #B3321F; }
+.wf-pill.wf-healthy, .wf-pill.wf-available, .wf-pill.wf-approved { background: #DDF5EA; color: #0F7048; }
+.wf-pill.wf-reorder-now, .wf-pill.wf-pending-approval, .wf-pill.wf-open { background: #FFF4C2; color: #6B5300; }
+.wf-pill.wf-overstocked { background: var(--zo-pale); color: var(--zo-slate); }
+.sr-scan { display: flex; align-items: center; gap: 10px; margin: 6px 0 10px; font: 600 13px Inter, sans-serif; }
+.sr-scan input, .sr-scan select { padding: 7px 10px; min-width: 260px; border: 2px solid var(--zo-yellow); border-radius: 8px; font: 14px Inter, sans-serif; }
+.sr-block { color: #B3321F; font-size: 12px; font-weight: 600; }

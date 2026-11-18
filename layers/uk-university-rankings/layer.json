@@ -1,0 +1,3445 @@
+{
+  "fileVersion": 3,
+  "name": "UK University Rankings 2027",
+  "datasource": "00000000-0000-0000-0000-000000000000",
+  "locale": {
+    "number": {
+      "decimalSep": ".",
+      "thousandSep": ","
+    },
+    "formats": {
+      "date": "yyyy-mm-dd",
+      "time": "hh:mm:ss",
+      "money": "$#,###.00",
+      "number": "#,##0.00",
+      "datetime": "yyyy-mm-dd hh:mm:ss",
+      "numberInt": "#,##0"
+    },
+    "calendar": {
+      "dayNames": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "monthNames": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      "dayNamesAbbr": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ],
+      "monthNamesAbbr": [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+      ]
+    },
+    "timezone": "Europe/London"
+  },
+  "views": {
+    "UNI_FACT": {
+      "fields": {
+        "Town": {
+          "source": "TOWN",
+          "dataType": "string"
+        },
+        "Guide": {
+          "source": "GUIDE",
+          "dataType": "string"
+        },
+        "London": {
+          "source": "LONDON_FLAG",
+          "dataType": "string"
+        },
+        "Nation": {
+          "source": "NATION",
+          "dataType": "string"
+        },
+        "Movement": {
+          "source": "MOVEMENT",
+          "dataType": "string"
+        },
+        "Rank 2025": {
+          "source": "RANK_2025",
+          "dataType": "int"
+        },
+        "Rank 2026": {
+          "source": "RANK_2026",
+          "dataType": "int"
+        },
+        "Rank 2027": {
+          "source": "RANK",
+          "dataType": "int"
+        },
+        "Rank Band": {
+          "source": "RANK_BAND",
+          "dataType": "string"
+        },
+        "University": {
+          "source": "NAME",
+          "dataType": "string"
+        },
+        "Rank Change": {
+          "source": "RANK_CHANGE",
+          "dataType": "int"
+        },
+        "Total Score": {
+          "source": "TOTAL",
+          "dataType": "float"
+        },
+        "University ID": {
+          "source": "UNI_ID",
+          "dataType": "int"
+        },
+        "Continuation %": {
+          "source": "CONTINUATION",
+          "dataType": "float"
+        },
+        "University Key": {
+          "source": "KEY",
+          "dataType": "string"
+        },
+        "Firsts / 2:1s %": {
+          "source": "FIRSTS",
+          "dataType": "float"
+        },
+        "Specialist Rank": {
+          "source": "SI_RANK",
+          "dataType": "int"
+        },
+        "Specialist Table": {
+          "source": "SI_TABLE",
+          "dataType": "string"
+        },
+        "University Group": {
+          "source": "UNI_GROUP",
+          "dataType": "string"
+        },
+        "Rank 2027 (Label)": {
+          "source": "RANK_RAW",
+          "dataType": "string"
+        },
+        "Research Quality %": {
+          "source": "RESEARCH",
+          "dataType": "float"
+        },
+        "Teaching Quality %": {
+          "source": "TEACHING",
+          "dataType": "float"
+        },
+        "University (Short)": {
+          "source": "SHORT",
+          "dataType": "string"
+        },
+        "Graduate Prospects %": {
+          "source": "PROSPECTS",
+          "dataType": "float"
+        },
+        "Student Experience %": {
+          "source": "EXPERIENCE",
+          "dataType": "float"
+        },
+        "Subject Wins (Count)": {
+          "source": "SUBJECT_WINS",
+          "dataType": "int"
+        },
+        "Subject Top-10s (Count)": {
+          "source": "SUBJECT_TOP10S",
+          "dataType": "int"
+        },
+        "Entry Standards (UCAS pts)": {
+          "source": "ENTRY",
+          "dataType": "float"
+        }
+      },
+      "source": {
+        "type": "table",
+        "table": "UNI_FACT",
+        "schema": "MOCK_DATA",
+        "database": "ASTRATO_GALLERY",
+        "objectType": "VIEW"
+      },
+      "description": "One row per university, UK league-table style 2027 edition (130 universities)."
+    },
+    "UNI_HISTORY_FACT": {
+      "fields": {
+        "Edition": {
+          "source": "EDITION",
+          "dataType": "int"
+        },
+        "Source Type": {
+          "source": "SOURCE_TYPE",
+          "dataType": "string"
+        },
+        "Edition Date": {
+          "source": "EDITION_DATE",
+          "dataType": "date"
+        },
+        "Edition Label": {
+          "source": "EDITION_LABEL",
+          "dataType": "string"
+        },
+        "Historic Rank": {
+          "source": "HIST_RANK",
+          "dataType": "int"
+        },
+        "History Nation": {
+          "source": "NATION",
+          "dataType": "string"
+        },
+        "In Top 10 Flag": {
+          "source": "IN_TOP10",
+          "dataType": "int"
+        },
+        "History University": {
+          "source": "NAME",
+          "dataType": "string"
+        },
+        "History University ID": {
+          "source": "UNI_ID",
+          "dataType": "int"
+        },
+        "History University Group": {
+          "source": "UNI_GROUP",
+          "dataType": "string"
+        },
+        "History University (Short)": {
+          "source": "SHORT",
+          "dataType": "string"
+        }
+      },
+      "source": {
+        "type": "table",
+        "table": "UNI_HISTORY_FACT",
+        "schema": "MOCK_DATA",
+        "database": "ASTRATO_GALLERY",
+        "objectType": "VIEW"
+      },
+      "description": "One row per university per edition: historic overall rank."
+    },
+    "UNI_SUBJECT_FACT": {
+      "fields": {
+        "Subject": {
+          "source": "SUBJECT",
+          "dataType": "string"
+        },
+        "Subject Rank": {
+          "source": "SUBJECT_RANK",
+          "dataType": "int"
+        },
+        "Subject Score": {
+          "source": "S_SCORE",
+          "dataType": "float"
+        },
+        "Subject Nation": {
+          "source": "NATION",
+          "dataType": "string"
+        },
+        "Subject Win Flag": {
+          "source": "IS_WIN",
+          "dataType": "int"
+        },
+        "Subject Research %": {
+          "source": "S_RESEARCH",
+          "dataType": "float"
+        },
+        "Subject Teaching %": {
+          "source": "S_TEACHING",
+          "dataType": "float"
+        },
+        "Subject University": {
+          "source": "NAME",
+          "dataType": "string"
+        },
+        "Subject Prospects %": {
+          "source": "S_PROSPECTS",
+          "dataType": "float"
+        },
+        "Subject Experience %": {
+          "source": "S_EXPERIENCE",
+          "dataType": "float"
+        },
+        "Subject Overall Rank": {
+          "source": "OVERALL_RANK",
+          "dataType": "int"
+        },
+        "Subject University ID": {
+          "source": "UNI_ID",
+          "dataType": "int"
+        },
+        "Subject Entry (UCAS pts)": {
+          "source": "S_ENTRY",
+          "dataType": "float"
+        },
+        "Subject University Group": {
+          "source": "UNI_GROUP",
+          "dataType": "string"
+        },
+        "Subject University (Short)": {
+          "source": "SHORT",
+          "dataType": "string"
+        }
+      },
+      "source": {
+        "type": "table",
+        "table": "UNI_SUBJECT_FACT",
+        "schema": "MOCK_DATA",
+        "database": "ASTRATO_GALLERY",
+        "objectType": "VIEW"
+      },
+      "description": "Top-10 places per subject table, 2027 edition."
+    }
+  },
+  "joins": [
+    {
+      "views": [
+        "UNI_HISTORY_FACT",
+        "UNI_FACT"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "UNI_HISTORY_FACT",
+                "field": "History University ID"
+              }
+            },
+            {
+              "reference": {
+                "view": "UNI_FACT",
+                "field": "University ID"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    },
+    {
+      "views": [
+        "UNI_SUBJECT_FACT",
+        "UNI_FACT"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "UNI_SUBJECT_FACT",
+                "field": "Subject University ID"
+              }
+            },
+            {
+              "reference": {
+                "view": "UNI_FACT",
+                "field": "University ID"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    }
+  ],
+  "dimensions": {
+    "Edition": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_HISTORY_FACT",
+        "field": "Edition"
+      },
+      "resultType": "int"
+    },
+    "Edition Label": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_HISTORY_FACT",
+        "field": "Edition Label"
+      },
+      "resultType": "string"
+    },
+    "History Nation": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_HISTORY_FACT",
+        "field": "History Nation"
+      },
+      "resultType": "string"
+    },
+    "History University": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_HISTORY_FACT",
+        "field": "History University"
+      },
+      "resultType": "string"
+    },
+    "History University (Short)": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_HISTORY_FACT",
+        "field": "History University (Short)"
+      },
+      "resultType": "string"
+    },
+    "History University Group": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_HISTORY_FACT",
+        "field": "History University Group"
+      },
+      "resultType": "string"
+    },
+    "London": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_FACT",
+        "field": "London"
+      },
+      "resultType": "string"
+    },
+    "Movement": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_FACT",
+        "field": "Movement"
+      },
+      "resultType": "string"
+    },
+    "Nation": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_FACT",
+        "field": "Nation"
+      },
+      "resultType": "string"
+    },
+    "Rank 2027": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_FACT",
+        "field": "Rank 2027"
+      },
+      "resultType": "int"
+    },
+    "Rank Band": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_FACT",
+        "field": "Rank Band"
+      },
+      "resultType": "string"
+    },
+    "Subject": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_SUBJECT_FACT",
+        "field": "Subject"
+      },
+      "resultType": "string"
+    },
+    "Subject Nation": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_SUBJECT_FACT",
+        "field": "Subject Nation"
+      },
+      "resultType": "string"
+    },
+    "Subject University": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_SUBJECT_FACT",
+        "field": "Subject University"
+      },
+      "resultType": "string"
+    },
+    "Subject University (Short)": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_SUBJECT_FACT",
+        "field": "Subject University (Short)"
+      },
+      "resultType": "string"
+    },
+    "Subject University Group": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_SUBJECT_FACT",
+        "field": "Subject University Group"
+      },
+      "resultType": "string"
+    },
+    "Total Score (2027)": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_FACT",
+        "field": "Total Score"
+      },
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "float",
+      "description": "2027 Total Score as a dimension, for range selections (what-if: universities between our score and our score plus a gain)."
+    },
+    "Town": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_FACT",
+        "field": "Town"
+      },
+      "resultType": "string"
+    },
+    "University": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_FACT",
+        "field": "University"
+      },
+      "resultType": "string"
+    },
+    "University (Short)": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_FACT",
+        "field": "University (Short)"
+      },
+      "resultType": "string"
+    },
+    "University Group": {
+      "kind": "field",
+      "reference": {
+        "view": "UNI_FACT",
+        "field": "University Group"
+      },
+      "resultType": "string"
+    }
+  },
+  "measures": {
+    "Avg Continuation": {
+      "description": "Average Continuation % across universities.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Continuation %"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Avg Entry Points": {
+      "description": "Average Entry Standards (UCAS pts) across universities.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Entry Standards (UCAS pts)"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0"
+      }
+    },
+    "Avg Experience": {
+      "description": "Average Student Experience % across universities.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Student Experience %"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Avg Firsts": {
+      "description": "Average Firsts / 2:1s % across universities.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Firsts / 2:1s %"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Avg Graduate Prospects": {
+      "description": "Average Graduate Prospects % across universities.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Graduate Prospects %"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Avg Historic Rank": {
+      "description": "Average overall rank of the universities in the selection in each edition (history view; lower is better). Use by Edition.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_HISTORY_FACT",
+              "field": "Historic Rank"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Avg Places Gained": {
+      "description": "Average places climbed 2026 to 2027: Avg Rank 2026 minus Avg Rank 2027. Positive is good.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "reference": {
+          "measure": "Avg Rank 2026"
+        }
+      },
+      "m2": {
+        "reference": {
+          "measure": "Avg Rank 2027"
+        }
+      },
+      "format": {
+        "pattern": "+0.0;-0.0;0.0"
+      }
+    },
+    "Avg Rank 2025": {
+      "description": "Average 2025 overall rank of the same universities (lower is better).",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Rank 2025"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Avg Rank 2026": {
+      "description": "Average 2026 overall rank of the same universities (lower is better).",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Rank 2026"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Avg Rank 2027": {
+      "description": "Average 2027 overall rank of the universities in the selection (lower is better).",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Rank 2027"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Avg Research": {
+      "description": "Average Research Quality % across universities.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Research Quality %"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Avg Subject Score": {
+      "description": "Average subject-table score.",
+      "categories": [
+        "Subject tables 2027"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_SUBJECT_FACT",
+              "field": "Subject Score"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Avg Teaching": {
+      "description": "Average Teaching Quality % across universities.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Teaching Quality %"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Avg Total Score": {
+      "description": "Average Total Score across universities.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Total Score"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Best Rank": {
+      "description": "Best (lowest) 2027 overall rank in the selection. Never sum ranks.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "MIN",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Rank 2027"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0"
+      }
+    },
+    "Climbers": {
+      "description": "Universities that rose vs 2026.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "distinct": true,
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "University ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "greaterThan",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "UNI_FACT",
+                  "field": "Rank Change"
+                }
+              },
+              {
+                "value": 0,
+                "dataType": "int"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Climbers 2026": {
+      "description": "Universities that rose from 2025 to 2026 (Rank 2026 better than Rank 2025): last year's Climbers.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "distinct": true,
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "University ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "lessThan",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "UNI_FACT",
+                  "field": "Rank 2026"
+                }
+              },
+              {
+                "reference": {
+                  "view": "UNI_FACT",
+                  "field": "Rank 2025"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Climbers Change": {
+      "description": "Climbers this year minus climbers last year (2026 to 2027 vs 2025 to 2026). Positive is good.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "int",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "reference": {
+          "measure": "Climbers"
+        }
+      },
+      "m2": {
+        "reference": {
+          "measure": "Climbers 2026"
+        }
+      },
+      "format": {
+        "pattern": "+#,##0;-#,##0;0"
+      }
+    },
+    "Entry vs Set Average": {
+      "description": "Entry Standards (UCAS points) minus the average of every university in the current selection. Positive = ahead of the set.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Entry Standards (UCAS pts)"
+            }
+          }
+        ]
+      },
+      "m2": {
+        "scope": "total",
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Entry Standards (UCAS pts)"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "+0;-0;0"
+      }
+    },
+    "Experience vs Set Average": {
+      "description": "Student Experience % minus the average of every university in the current selection (points). Positive = ahead of the set.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Student Experience %"
+            }
+          }
+        ]
+      },
+      "m2": {
+        "scope": "total",
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Student Experience %"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "+0.0;-0.0;0.0"
+      }
+    },
+    "Fallers": {
+      "description": "Universities that fell vs 2026.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "distinct": true,
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "University ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "lessThan",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "UNI_FACT",
+                  "field": "Rank Change"
+                }
+              },
+              {
+                "value": 0,
+                "dataType": "int"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Fallers 2026": {
+      "description": "Universities that fell from 2025 to 2026 (Rank 2026 worse than Rank 2025): last year's Fallers.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "distinct": true,
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "University ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "greaterThan",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "UNI_FACT",
+                  "field": "Rank 2026"
+                }
+              },
+              {
+                "reference": {
+                  "view": "UNI_FACT",
+                  "field": "Rank 2025"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Fallers Change": {
+      "description": "Fallers this year minus fallers last year. Negative is good.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "int",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "reference": {
+          "measure": "Fallers"
+        }
+      },
+      "m2": {
+        "reference": {
+          "measure": "Fallers 2026"
+        }
+      },
+      "format": {
+        "pattern": "+#,##0;-#,##0;0"
+      }
+    },
+    "Historic Rank": {
+      "description": "Overall rank in an edition (MIN; never sum).",
+      "categories": [
+        "Rank history"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "MIN",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_HISTORY_FACT",
+              "field": "Historic Rank"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0"
+      }
+    },
+    "Places Gained Since 2025": {
+      "description": "Rank in 2025 minus rank in 2027 (history view). Positive = climbed. Per university only.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "int",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "reference": {
+          "measure": "Rank in 2025 Edition"
+        }
+      },
+      "m2": {
+        "reference": {
+          "measure": "Rank in 2027 Edition"
+        }
+      },
+      "format": {
+        "pattern": "+0;-0;0"
+      }
+    },
+    "Projected Rank at Score": {
+      "description": "The overall rank a university would hold with the 2027 Total Score given by parameter 'score' (default 572): universities scoring strictly above it, plus one. Ties are not broken.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "int",
+      "expression": "{m1} + {m2}",
+      "m1": {
+        "distinct": true,
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "University ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "greaterThan",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "UNI_FACT",
+                  "field": "Total Score"
+                }
+              },
+              {
+                "reference": {
+                  "parameter": "score"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "value": 1
+      },
+      "format": {
+        "pattern": "0"
+      },
+      "parameters": {
+        "score": {
+          "default": 572,
+          "dataType": "float"
+        }
+      }
+    },
+    "Prospects vs Set Average": {
+      "description": "Graduate Prospects % minus the average of every university in the current selection (points). Positive = ahead of the set.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Graduate Prospects %"
+            }
+          }
+        ]
+      },
+      "m2": {
+        "scope": "total",
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Graduate Prospects %"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "+0.0;-0.0;0.0"
+      }
+    },
+    "Rank (value)": {
+      "description": "2027 overall rank for a single university (MIN).",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "MIN",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Rank 2027"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0"
+      }
+    },
+    "Rank 2026 (value)": {
+      "description": "2026 overall rank for a single university (MIN; never sum).",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "MIN",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Rank 2026"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0"
+      }
+    },
+    "Rank Change (value)": {
+      "description": "Places moved vs 2026 (positive = climbed). Use per university only.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Rank Change"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "+0;-0;0"
+      }
+    },
+    "Rank in 2025 Edition": {
+      "description": "Overall rank in the 2025 edition (history view, MIN; one university at a time).",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "MIN",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_HISTORY_FACT",
+              "field": "Historic Rank"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "UNI_HISTORY_FACT",
+                  "field": "Edition"
+                }
+              },
+              {
+                "value": 2025,
+                "dataType": "int"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "0"
+      }
+    },
+    "Rank in 2027 Edition": {
+      "description": "Overall rank in the 2027 edition (history view, MIN; one university at a time).",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "MIN",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_HISTORY_FACT",
+              "field": "Historic Rank"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "UNI_HISTORY_FACT",
+                  "field": "Edition"
+                }
+              },
+              {
+                "value": 2027,
+                "dataType": "int"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "0"
+      }
+    },
+    "Research vs Set Average": {
+      "description": "Research Quality % minus the average of every university in the current selection (points). Positive = ahead of the set.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Research Quality %"
+            }
+          }
+        ]
+      },
+      "m2": {
+        "scope": "total",
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Research Quality %"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "+0.0;-0.0;0.0"
+      }
+    },
+    "Score Gap to Benchmark": {
+      "description": "Average 2027 Total Score minus the benchmark score (parameter 'benchmark', default 572 = Kent's 2027 total). Positive = scores above the benchmark university. The app sets the benchmark to the chosen university's score.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Total Score"
+            }
+          }
+        ]
+      },
+      "m2": {
+        "reference": {
+          "parameter": "benchmark"
+        }
+      },
+      "format": {
+        "pattern": "+0;-0;0"
+      },
+      "parameters": {
+        "benchmark": {
+          "default": 572,
+          "dataType": "float"
+        }
+      }
+    },
+    "Subject Rank (value)": {
+      "description": "Rank within a subject table (MIN).",
+      "categories": [
+        "Subject tables 2027"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "MIN",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_SUBJECT_FACT",
+              "field": "Subject Rank"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0"
+      }
+    },
+    "Subject Titles": {
+      "description": "Subject tables where the university ranks 1st.",
+      "categories": [
+        "Subject tables 2027"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_SUBJECT_FACT",
+              "field": "Subject Win Flag"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Subject Top-10 Places": {
+      "description": "Subject-table top-10 places held.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Subject Top-10s (Count)"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Subject Wins": {
+      "description": "Subject tables topped by the university.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Subject Wins (Count)"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Top-10 Appearances": {
+      "description": "Editions in which the university was top 10.",
+      "categories": [
+        "Rank history"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_HISTORY_FACT",
+              "field": "In Top 10 Flag"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Top-10 Places": {
+      "description": "Top-10 places in subject tables (rows).",
+      "categories": [
+        "Subject tables 2027"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_SUBJECT_FACT",
+              "field": "Subject University ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Total Score Max": {
+      "description": "Highest 2027 total score in the selection.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "MAX",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "Total Score"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "0"
+      }
+    },
+    "Universities": {
+      "description": "Distinct universities in the 2027 table.",
+      "categories": [
+        "Rankings 2027"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "distinct": true,
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "University ID"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Universities Scoring Above": {
+      "description": "Universities whose 2027 Total Score is above the parameter 'score' (default 572). With the chosen university's score plus a gain, this is how many would still rank above it.",
+      "categories": [
+        "Climb planner"
+      ],
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "distinct": true,
+        "aggregate": "COUNT",
+        "arguments": [
+          {
+            "reference": {
+              "view": "UNI_FACT",
+              "field": "University ID"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "greaterThan",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "UNI_FACT",
+                  "field": "Total Score"
+                }
+              },
+              {
+                "reference": {
+                  "parameter": "score"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      },
+      "parameters": {
+        "score": {
+          "default": 572,
+          "dataType": "float"
+        }
+      }
+    }
+  },
+  "udfs": {},
+  "businessQuestions": {
+    "Biggest climbers": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "c"
+          }
+        }
+      ],
+      "defaults": {
+        "topN": 10,
+        "ranking": {
+          "direction": "descending",
+          "reference": {
+            "measure": "c"
+          }
+        }
+      },
+      "measures": [
+        {
+          "key": "c",
+          "reference": {
+            "measure": "Rank Change (value)"
+          }
+        },
+        {
+          "key": "r",
+          "reference": {
+            "measure": "Rank (value)"
+          }
+        }
+      ],
+      "question": "Biggest climbers",
+      "categories": [
+        "UK University Rankings 2027"
+      ],
+      "dimensions": [
+        {
+          "key": "u",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "description": "Top 10 universities by places gained vs 2026.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Biggest fallers": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "measure": "c"
+          }
+        }
+      ],
+      "defaults": {
+        "topN": 10,
+        "ranking": {
+          "direction": "descending",
+          "reference": {
+            "measure": "c"
+          }
+        }
+      },
+      "measures": [
+        {
+          "key": "c",
+          "reference": {
+            "measure": "Rank Change (value)"
+          }
+        },
+        {
+          "key": "r",
+          "reference": {
+            "measure": "Rank (value)"
+          }
+        }
+      ],
+      "question": "Biggest fallers",
+      "categories": [
+        "UK University Rankings 2027"
+      ],
+      "dimensions": [
+        {
+          "key": "u",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "description": "Top 10 universities by places lost vs 2026.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Does each university's research quality track its total score?": {
+      "measures": [
+        {
+          "key": "research",
+          "reference": {
+            "measure": "Avg Research"
+          }
+        },
+        {
+          "key": "total",
+          "reference": {
+            "measure": "Avg Total Score"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "description": "One point per university: Research Quality % against 2027 total score.",
+      "preferredCharts": [
+        {
+          "type": "scatter"
+        }
+      ]
+    },
+    "Does research quality track the total score?": {
+      "measures": [
+        {
+          "key": "research",
+          "reference": {
+            "measure": "Avg Research"
+          }
+        },
+        {
+          "key": "total",
+          "reference": {
+            "measure": "Avg Total Score"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        },
+        {
+          "key": "band",
+          "reference": {
+            "dimension": "Rank Band"
+          }
+        }
+      ],
+      "preferredCharts": [
+        {
+          "type": "scatter"
+        }
+      ]
+    },
+    "How did our rivals move this year?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "mv"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "n",
+          "reference": {
+            "measure": "Universities"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "mv",
+          "reference": {
+            "dimension": "Movement"
+          }
+        }
+      ],
+      "description": "Universities in the selection by movement since 2026.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "How do university groups compare?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "s"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "n",
+          "reference": {
+            "measure": "Universities"
+          }
+        },
+        {
+          "key": "s",
+          "reference": {
+            "measure": "Avg Total Score"
+          }
+        },
+        {
+          "key": "t",
+          "reference": {
+            "measure": "Avg Teaching"
+          }
+        },
+        {
+          "key": "e",
+          "reference": {
+            "measure": "Avg Experience"
+          }
+        },
+        {
+          "key": "r",
+          "reference": {
+            "measure": "Avg Research"
+          }
+        },
+        {
+          "key": "en",
+          "reference": {
+            "measure": "Avg Entry Points"
+          }
+        },
+        {
+          "key": "p",
+          "reference": {
+            "measure": "Avg Graduate Prospects"
+          }
+        },
+        {
+          "key": "f",
+          "reference": {
+            "measure": "Avg Firsts"
+          }
+        },
+        {
+          "key": "c",
+          "reference": {
+            "measure": "Avg Continuation"
+          }
+        }
+      ],
+      "question": "How do university groups compare?",
+      "categories": [
+        "UK University Rankings 2027"
+      ],
+      "dimensions": [
+        {
+          "key": "g",
+          "reference": {
+            "dimension": "University Group"
+          }
+        }
+      ],
+      "description": "Average quality metrics by university group.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "How far is each rank band behind the band above?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "band"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "research",
+          "reference": {
+            "measure": "Avg Research"
+          },
+          "advancedCalculation": {
+            "interRecord": {
+              "offset": -1,
+              "comparison": "diff"
+            }
+          }
+        },
+        {
+          "key": "entry",
+          "reference": {
+            "measure": "Avg Entry Points"
+          },
+          "advancedCalculation": {
+            "interRecord": {
+              "offset": -1,
+              "comparison": "diff"
+            }
+          }
+        },
+        {
+          "key": "prospects",
+          "reference": {
+            "measure": "Avg Graduate Prospects"
+          },
+          "advancedCalculation": {
+            "interRecord": {
+              "offset": -1,
+              "comparison": "diff"
+            }
+          }
+        },
+        {
+          "key": "firsts",
+          "reference": {
+            "measure": "Avg Firsts"
+          },
+          "advancedCalculation": {
+            "interRecord": {
+              "offset": -1,
+              "comparison": "diff"
+            }
+          }
+        },
+        {
+          "key": "teaching",
+          "reference": {
+            "measure": "Avg Teaching"
+          },
+          "advancedCalculation": {
+            "interRecord": {
+              "offset": -1,
+              "comparison": "diff"
+            }
+          }
+        },
+        {
+          "key": "experience",
+          "reference": {
+            "measure": "Avg Experience"
+          },
+          "advancedCalculation": {
+            "interRecord": {
+              "offset": -1,
+              "comparison": "diff"
+            }
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "band",
+          "reference": {
+            "dimension": "Rank Band"
+          }
+        }
+      ],
+      "description": "Band average minus the average of the band above it, per measure (inter-record diff). Negative = behind.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "How far is each rival from the rivals' average on entry standards?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "gap"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "gap",
+          "reference": {
+            "measure": "Avg Entry Points"
+          },
+          "advancedCalculation": {
+            "compareToTotal": {
+              "aggregate": "AVG",
+              "comparison": "diff"
+            }
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "How far is each rival from the rivals' average on graduate prospects?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "gap"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "gap",
+          "reference": {
+            "measure": "Prospects vs Set Average"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "description": "Graduate Prospects % minus the average of the universities in the selection (points), from the stored measure Prospects vs Set Average. Positive = ahead.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "How far is each rival from the rivals' average on research quality?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "gap"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "gap",
+          "reference": {
+            "measure": "Avg Research"
+          },
+          "advancedCalculation": {
+            "compareToTotal": {
+              "aggregate": "AVG",
+              "comparison": "diff"
+            }
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "How far is each rival from the rivals' average on student experience?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "gap"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "gap",
+          "reference": {
+            "measure": "Experience vs Set Average"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "description": "Student Experience % minus the average of the universities in the selection (points), from the stored measure Experience vs Set Average. Positive = ahead.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "How has each university's rank moved by edition?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "ed"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "rank",
+          "reference": {
+            "measure": "Historic Rank"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "History University (Short)"
+          }
+        },
+        {
+          "key": "ed",
+          "reference": {
+            "dimension": "Edition"
+          }
+        }
+      ],
+      "description": "Overall rank per edition (sparkline source).",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How has our rank moved by edition?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "ed"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "rank",
+          "reference": {
+            "measure": "Historic Rank"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "ed",
+          "reference": {
+            "dimension": "Edition"
+          }
+        }
+      ],
+      "description": "Overall rank in each edition (2025-2027). The app narrows it to the chosen university. Lower is better.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How has the rival set's average rank moved by edition?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "ed"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "avg",
+          "reference": {
+            "measure": "Avg Historic Rank"
+          }
+        },
+        {
+          "key": "ma",
+          "reference": {
+            "measure": "Avg Historic Rank"
+          },
+          "advancedCalculation": {
+            "movingCalculation": {
+              "aggregate": "AVG",
+              "windowEnd": 0,
+              "windowBegin": -1,
+              "showIfNotEnoughValues": false
+            }
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "ed",
+          "reference": {
+            "dimension": "Edition"
+          }
+        }
+      ],
+      "description": "Average overall rank of the universities in the selection in each edition, with a two-edition moving average. Lower is better.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How have our rivals' ranks moved since 2025?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "measure": "r27"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "r25",
+          "reference": {
+            "measure": "Rank in 2025 Edition"
+          }
+        },
+        {
+          "key": "r27",
+          "reference": {
+            "measure": "Rank in 2027 Edition"
+          }
+        },
+        {
+          "key": "gain",
+          "reference": {
+            "measure": "Places Gained Since 2025"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "History University (Short)"
+          }
+        }
+      ],
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "How many points of total score separate each rival from us?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "gap"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "gap",
+          "reference": {
+            "measure": "Score Gap to Benchmark"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "description": "Each university's 2027 Total Score minus ours (benchmark parameter, set by the app to the chosen university's score). Positive = scores above us.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "How many universities climbed, vs last year?": {
+      "measures": [
+        {
+          "key": "now",
+          "reference": {
+            "measure": "Climbers"
+          }
+        },
+        {
+          "key": "before",
+          "reference": {
+            "measure": "Climbers 2026"
+          }
+        },
+        {
+          "key": "chg",
+          "reference": {
+            "measure": "Climbers Change"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [],
+      "description": "Universities that rose 2026 to 2027, against those that rose 2025 to 2026.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How many universities fell, vs last year?": {
+      "measures": [
+        {
+          "key": "now",
+          "reference": {
+            "measure": "Fallers"
+          }
+        },
+        {
+          "key": "before",
+          "reference": {
+            "measure": "Fallers 2026"
+          }
+        },
+        {
+          "key": "chg",
+          "reference": {
+            "measure": "Fallers Change"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [],
+      "description": "Universities that fell 2026 to 2027, against those that fell 2025 to 2026.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How many universities sit in each rank band?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "band"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "n",
+          "reference": {
+            "measure": "Universities"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "band",
+          "reference": {
+            "dimension": "Rank Band"
+          }
+        }
+      ],
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "How many universities would still score above us after the gain?": {
+      "measures": [
+        {
+          "key": "n",
+          "reference": {
+            "measure": "Universities Scoring Above"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [],
+      "description": "Universities whose 2027 Total Score is above our score plus the what-if gain (parameter score). Our projected rank is this plus one.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How many universities would still score above us?": {
+      "measures": [
+        {
+          "key": "n",
+          "reference": {
+            "measure": "Universities"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [],
+      "description": "Universities in the selection; the what-if narrows it to totals above our score plus the gain.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How many universities would we overtake?": {
+      "measures": [
+        {
+          "key": "n",
+          "reference": {
+            "measure": "Universities"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [],
+      "description": "Universities in the selection. The app narrows it to Total Score above ours and at most ours plus the gain.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "Subject titles by university": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "t"
+          }
+        }
+      ],
+      "defaults": {
+        "topN": 10,
+        "ranking": {
+          "direction": "descending",
+          "reference": {
+            "measure": "t"
+          }
+        }
+      },
+      "measures": [
+        {
+          "key": "t",
+          "reference": {
+            "measure": "Subject Titles"
+          }
+        },
+        {
+          "key": "p",
+          "reference": {
+            "measure": "Top-10 Places"
+          }
+        }
+      ],
+      "question": "Subject titles by university",
+      "categories": [
+        "UK University Rankings 2027"
+      ],
+      "dimensions": [
+        {
+          "key": "u",
+          "reference": {
+            "dimension": "Subject University (Short)"
+          }
+        }
+      ],
+      "description": "Top 10 universities by number of subject tables topped (2027).",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Teaching vs research by university": {
+      "measures": [
+        {
+          "key": "t",
+          "reference": {
+            "measure": "Avg Teaching"
+          }
+        },
+        {
+          "key": "r",
+          "reference": {
+            "measure": "Avg Research"
+          }
+        }
+      ],
+      "question": "Teaching vs research by university",
+      "categories": [
+        "UK University Rankings 2027"
+      ],
+      "dimensions": [
+        {
+          "key": "u",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        },
+        {
+          "key": "g",
+          "reference": {
+            "dimension": "University Group"
+          }
+        }
+      ],
+      "description": "Teaching quality against research quality for every university.",
+      "preferredCharts": [
+        {
+          "type": "scatter"
+        }
+      ]
+    },
+    "Top 10 rank history": {
+      "filters": {
+        "expression": "{t}",
+        "t": {
+          "operator": "lessThanOrEqual",
+          "arguments": [
+            {
+              "reference": {
+                "view": "UNI_HISTORY_FACT",
+                "field": "Historic Rank"
+              }
+            },
+            {
+              "value": 10
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "e"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "r",
+          "reference": {
+            "measure": "Historic Rank"
+          }
+        }
+      ],
+      "question": "Top 10 rank history",
+      "categories": [
+        "UK University Rankings 2027"
+      ],
+      "dimensions": [
+        {
+          "key": "e",
+          "reference": {
+            "dimension": "Edition"
+          }
+        },
+        {
+          "key": "u",
+          "reference": {
+            "dimension": "History University (Short)"
+          }
+        }
+      ],
+      "description": "Overall rank by edition for universities while in the top 10 (Historic Rank <= 10).",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "Top 10 universities 2027": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "measure": "r"
+          }
+        }
+      ],
+      "defaults": {
+        "topN": 10,
+        "ranking": {
+          "direction": "descending",
+          "reference": {
+            "measure": "r"
+          }
+        }
+      },
+      "measures": [
+        {
+          "key": "r",
+          "reference": {
+            "measure": "Rank (value)"
+          }
+        },
+        {
+          "key": "s",
+          "reference": {
+            "measure": "Avg Total Score"
+          }
+        }
+      ],
+      "question": "Top 10 universities 2027",
+      "categories": [
+        "UK University Rankings 2027"
+      ],
+      "dimensions": [
+        {
+          "key": "u",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "description": "Overall top 10 of the 2027 table by rank, with total score.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "Universities by nation": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "u"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "u",
+          "reference": {
+            "measure": "Universities"
+          }
+        }
+      ],
+      "question": "Universities by nation",
+      "categories": [
+        "UK University Rankings 2027"
+      ],
+      "dimensions": [
+        {
+          "key": "n",
+          "reference": {
+            "dimension": "Nation"
+          }
+        }
+      ],
+      "description": "Count of ranked universities per UK nation.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "What is the average rank in view, 2027 vs 2026?": {
+      "measures": [
+        {
+          "key": "r27",
+          "reference": {
+            "measure": "Avg Rank 2027"
+          }
+        },
+        {
+          "key": "r26",
+          "reference": {
+            "measure": "Avg Rank 2026"
+          }
+        },
+        {
+          "key": "gain",
+          "reference": {
+            "measure": "Avg Places Gained"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [],
+      "description": "Average overall rank of the universities in the current selection this year and last; places gained is positive when the group climbed.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "What rank would a higher total score buy us?": {
+      "measures": [
+        {
+          "key": "proj",
+          "reference": {
+            "measure": "Projected Rank at Score"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [],
+      "description": "Projected overall rank at our 2027 Total Score plus the what-if gain (parameter score), against every university in the 2027 table.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "Where did this year's climbers sit?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "band"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "n",
+          "reference": {
+            "measure": "Climbers"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "band",
+          "reference": {
+            "dimension": "Rank Band"
+          }
+        }
+      ],
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Where did this year's fallers sit?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "band"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "n",
+          "reference": {
+            "measure": "Fallers"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "band",
+          "reference": {
+            "dimension": "Rank Band"
+          }
+        }
+      ],
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Where do we rank this year, and how far have we moved?": {
+      "measures": [
+        {
+          "key": "rank",
+          "reference": {
+            "measure": "Rank (value)"
+          }
+        },
+        {
+          "key": "chg",
+          "reference": {
+            "measure": "Rank Change (value)"
+          }
+        },
+        {
+          "key": "r26",
+          "reference": {
+            "measure": "Rank 2026 (value)"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [],
+      "description": "2027 overall rank, places moved since 2026 (positive = climbed) and the 2026 rank. The app narrows it to the chosen university.",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "Where does each rival rank on each measure?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "measure": "rank"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "rank",
+          "reference": {
+            "measure": "Rank (value)"
+          }
+        },
+        {
+          "key": "research",
+          "reference": {
+            "measure": "Avg Research"
+          },
+          "advancedCalculation": {
+            "rank": {
+              "direction": "descending"
+            }
+          }
+        },
+        {
+          "key": "entry",
+          "reference": {
+            "measure": "Avg Entry Points"
+          },
+          "advancedCalculation": {
+            "rank": {
+              "direction": "descending"
+            }
+          }
+        },
+        {
+          "key": "prospects",
+          "reference": {
+            "measure": "Avg Graduate Prospects"
+          },
+          "advancedCalculation": {
+            "rank": {
+              "direction": "descending"
+            }
+          }
+        },
+        {
+          "key": "firsts",
+          "reference": {
+            "measure": "Avg Firsts"
+          },
+          "advancedCalculation": {
+            "rank": {
+              "direction": "descending"
+            }
+          }
+        },
+        {
+          "key": "continuation",
+          "reference": {
+            "measure": "Avg Continuation"
+          },
+          "advancedCalculation": {
+            "rank": {
+              "direction": "descending"
+            }
+          }
+        },
+        {
+          "key": "experience",
+          "reference": {
+            "measure": "Avg Experience"
+          },
+          "advancedCalculation": {
+            "rank": {
+              "direction": "descending"
+            }
+          }
+        },
+        {
+          "key": "teaching",
+          "reference": {
+            "measure": "Avg Teaching"
+          },
+          "advancedCalculation": {
+            "rank": {
+              "direction": "descending"
+            }
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "description": "Rank of each university within the selection on each component (1 = best).",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "Which rivals have the highest entry standards?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "entry"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "entry",
+          "reference": {
+            "measure": "Avg Entry Points"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Which rivals score highest on research quality?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "research"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "research",
+          "reference": {
+            "measure": "Avg Research"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Which universities would we overtake?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "rank"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "total",
+          "reference": {
+            "measure": "Avg Total Score"
+          }
+        },
+        {
+          "key": "gap",
+          "reference": {
+            "measure": "Score Gap to Benchmark"
+          }
+        },
+        {
+          "key": "chg",
+          "reference": {
+            "measure": "Rank Change (value)"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "rank",
+          "reference": {
+            "dimension": "Rank 2027"
+          }
+        },
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "description": "League rows with rank, total score and the points they sit above us. The app narrows it to Total Score between our score and our score plus the gain.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "Who is ahead of the rival set on entry standards, and by how much?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "gap"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "gap",
+          "reference": {
+            "measure": "Entry vs Set Average"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "description": "Entry Standards (UCAS points) minus the average of the universities in the selection, from the stored measure Entry vs Set Average. Positive = ahead.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Who is ahead of the rival set on research quality, and by how much?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "gap"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "gap",
+          "reference": {
+            "measure": "Research vs Set Average"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "description": "Research Quality % minus the average of the universities in the selection (points), from the stored measure Research vs Set Average. Positive = ahead.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Who moved most among our rivals?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "chg"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "chg",
+          "reference": {
+            "measure": "Rank Change (value)"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University (Short)"
+          }
+        }
+      ],
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Who sits within 10 places of us, and how do they score?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "rank"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "r26",
+          "reference": {
+            "measure": "Rank 2026 (value)"
+          }
+        },
+        {
+          "key": "chg",
+          "reference": {
+            "measure": "Rank Change (value)"
+          }
+        },
+        {
+          "key": "total",
+          "reference": {
+            "measure": "Avg Total Score"
+          }
+        },
+        {
+          "key": "research",
+          "reference": {
+            "measure": "Avg Research"
+          }
+        },
+        {
+          "key": "entry",
+          "reference": {
+            "measure": "Avg Entry Points"
+          }
+        },
+        {
+          "key": "prospects",
+          "reference": {
+            "measure": "Avg Graduate Prospects"
+          }
+        },
+        {
+          "key": "experience",
+          "reference": {
+            "measure": "Avg Experience"
+          }
+        },
+        {
+          "key": "teaching",
+          "reference": {
+            "measure": "Avg Teaching"
+          }
+        }
+      ],
+      "categories": [
+        "Climb planner"
+      ],
+      "dimensions": [
+        {
+          "key": "rank",
+          "reference": {
+            "dimension": "Rank 2027"
+          }
+        },
+        {
+          "key": "uni",
+          "reference": {
+            "dimension": "University"
+          }
+        }
+      ],
+      "description": "League table rows; the app narrows it to the ranks around the chosen university.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    }
+  },
+  "layout": {}
+}

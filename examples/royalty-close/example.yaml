@@ -1,0 +1,77 @@
+slug: royalty-close
+title: Royalty Close & Exception Review
+company: Larkspur Music (fictional music publisher)
+layer: royalty-engine
+summary: >-
+  Finance controllers and royalty operations close a monthly royalty statement run (current run
+  against the prior one): find the statements that need attention, open and assign an exception
+  case, submit evidence, and have a controller approve the disposition, return it or approve a
+  carry-forward. Cases and their audit trail are written back to the warehouse.
+industry: media
+function: finance
+persona: Finance Controller / Royalty Analyst (royalty operations)
+archetype: workbench
+look: >-
+  light; black top tab bar with a green (#1DB584) active tab, a navy-to-teal gradient band
+  (#1B3A5C → #13706F) holding white header dropdowns, a green banner sentence overlapping the band,
+  white cards on a pale canvas, Roboto; coloured status pills, coloured indicator text in tables;
+  English/Spanish switch; a phone-first Summary tab
+tabs:
+  - Summary — on a phone, what needs me, where is the exposure, and which five statements are largest?
+  - Close overview — which statements need attention before close, by branch and exception category, and how does this run compare with the prior one?
+  - Statement investigation — what are one statement's amounts, suspense, calculation errors and income lines, and what case is open on it?
+  - Controller review — who owns each exception, what evidence supports sign-off, and which carry-forwards are still exposed?
+  - Close simulator — with these analysts, clearance rate and days left, will the run close on time and how much exposure is left?
+  - Business questions — the layer's stored close questions, each run as a native table
+patterns:
+  - kpi-sparkline-comparison
+  - selection-bar
+  - table-sparklines
+  - writeback-workflow
+  - role-switcher
+  - xlsx-export
+  - preload-tabs
+  - query-scheduler
+charts: [bar, stacked-bar, combo, pie, table, table-sparklines, kpi, sparkline]
+interactions: [click-to-filter, selection-bar, drill-down, tabs, role-switcher, sliders]
+workflows: [exception-case-management, maker-checker-approval, carry-forward-approval]
+writeback: true
+exports: [xlsx]
+objects: 79   # mounted at load across the five native tabs (filters, KPI number + sparkline + comparison rows, charts, tables), plus one stored-question table on Business questions
+start_here:
+  - project/src/app.js — shell, header filters, governed query helper, writeback with guards, statement investigation, controller review, simulator, pivot, Excel close pack, smoke checks
+  - project/src/catalogue.js — every native object declared as data (KPI cards, queue, scorecard, charts, detail tables)
+  - project/src/questions.js — the 21 stored questions and the tile that runs one as a native table
+  - project/tools/layer.mjs — views, measures, questions and the Data Actions with role and branch guards in SQL
+capabilities:
+  - writeback-workflow — project/src/app.js:342
+  - role-switcher — project/src/app.js:285
+  - what-if — project/src/app.js:481
+  - excel-export — project/src/app.js:639
+  - narrative-headline — project/src/app.js:300
+  - drill-down — project/src/app.js:370
+stealable:
+  - "Case workflow on two governed views (cases + action history) through app.writeback, with a role, branch-scope and maker–checker guard before every write and a labelled browser-storage fallback — project/src/app.js:342"
+  - "Copy-to-clipboard for a native table: re-runs the table's own governed query (its columns, static filters and the group's applied selections) and writes every row as tab-separated text — project/src/app.js:108"
+  - "Banner sentence built from two governed queries of stored measures, following the header filters — project/src/app.js:300"
+  - "KPI card = number + bar or line sparkline by processing run + header-less one-row comparison table coloured by whether it moved the right way — project/src/catalogue.js:28"
+  - "Pivot with branch subtotals from three governed queries (leaf rows, branch totals, grand total), so totals stay right for non-additive measures — project/src/app.js:567"
+  - "English/Spanish switch with a MutationObserver that translates page text, including native objects' rendered labels, while selections and writes keep the English values — project/src/i18n.js:302"
+  - "Data Actions whose SQL repeats the app's guards (role, branch scope, maker–checker) and appends the audit row — project/tools/layer.mjs:193"
+caveats:
+  - The app writes ROYALTY_CLOSE_CASES and ROYALTY_CLOSE_EVENTS with app.writeback inserts and updates; it does not call the layer's Data Actions. The role, branch-scope and maker–checker guard therefore runs only in the browser (src/app.js:341). The Data Actions enforce the same rules in SQL, but nothing in the app calls them.
+  - If a write fails or writeback is unavailable, the change is kept in localStorage (key royalty-close-local-v1) and the toast says so. Reset demo clears only that copy; the warehouse reset copies the *_SEED tables back (README, Rebuild from nothing).
+  - The smoke checks are read-only; no write was exercised by the smoke test.
+  - "Visualizations 0.9: the Unreconciled statements comparison row shows the change as \"-13.1 pts\" with a decimal pts format, while the measure is +13.125 through MCP."
+  - At 1440 wide with six KPI cards per row, the calc-error comparison is truncated ("impact $33,…"). "Acting as" is clipped at 1280, and the header stacks below 1100px. Summary stays a narrow column even at 1440.
+  - The Exception pivot is an HTML table drawn from governed queries (the native table here has a grand total only); the close simulator's bars are hand-drawn SVG and its projection is browser arithmetic, including a fixed 0.6 factor on residual exposure (src/app.js:498).
+  - Native tiles query layer measures directly, not stored questions; the "BQ · …" caption on each card is generated from the tile title (src/catalogue.js:172). Only the Business questions tab runs stored questions, and it hides the 7 that belong to the layer's sibling recovery app.
+  - The header Branch, Run and Currency dropdowns write the same selection into all four groups (src/app.js:292), so one change re-queries about 150 objects on every tab.
+  - "No analyst in ROYALTY_USERS covers DE, ES or JP: nobody can open or submit a case on those branches, and seeded cases there are owned by an analyst scoped to US only."
+  - Dates are fixed: demo date 2026-11-11, current run R-2026-10, close deadline 14 Nov. The banner hard-codes "across 8 branches" (src/app.js:308).
+  - tools/layer.mjs imports tools/mcp.mjs and reads tools/types.txt, and neither is shipped; it creates the layer with a zero datasource id. ASTRATO_GALLERY.MOCK_DATA is hard-coded in layer.mjs and the Data Action SQL.
+  - The layer is shared with a recovery app that is not in this repo. Its Paid vs Collectable and Recovery views, 7 of the 21 questions and 5 of the 8 Data Actions are unused here.
+  - Some code comments and dictionary strings still name the original source tables; the dashboard.js header comment describes another app's selection groups.
+  - Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite. Checked with the kit smoke test at 1440, 1280 and 1024 (79 objects, 6 checks including the Excel download), compile-check 92/92 and vite build.
+  - No screenshots are shipped yet.
+  - astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too.

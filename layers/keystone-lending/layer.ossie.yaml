@@ -1,0 +1,2618 @@
+version: 0.1.1
+name: Keystone Affordability & Decisions
+datasets:
+  - name: Applications
+    source: '"ASTRATO_GALLERY"."MOCK_DATA"."LENDING_AFFORDABILITY"'
+    fields:
+      - name: APR
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"APR"'
+      - name: Age
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"AGE"'
+      - name: Stage
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STAGE"'
+        dimension: {}
+        description: 'Workflow stage: Affordability Check → Awaiting Approval → Decided.'
+        ai_context:
+          instructions: 'Workflow stage: Affordability Check → Awaiting Approval → Decided.'
+      - name: Region
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"REGION"'
+        dimension: {}
+        description: UK region of the applicant.
+        ai_context:
+          instructions: UK region of the applicant.
+      - name: Channel
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CHANNEL"'
+        dimension: {}
+        description: Where the application was made.
+        ai_context:
+          instructions: Where the application was made.
+      - name: Is Open
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"IS_OPEN"'
+      - name: Is Pass
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"IS_PASS"'
+      - name: Outcome
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"OUTCOME"'
+        dimension: {}
+        description: Approved, Declined, Pending approval or In assessment.
+        ai_context:
+          instructions: Approved, Declined, Pending approval or In assessment.
+      - name: Product
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"PRODUCT"'
+        dimension: {}
+        description: Credit product applied for.
+        ai_context:
+          instructions: Credit product applied for.
+      - name: Age Band
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"AGE_BAND"'
+        dimension: {}
+        description: Applicant age band.
+        ai_context:
+          instructions: Applicant age band.
+      - name: Approver
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"APPROVER"'
+        dimension: {}
+        description: Credit approver who signs off the decision.
+        ai_context:
+          instructions: Credit approver who signs off the decision.
+      - name: Proposal
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"PROPOSAL"'
+        dimension: {}
+        description: 'Underwriter''s proposal: Approve, Counter-offer, Refer or Decline.'
+        ai_context:
+          instructions: 'Underwriter''s proposal: Approve, Counter-offer, Refer or Decline.'
+      - name: App Count
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"APP_COUNT"'
+      - name: Childcare
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CHILDCARE"'
+      - name: Days Open
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DAYS_OPEN"'
+      - name: Groceries
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"GROCERIES"'
+      - name: Transport
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"TRANSPORT"'
+      - name: Is Decided
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"IS_DECIDED"'
+      - name: Credit Band
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CREDIT_BAND"'
+        dimension: {}
+        description: Credit score band (Experian-style 0–999).
+        ai_context:
+          instructions: Credit score band (Experian-style 0–999).
+      - name: Income Band
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"INCOME_BAND"'
+        dimension: {}
+        description: Monthly net income band (sort prefix 1–5).
+        ai_context:
+          instructions: Monthly net income band (sort prefix 1–5).
+      - name: Is Approved
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"IS_APPROVED"'
+      - name: Stage Order
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STAGE_ORDER"'
+      - name: Term Months
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"TERM_MONTHS"'
+      - name: Underwriter
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"UNDERWRITER"'
+        dimension: {}
+        description: Underwriter who drafted the proposal.
+        ai_context:
+          instructions: Underwriter who drafted the proposal.
+      - name: Applicant Id
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"APPLICANT_ID"'
+      - name: Credit Score
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CREDIT_SCORE"'
+      - name: Housing Cost
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"HOUSING_COST"'
+      - name: Decision Date
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DECISION_DATE"'
+      - name: Proposal Date
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"PROPOSAL_DATE"'
+      - name: Debt To Income
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DEBT_TO_INCOME"'
+      - name: Final Decision
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"FINAL_DECISION"'
+      - name: Household Size
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"HOUSEHOLD_SIZE"'
+      - name: Loan To Income
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LOAN_TO_INCOME"'
+      - name: Total Expenses
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"TOTAL_EXPENSES"'
+      - name: Approved Amount
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"APPROVED_AMOUNT"'
+      - name: Employment Type
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"EMPLOYMENT_TYPE"'
+        dimension: {}
+        description: Employment status declared on the application.
+        ai_context:
+          instructions: Employment status declared on the application.
+      - name: Policy Breaches
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"POLICY_BREACHES"'
+      - name: Proposal Upheld
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"PROPOSAL_UPHELD"'
+      - name: Application Date
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"APPLICATION_DATE"'
+      - name: Days To Decision
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DAYS_TO_DECISION"'
+      - name: Requested Amount
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"REQUESTED_AMOUNT"'
+      - name: Application Month
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"APPLICATION_MONTH_LABEL"'
+        dimension: {}
+        description: Month the application was submitted (yyyy-mm).
+        ai_context:
+          instructions: Month the application was submitted (yyyy-mm).
+      - name: Expense To Income
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"EXPENSE_TO_INCOME"'
+      - name: Essential Expenses
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"ESSENTIAL_EXPENSES"'
+      - name: Monthly Net Income
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"MONTHLY_NET_INCOME"'
+      - name: Proposed Repayment
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"PROPOSED_REPAYMENT"'
+      - name: Stressed Repayment
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STRESSED_REPAYMENT"'
+      - name: Application Quarter
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"APPLICATION_QUARTER"'
+        dimension: {}
+        description: Calendar quarter the application was submitted (yyyy-Qn).
+        ai_context:
+          instructions: Calendar quarter the application was submitted (yyyy-Qn).
+      - name: Discretionary Spend
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DISCRETIONARY_SPEND"'
+      - name: Stressed Disposable
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STRESSED_DISPOSABLE"'
+      - name: Affordability Result
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"AFFORDABILITY_RESULT"'
+        dimension: {}
+        description: 'Default-policy affordability outcome: Pass (0 breaches), Marginal (1), Fail (2+).'
+        ai_context:
+          instructions: 'Default-policy affordability outcome: Pass (0 breaches), Marginal (1), Fail (2+).'
+      - name: Disposable After Loan
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DISPOSABLE_AFTER_LOAN"'
+      - name: Existing Debt Payments
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"EXISTING_DEBT_PAYMENTS"'
+      - name: Application Month Label
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"APPLICATION_MONTH_LABEL"'
+      - name: Utilities & Council Tax
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"UTILITIES_COUNCIL_TAX"'
+      - name: All Applications
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"APP_COUNT"'
+        dimension: {}
+        description: 'A single value (1) shared by every application: the grain of portfolio-level headline figures.'
+        ai_context:
+          instructions: 'A single value (1) shared by every application: the grain of portfolio-level headline figures.'
+      - name: Applicant
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"APPLICANT_ID"'
+        dimension: {}
+        description: Application reference (NW-xxxxxx).
+        ai_context:
+          instructions: Application reference (NW-xxxxxx).
+  - name: Workflow Events
+    source: '"ASTRATO_GALLERY"."MOCK_DATA"."LENDING_WORKFLOW_EVENTS"'
+    fields:
+      - name: Role
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"ROLE"'
+      - name: Step
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STEP"'
+      - name: Actor
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"ACTOR"'
+      - name: Action
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"ACTION"'
+      - name: Step No
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STEP_NO"'
+      - name: Event Date
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"EVENT_DATE"'
+      - name: Applicant Id
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"APPLICANT_ID"'
+      - name: Workflow Step
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STEP"'
+        dimension: {}
+        description: Audit-trail step.
+        ai_context:
+          instructions: Audit-trail step.
+relationships:
+  - name: relationship_1_Workflow Events_to_Applications
+    from: Workflow Events
+    to: Applications
+    from_columns:
+      - Applicant Id
+    to_columns:
+      - Applicant Id
+metrics:
+  - name: Applications
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: COUNT(DISTINCT "v1_APPLICANT_ID")
+    description: Number of applications.
+    ai_context:
+      instructions: Number of applications.
+  - name: Approval Rate
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v1_IS_APPROVED") / NULLIF(SUM("v1_IS_DECIDED"), 0)
+    description: Approved ÷ decided applications.
+    ai_context:
+      instructions: Approved ÷ decided applications.
+  - name: Approved
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v1_IS_APPROVED")
+    description: Approved applications.
+    ai_context:
+      instructions: Approved applications.
+  - name: Approved Lending
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v1_APPROVED_AMOUNT")
+    description: Total amount approved.
+    ai_context:
+      instructions: Total amount approved.
+  - name: Avg Childcare
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_CHILDCARE")
+    description: Average monthly childcare.
+    ai_context:
+      instructions: Average monthly childcare.
+  - name: Avg Credit Score
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_CREDIT_SCORE")
+    description: Average credit score.
+    ai_context:
+      instructions: Average credit score.
+  - name: Avg Days to Decision
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_DAYS_TO_DECISION")
+    description: Average days from application to final decision.
+    ai_context:
+      instructions: Average days from application to final decision.
+  - name: Avg Discretionary Spend
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_DISCRETIONARY_SPEND")
+    description: Average monthly discretionary spend.
+    ai_context:
+      instructions: Average monthly discretionary spend.
+  - name: Avg Disposable After Loan
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_DISPOSABLE_AFTER_LOAN")
+    description: Income minus essentials, existing debt and the new repayment.
+    ai_context:
+      instructions: Income minus essentials, existing debt and the new repayment.
+  - name: Avg Essential Expenses
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_ESSENTIAL_EXPENSES")
+    description: 'Average essential outgoings: housing, groceries, utilities & council tax, transport, childcare.'
+    ai_context:
+      instructions: 'Average essential outgoings: housing, groceries, utilities & council tax, transport, childcare.'
+  - name: Avg Existing Debt
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_EXISTING_DEBT_PAYMENTS")
+    description: Average existing monthly credit commitments.
+    ai_context:
+      instructions: Average existing monthly credit commitments.
+  - name: Avg Groceries
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_GROCERIES")
+    description: Average monthly groceries.
+    ai_context:
+      instructions: Average monthly groceries.
+  - name: Avg Housing Cost
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_HOUSING_COST")
+    description: Average rent or housing cost.
+    ai_context:
+      instructions: Average rent or housing cost.
+  - name: Avg Monthly Income
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_MONTHLY_NET_INCOME")
+    description: Average monthly net (take-home) income.
+    ai_context:
+      instructions: Average monthly net (take-home) income.
+  - name: Avg Proposed Repayment
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_PROPOSED_REPAYMENT")
+    description: Average monthly repayment on the new credit.
+    ai_context:
+      instructions: Average monthly repayment on the new credit.
+  - name: Avg Requested Amount
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_REQUESTED_AMOUNT")
+    description: Average amount requested.
+    ai_context:
+      instructions: Average amount requested.
+  - name: Avg Total Expenses
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_TOTAL_EXPENSES")
+    description: 'Average monthly outgoings: essential plus discretionary.'
+    ai_context:
+      instructions: 'Average monthly outgoings: essential plus discretionary.'
+  - name: Avg Transport
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_TRANSPORT")
+    description: Average monthly transport.
+    ai_context:
+      instructions: Average monthly transport.
+  - name: Avg Utilities
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v1_UTILITIES_COUNCIL_TAX")
+    description: Average utilities and council tax.
+    ai_context:
+      instructions: Average utilities and council tax.
+  - name: Debt to Income
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            (CASE WHEN COALESCE(SUM("v1_EXISTING_DEBT_PAYMENTS"), SUM("v1_PROPOSED_REPAYMENT")) IS NULL THEN NULL ELSE
+            COALESCE(SUM("v1_EXISTING_DEBT_PAYMENTS"), 0) + COALESCE(SUM("v1_PROPOSED_REPAYMENT"), 0) END) /
+            NULLIF(SUM("v1_MONTHLY_NET_INCOME"), 0)
+    description: Existing plus new repayments ÷ net income (portfolio-weighted).
+    ai_context:
+      instructions: Existing plus new repayments ÷ net income (portfolio-weighted).
+  - name: Expense Ratio
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v1_TOTAL_EXPENSES") / NULLIF(SUM("v1_MONTHLY_NET_INCOME"), 0)
+    description: Total expenses ÷ net income (portfolio-weighted).
+    ai_context:
+      instructions: Total expenses ÷ net income (portfolio-weighted).
+  - name: Open Applications
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v1_IS_OPEN")
+    description: Applications still in the workflow.
+    ai_context:
+      instructions: Applications still in the workflow.
+  - name: Pass Rate
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v1_IS_PASS") / NULLIF(SUM("v1_APP_COUNT"), 0)
+    description: Share of applications passing default affordability policy.
+    ai_context:
+      instructions: Share of applications passing default affordability policy.
+  - name: Proposal Upheld Rate
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v1_PROPOSAL_UPHELD") / NULLIF(SUM("v1_IS_DECIDED"), 0)
+    description: Decided applications where the approver confirmed the underwriter proposal.
+    ai_context:
+      instructions: Decided applications where the approver confirmed the underwriter proposal.
+  - name: Requested Lending
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v1_REQUESTED_AMOUNT")
+    description: Total amount requested.
+    ai_context:
+      instructions: Total amount requested.
+custom_extensions:
+  - vendor_name: COMMON
+    data: |-
+      {
+        "datasourceDriver": "snowflake",
+        "diagnostics": [],
+        "document": {
+          "businessQuestions": {
+            "How affordable is each product?": {
+              "categories": [
+                "Keystone app"
+              ],
+              "description": "Volume, income, expenses, new repayment, disposable income, debt-to-income and approval rate by product, largest first.",
+              "dimensions": [
+                {
+                  "key": "d_product",
+                  "reference": {
+                    "dimension": "Product"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "apps",
+                  "reference": {
+                    "measure": "Applications"
+                  }
+                },
+                {
+                  "key": "inc",
+                  "reference": {
+                    "measure": "Avg Monthly Income"
+                  }
+                },
+                {
+                  "key": "exp",
+                  "reference": {
+                    "measure": "Avg Total Expenses"
+                  }
+                },
+                {
+                  "key": "rep",
+                  "reference": {
+                    "measure": "Avg Proposed Repayment"
+                  }
+                },
+                {
+                  "key": "disp",
+                  "reference": {
+                    "measure": "Avg Disposable After Loan"
+                  }
+                },
+                {
+                  "key": "dti",
+                  "reference": {
+                    "measure": "Debt to Income"
+                  }
+                },
+                {
+                  "key": "appr",
+                  "reference": {
+                    "measure": "Approval Rate"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "apps"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "table"
+                }
+              ],
+              "question": "How affordable is each product?"
+            },
+            "How are underwriters performing?": {
+              "categories": [
+                "Keystone app"
+              ],
+              "description": "Cases, open cases, approval rate, proposals upheld by the approver and days to decision, by underwriter.",
+              "dimensions": [
+                {
+                  "key": "d_uw",
+                  "reference": {
+                    "dimension": "Underwriter"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "apps",
+                  "reference": {
+                    "measure": "Applications"
+                  }
+                },
+                {
+                  "key": "open",
+                  "reference": {
+                    "measure": "Open Applications"
+                  }
+                },
+                {
+                  "key": "appr",
+                  "reference": {
+                    "measure": "Approval Rate"
+                  }
+                },
+                {
+                  "key": "upheld",
+                  "reference": {
+                    "measure": "Proposal Upheld Rate"
+                  }
+                },
+                {
+                  "key": "days",
+                  "reference": {
+                    "measure": "Avg Days to Decision"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "apps"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "table"
+                }
+              ],
+              "question": "How are underwriters performing?"
+            },
+            "How did the headline metrics change month on month?": {
+              "categories": [
+                "Keystone app"
+              ],
+              "description": "Each headline measure for every application month, with its change against the previous month: % growth for counts and £ averages, percentage-point difference for Debt to Income and Approval Rate. The first row is the latest month.",
+              "dimensions": [
+                {
+                  "key": "d_period",
+                  "reference": {
+                    "dimension": "Application Month"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "apps",
+                  "reference": {
+                    "measure": "Applications"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "growth",
+                      "offset": 1
+                    }
+                  },
+                  "key": "apps_chg",
+                  "reference": {
+                    "measure": "Applications"
+                  }
+                },
+                {
+                  "key": "inc",
+                  "reference": {
+                    "measure": "Avg Monthly Income"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "growth",
+                      "offset": 1
+                    }
+                  },
+                  "key": "inc_chg",
+                  "reference": {
+                    "measure": "Avg Monthly Income"
+                  }
+                },
+                {
+                  "key": "exp",
+                  "reference": {
+                    "measure": "Avg Total Expenses"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "growth",
+                      "offset": 1
+                    }
+                  },
+                  "key": "exp_chg",
+                  "reference": {
+                    "measure": "Avg Total Expenses"
+                  }
+                },
+                {
+                  "key": "disp",
+                  "reference": {
+                    "measure": "Avg Disposable After Loan"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "growth",
+                      "offset": 1
+                    }
+                  },
+                  "key": "disp_chg",
+                  "reference": {
+                    "measure": "Avg Disposable After Loan"
+                  }
+                },
+                {
+                  "key": "dti",
+                  "reference": {
+                    "measure": "Debt to Income"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "diff",
+                      "offset": 1
+                    }
+                  },
+                  "key": "dti_chg",
+                  "reference": {
+                    "measure": "Debt to Income"
+                  }
+                },
+                {
+                  "key": "appr",
+                  "reference": {
+                    "measure": "Approval Rate"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "diff",
+                      "offset": 1
+                    }
+                  },
+                  "key": "appr_chg",
+                  "reference": {
+                    "measure": "Approval Rate"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "dimension": "d_period"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "table"
+                }
+              ],
+              "question": "How did the headline metrics change month on month?"
+            },
+            "How did the headline metrics change quarter on quarter?": {
+              "categories": [
+                "Keystone app"
+              ],
+              "description": "Each headline measure for every application quarter, with its change against the previous quarter: % growth for counts and £ averages, percentage-point difference for Debt to Income and Approval Rate. The first row is the latest quarter.",
+              "dimensions": [
+                {
+                  "key": "d_period",
+                  "reference": {
+                    "dimension": "Application Quarter"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "apps",
+                  "reference": {
+                    "measure": "Applications"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "growth",
+                      "offset": 1
+                    }
+                  },
+                  "key": "apps_chg",
+                  "reference": {
+                    "measure": "Applications"
+                  }
+                },
+                {
+                  "key": "inc",
+                  "reference": {
+                    "measure": "Avg Monthly Income"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "growth",
+                      "offset": 1
+                    }
+                  },
+                  "key": "inc_chg",
+                  "reference": {
+                    "measure": "Avg Monthly Income"
+                  }
+                },
+                {
+                  "key": "exp",
+                  "reference": {
+                    "measure": "Avg Total Expenses"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "growth",
+                      "offset": 1
+                    }
+                  },
+                  "key": "exp_chg",
+                  "reference": {
+                    "measure": "Avg Total Expenses"
+                  }
+                },
+                {
+                  "key": "disp",
+                  "reference": {
+                    "measure": "Avg Disposable After Loan"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "growth",
+                      "offset": 1
+                    }
+                  },
+                  "key": "disp_chg",
+                  "reference": {
+                    "measure": "Avg Disposable After Loan"
+                  }
+                },
+                {
+                  "key": "dti",
+                  "reference": {
+                    "measure": "Debt to Income"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "diff",
+                      "offset": 1
+                    }
+                  },
+                  "key": "dti_chg",
+                  "reference": {
+                    "measure": "Debt to Income"
+                  }
+                },
+                {
+                  "key": "appr",
+                  "reference": {
+                    "measure": "Approval Rate"
+                  }
+                },
+                {
+                  "advancedCalculation": {
+                    "interRecord": {
+                      "comparison": "diff",
+                      "offset": 1
+                    }
+                  },
+                  "key": "appr_chg",
+                  "reference": {
+                    "measure": "Approval Rate"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "dimension": "d_period"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "table"
+                }
+              ],
+              "question": "How did the headline metrics change quarter on quarter?"
+            },
+            "How do income and expenses compare by region?": {
+              "categories": [
+                "Keystone app"
+              ],
+              "description": "Average monthly net income and total expenses per applicant, by UK region, highest income first.",
+              "dimensions": [
+                {
+                  "key": "d_region",
+                  "reference": {
+                    "dimension": "Region"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "inc",
+                  "reference": {
+                    "measure": "Avg Monthly Income"
+                  }
+                },
+                {
+                  "key": "exp",
+                  "reference": {
+                    "measure": "Avg Total Expenses"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "inc"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ],
+              "question": "How do income and expenses compare by region?"
+            },
+            "How do income and expenses trend by month?": {
+              "categories": [
+                "Keystone app"
+              ],
+              "description": "The headline measures and average essential expenses for every application month, oldest first.",
+              "dimensions": [
+                {
+                  "key": "d_month",
+                  "reference": {
+                    "dimension": "Application Month"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "apps",
+                  "reference": {
+                    "measure": "Applications"
+                  }
+                },
+                {
+                  "key": "inc",
+                  "reference": {
+                    "measure": "Avg Monthly Income"
+                  }
+                },
+                {
+                  "key": "exp",
+                  "reference": {
+                    "measure": "Avg Total Expenses"
+                  }
+                },
+                {
+                  "key": "disp",
+                  "reference": {
+                    "measure": "Avg Disposable After Loan"
+                  }
+                },
+                {
+                  "key": "dti",
+                  "reference": {
+                    "measure": "Debt to Income"
+                  }
+                },
+                {
+                  "key": "appr",
+                  "reference": {
+                    "measure": "Approval Rate"
+                  }
+                },
+                {
+                  "key": "ess",
+                  "reference": {
+                    "measure": "Avg Essential Expenses"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "d_month"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "line"
+                }
+              ],
+              "question": "How do income and expenses trend by month?"
+            },
+            "How does approval rate vary by credit band?": {
+              "categories": [
+                "Keystone app"
+              ],
+              "description": "Approved ÷ decided applications for each credit score band, highest first.",
+              "dimensions": [
+                {
+                  "key": "d_credit",
+                  "reference": {
+                    "dimension": "Credit Band"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "appr",
+                  "reference": {
+                    "measure": "Approval Rate"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "appr"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ],
+              "question": "How does approval rate vary by credit band?"
+            },
+            "How many applications are there by income band?": {
+              "categories": [
+                "Keystone app"
+              ],
+              "description": "Applications by net income band, lowest band first.",
+              "dimensions": [
+                {
+                  "key": "d_band",
+                  "reference": {
+                    "dimension": "Income Band"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "apps",
+                  "reference": {
+                    "measure": "Applications"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "d_band"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ],
+              "question": "How many applications are there by income band?"
+            },
+            "How many applications are there by product?": {
+              "categories": [
+                "Keystone app"
+              ],
+              "description": "Applications by product, largest first.",
+              "dimensions": [
+                {
+                  "key": "d_product",
+                  "reference": {
+                    "dimension": "Product"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "apps",
+                  "reference": {
+                    "measure": "Applications"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "apps"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ],
+              "question": "How many applications are there by product?"
+            },
+            "What are the headline affordability metrics?": {
+              "categories": [
+                "Keystone app"
+              ],
+              "description": "Portfolio headline figures over the applications in view: volume, average income, expenses and disposable income, debt-to-income, approval rate and lending requested.",
+              "dimensions": [
+                {
+                  "key": "d_all",
+                  "reference": {
+                    "dimension": "All Applications"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "apps",
+                  "reference": {
+                    "measure": "Applications"
+                  }
+                },
+                {
+                  "key": "inc",
+                  "reference": {
+                    "measure": "Avg Monthly Income"
+                  }
+                },
+                {
+                  "key": "exp",
+                  "reference": {
+                    "measure": "Avg Total Expenses"
+                  }
+                },
+                {
+                  "key": "disp",
+                  "reference": {
+                    "measure": "Avg Disposable After Loan"
+                  }
+                },
+                {
+                  "key": "dti",
+                  "reference": {
+                    "measure": "Debt to Income"
+                  }
+                },
+                {
+                  "key": "appr",
+                  "reference": {
+                    "measure": "Approval Rate"
+                  }
+                },
+                {
+                  "key": "lend",
+                  "reference": {
+                    "measure": "Requested Lending"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "kpi"
+                }
+              ],
+              "question": "What are the headline affordability metrics?"
+            },
+            "Where are applications in the workflow?": {
+              "categories": [
+                "Keystone app"
+              ],
+              "description": "Applications by workflow stage, in stage order.",
+              "dimensions": [
+                {
+                  "key": "d_stage",
+                  "reference": {
+                    "dimension": "Stage"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "apps",
+                  "reference": {
+                    "measure": "Applications"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "d_stage"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ],
+              "question": "Where are applications in the workflow?"
+            },
+            "Where does the money go, by income band?": {
+              "categories": [
+                "Keystone app"
+              ],
+              "description": "Average monthly outgoings per applicant by category, for each net income band.",
+              "dimensions": [
+                {
+                  "key": "d_band",
+                  "reference": {
+                    "dimension": "Income Band"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "housing",
+                  "reference": {
+                    "measure": "Avg Housing Cost"
+                  }
+                },
+                {
+                  "key": "groceries",
+                  "reference": {
+                    "measure": "Avg Groceries"
+                  }
+                },
+                {
+                  "key": "utilities",
+                  "reference": {
+                    "measure": "Avg Utilities"
+                  }
+                },
+                {
+                  "key": "transport",
+                  "reference": {
+                    "measure": "Avg Transport"
+                  }
+                },
+                {
+                  "key": "childcare",
+                  "reference": {
+                    "measure": "Avg Childcare"
+                  }
+                },
+                {
+                  "key": "discretionary",
+                  "reference": {
+                    "measure": "Avg Discretionary Spend"
+                  }
+                },
+                {
+                  "key": "debt",
+                  "reference": {
+                    "measure": "Avg Existing Debt"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "d_band"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "type": "bar"
+                }
+              ],
+              "question": "Where does the money go, by income band?"
+            }
+          },
+          "datasource": "00000000-0000-0000-0000-000000000000",
+          "dimensions": {
+            "Affordability Result": {
+              "description": "Default-policy affordability outcome: Pass (0 breaches), Marginal (1), Fail (2+).",
+              "kind": "field",
+              "reference": {
+                "field": "Affordability Result",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Age Band": {
+              "description": "Applicant age band.",
+              "kind": "field",
+              "reference": {
+                "field": "Age Band",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "All Applications": {
+              "description": "A single value (1) shared by every application: the grain of portfolio-level headline figures.",
+              "kind": "field",
+              "reference": {
+                "field": "App Count",
+                "view": "Applications"
+              },
+              "resultType": "number"
+            },
+            "Applicant": {
+              "description": "Application reference (NW-xxxxxx).",
+              "kind": "field",
+              "reference": {
+                "field": "Applicant Id",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Application Month": {
+              "description": "Month the application was submitted (yyyy-mm).",
+              "kind": "field",
+              "reference": {
+                "field": "Application Month Label",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Application Quarter": {
+              "description": "Calendar quarter the application was submitted (yyyy-Qn).",
+              "kind": "field",
+              "reference": {
+                "field": "Application Quarter",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Approver": {
+              "description": "Credit approver who signs off the decision.",
+              "kind": "field",
+              "reference": {
+                "field": "Approver",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Channel": {
+              "description": "Where the application was made.",
+              "kind": "field",
+              "reference": {
+                "field": "Channel",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Credit Band": {
+              "description": "Credit score band (Experian-style 0–999).",
+              "kind": "field",
+              "reference": {
+                "field": "Credit Band",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Employment Type": {
+              "description": "Employment status declared on the application.",
+              "kind": "field",
+              "reference": {
+                "field": "Employment Type",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Income Band": {
+              "description": "Monthly net income band (sort prefix 1–5).",
+              "kind": "field",
+              "reference": {
+                "field": "Income Band",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Outcome": {
+              "description": "Approved, Declined, Pending approval or In assessment.",
+              "kind": "field",
+              "reference": {
+                "field": "Outcome",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Product": {
+              "description": "Credit product applied for.",
+              "kind": "field",
+              "reference": {
+                "field": "Product",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Proposal": {
+              "description": "Underwriter's proposal: Approve, Counter-offer, Refer or Decline.",
+              "kind": "field",
+              "reference": {
+                "field": "Proposal",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Region": {
+              "description": "UK region of the applicant.",
+              "kind": "field",
+              "reference": {
+                "field": "Region",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Stage": {
+              "description": "Workflow stage: Affordability Check → Awaiting Approval → Decided.",
+              "kind": "field",
+              "reference": {
+                "field": "Stage",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Underwriter": {
+              "description": "Underwriter who drafted the proposal.",
+              "kind": "field",
+              "reference": {
+                "field": "Underwriter",
+                "view": "Applications"
+              },
+              "resultType": "string"
+            },
+            "Workflow Step": {
+              "description": "Audit-trail step.",
+              "kind": "field",
+              "reference": {
+                "field": "Step",
+                "view": "Workflow Events"
+              },
+              "resultType": "string"
+            }
+          },
+          "fileVersion": 3,
+          "joins": [
+            {
+              "cardinality": "many-to-one",
+              "conditions": [
+                {
+                  "arguments": [
+                    {
+                      "reference": {
+                        "field": "Applicant Id",
+                        "view": "Workflow Events"
+                      }
+                    },
+                    {
+                      "reference": {
+                        "field": "Applicant Id",
+                        "view": "Applications"
+                      }
+                    }
+                  ],
+                  "operator": "equals"
+                }
+              ],
+              "views": [
+                "Workflow Events",
+                "Applications"
+              ]
+            }
+          ],
+          "layout": {},
+          "locale": {
+            "calendar": {
+              "dayNames": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+              ],
+              "dayNamesAbbr": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+              ],
+              "monthNames": [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+              ],
+              "monthNamesAbbr": [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"
+              ]
+            },
+            "formats": {
+              "date": "yyyy-mm-dd",
+              "datetime": "yyyy-mm-dd hh:mm:ss",
+              "money": "$#,###.00",
+              "number": "#,##0.00",
+              "numberInt": "#,##0",
+              "time": "hh:mm:ss"
+            },
+            "number": {
+              "decimalSep": ".",
+              "thousandSep": ","
+            },
+            "timezone": "Europe/London"
+          },
+          "measures": {
+            "Applications": {
+              "description": "Number of applications.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Applicant Id",
+                      "view": "Applications"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "int"
+            },
+            "Approval Rate": {
+              "description": "Approved ÷ decided applications.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "0.0%"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Is Approved",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Is Decided",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Approved": {
+              "description": "Approved applications.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Is Approved",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Approved Lending": {
+              "description": "Total amount approved.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0,,.0\"m\""
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Approved Amount",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Childcare": {
+              "description": "Average monthly childcare.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Childcare",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Credit Score": {
+              "description": "Average credit score.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Credit Score",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Days to Decision": {
+              "description": "Average days from application to final decision.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Days To Decision",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Discretionary Spend": {
+              "description": "Average monthly discretionary spend.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Discretionary Spend",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Disposable After Loan": {
+              "description": "Income minus essentials, existing debt and the new repayment.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Disposable After Loan",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Essential Expenses": {
+              "description": "Average essential outgoings: housing, groceries, utilities & council tax, transport, childcare.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Essential Expenses",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Existing Debt": {
+              "description": "Average existing monthly credit commitments.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Existing Debt Payments",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Groceries": {
+              "description": "Average monthly groceries.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Groceries",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Housing Cost": {
+              "description": "Average rent or housing cost.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Housing Cost",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Monthly Income": {
+              "description": "Average monthly net (take-home) income.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Monthly Net Income",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Proposed Repayment": {
+              "description": "Average monthly repayment on the new credit.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Proposed Repayment",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Requested Amount": {
+              "description": "Average amount requested.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Requested Amount",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Total Expenses": {
+              "description": "Average monthly outgoings: essential plus discretionary.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Total Expenses",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Transport": {
+              "description": "Average monthly transport.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Transport",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Utilities": {
+              "description": "Average utilities and council tax.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Utilities & Council Tax",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Debt to Income": {
+              "description": "Existing plus new repayments ÷ net income (portfolio-weighted).",
+              "expression": "({m1} + {m2}) / {m3}",
+              "format": {
+                "pattern": "0.0%"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Existing Debt Payments",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Proposed Repayment",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "m3": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Monthly Net Income",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Expense Ratio": {
+              "description": "Total expenses ÷ net income (portfolio-weighted).",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "0.0%"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Total Expenses",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Monthly Net Income",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Open Applications": {
+              "description": "Applications still in the workflow.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Is Open",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Pass Rate": {
+              "description": "Share of applications passing default affordability policy.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "0.0%"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Is Pass",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "App Count",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Proposal Upheld Rate": {
+              "description": "Decided applications where the approver confirmed the underwriter proposal.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "0.0%"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Proposal Upheld",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Is Decided",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Requested Lending": {
+              "description": "Total amount requested.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "£#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Requested Amount",
+                      "view": "Applications"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            }
+          },
+          "name": "Keystone Affordability & Decisions",
+          "udfs": {},
+          "views": {
+            "Applications": {
+              "fields": {
+                "APR": {
+                  "dataType": "number",
+                  "source": "APR"
+                },
+                "Affordability Result": {
+                  "dataType": "string",
+                  "source": "AFFORDABILITY_RESULT"
+                },
+                "Age": {
+                  "dataType": "number",
+                  "source": "AGE"
+                },
+                "Age Band": {
+                  "dataType": "string",
+                  "source": "AGE_BAND"
+                },
+                "App Count": {
+                  "dataType": "number",
+                  "source": "APP_COUNT"
+                },
+                "Applicant Id": {
+                  "dataType": "string",
+                  "source": "APPLICANT_ID"
+                },
+                "Application Date": {
+                  "dataType": "date",
+                  "source": "APPLICATION_DATE"
+                },
+                "Application Month": {
+                  "dataType": "date",
+                  "source": "APPLICATION_MONTH"
+                },
+                "Application Month Label": {
+                  "dataType": "string",
+                  "source": "APPLICATION_MONTH_LABEL"
+                },
+                "Application Quarter": {
+                  "dataType": "string",
+                  "source": "APPLICATION_QUARTER"
+                },
+                "Approved Amount": {
+                  "dataType": "number",
+                  "source": "APPROVED_AMOUNT"
+                },
+                "Approver": {
+                  "dataType": "string",
+                  "source": "APPROVER"
+                },
+                "Channel": {
+                  "dataType": "string",
+                  "source": "CHANNEL"
+                },
+                "Childcare": {
+                  "dataType": "number",
+                  "source": "CHILDCARE"
+                },
+                "Credit Band": {
+                  "dataType": "string",
+                  "source": "CREDIT_BAND"
+                },
+                "Credit Score": {
+                  "dataType": "number",
+                  "source": "CREDIT_SCORE"
+                },
+                "Days Open": {
+                  "dataType": "number",
+                  "source": "DAYS_OPEN"
+                },
+                "Days To Decision": {
+                  "dataType": "number",
+                  "source": "DAYS_TO_DECISION"
+                },
+                "Debt To Income": {
+                  "dataType": "number",
+                  "source": "DEBT_TO_INCOME"
+                },
+                "Decision Date": {
+                  "dataType": "date",
+                  "source": "DECISION_DATE"
+                },
+                "Discretionary Spend": {
+                  "dataType": "number",
+                  "source": "DISCRETIONARY_SPEND"
+                },
+                "Disposable After Loan": {
+                  "dataType": "number",
+                  "source": "DISPOSABLE_AFTER_LOAN"
+                },
+                "Employment Type": {
+                  "dataType": "string",
+                  "source": "EMPLOYMENT_TYPE"
+                },
+                "Essential Expenses": {
+                  "dataType": "number",
+                  "source": "ESSENTIAL_EXPENSES"
+                },
+                "Existing Debt Payments": {
+                  "dataType": "number",
+                  "source": "EXISTING_DEBT_PAYMENTS"
+                },
+                "Expense To Income": {
+                  "dataType": "number",
+                  "source": "EXPENSE_TO_INCOME"
+                },
+                "Final Decision": {
+                  "dataType": "string",
+                  "source": "FINAL_DECISION"
+                },
+                "Groceries": {
+                  "dataType": "number",
+                  "source": "GROCERIES"
+                },
+                "Household Size": {
+                  "dataType": "number",
+                  "source": "HOUSEHOLD_SIZE"
+                },
+                "Housing Cost": {
+                  "dataType": "number",
+                  "source": "HOUSING_COST"
+                },
+                "Income Band": {
+                  "dataType": "string",
+                  "source": "INCOME_BAND"
+                },
+                "Is Approved": {
+                  "dataType": "number",
+                  "source": "IS_APPROVED"
+                },
+                "Is Decided": {
+                  "dataType": "number",
+                  "source": "IS_DECIDED"
+                },
+                "Is Open": {
+                  "dataType": "number",
+                  "source": "IS_OPEN"
+                },
+                "Is Pass": {
+                  "dataType": "number",
+                  "source": "IS_PASS"
+                },
+                "Loan To Income": {
+                  "dataType": "number",
+                  "source": "LOAN_TO_INCOME"
+                },
+                "Monthly Net Income": {
+                  "dataType": "number",
+                  "source": "MONTHLY_NET_INCOME"
+                },
+                "Outcome": {
+                  "dataType": "string",
+                  "source": "OUTCOME"
+                },
+                "Policy Breaches": {
+                  "dataType": "number",
+                  "source": "POLICY_BREACHES"
+                },
+                "Product": {
+                  "dataType": "string",
+                  "source": "PRODUCT"
+                },
+                "Proposal": {
+                  "dataType": "string",
+                  "source": "PROPOSAL"
+                },
+                "Proposal Date": {
+                  "dataType": "date",
+                  "source": "PROPOSAL_DATE"
+                },
+                "Proposal Upheld": {
+                  "dataType": "number",
+                  "source": "PROPOSAL_UPHELD"
+                },
+                "Proposed Repayment": {
+                  "dataType": "number",
+                  "source": "PROPOSED_REPAYMENT"
+                },
+                "Region": {
+                  "dataType": "string",
+                  "source": "REGION"
+                },
+                "Requested Amount": {
+                  "dataType": "number",
+                  "source": "REQUESTED_AMOUNT"
+                },
+                "Stage": {
+                  "dataType": "string",
+                  "source": "STAGE"
+                },
+                "Stage Order": {
+                  "dataType": "number",
+                  "source": "STAGE_ORDER"
+                },
+                "Stressed Disposable": {
+                  "dataType": "number",
+                  "source": "STRESSED_DISPOSABLE"
+                },
+                "Stressed Repayment": {
+                  "dataType": "number",
+                  "source": "STRESSED_REPAYMENT"
+                },
+                "Term Months": {
+                  "dataType": "number",
+                  "source": "TERM_MONTHS"
+                },
+                "Total Expenses": {
+                  "dataType": "number",
+                  "source": "TOTAL_EXPENSES"
+                },
+                "Transport": {
+                  "dataType": "number",
+                  "source": "TRANSPORT"
+                },
+                "Underwriter": {
+                  "dataType": "string",
+                  "source": "UNDERWRITER"
+                },
+                "Utilities & Council Tax": {
+                  "dataType": "number",
+                  "source": "UTILITIES_COUNCIL_TAX"
+                }
+              },
+              "source": {
+                "database": "ASTRATO_GALLERY",
+                "schema": "MOCK_DATA",
+                "table": "LENDING_AFFORDABILITY",
+                "type": "table"
+              }
+            },
+            "Workflow Events": {
+              "fields": {
+                "Action": {
+                  "dataType": "string",
+                  "source": "ACTION"
+                },
+                "Actor": {
+                  "dataType": "string",
+                  "source": "ACTOR"
+                },
+                "Applicant Id": {
+                  "dataType": "string",
+                  "source": "APPLICANT_ID"
+                },
+                "Event Date": {
+                  "dataType": "date",
+                  "source": "EVENT_DATE"
+                },
+                "Role": {
+                  "dataType": "string",
+                  "source": "ROLE"
+                },
+                "Step": {
+                  "dataType": "string",
+                  "source": "STEP"
+                },
+                "Step No": {
+                  "dataType": "number",
+                  "source": "STEP_NO"
+                }
+              },
+              "source": {
+                "database": "ASTRATO_GALLERY",
+                "schema": "MOCK_DATA",
+                "table": "LENDING_WORKFLOW_EVENTS",
+                "type": "table"
+              }
+            }
+          }
+        },
+        "documentRevision": "9",
+        "exportMode": "permissive",
+        "formatVersion": 1,
+        "measures": {
+          "Applications": {
+            "compiledSql": "SELECT\n  COUNT(DISTINCT \"v1_APPLICANT_ID\") AS m1\nFROM (\n  SELECT\n    \"v1_APPLICANT_ID\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.APPLICANT_ID AS \"v1_APPLICANT_ID\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Approval Rate": {
+            "compiledSql": "SELECT\n  SUM(\"v1_IS_APPROVED\") / NULLIF(SUM(\"v1_IS_DECIDED\"), 0) AS m1\nFROM (\n  SELECT\n    \"v1_IS_APPROVED\", \"v1_IS_DECIDED\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.IS_APPROVED AS \"v1_IS_APPROVED\",\n      v1.IS_DECIDED AS \"v1_IS_DECIDED\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Approved": {
+            "compiledSql": "SELECT\n  SUM(\"v1_IS_APPROVED\") AS m1\nFROM (\n  SELECT\n    \"v1_IS_APPROVED\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.IS_APPROVED AS \"v1_IS_APPROVED\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Approved Lending": {
+            "compiledSql": "SELECT\n  SUM(\"v1_APPROVED_AMOUNT\") AS m1\nFROM (\n  SELECT\n    \"v1_APPROVED_AMOUNT\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.APPROVED_AMOUNT AS \"v1_APPROVED_AMOUNT\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Childcare": {
+            "compiledSql": "SELECT\n  AVG(\"v1_CHILDCARE\") AS m1\nFROM (\n  SELECT\n    \"v1_CHILDCARE\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.CHILDCARE AS \"v1_CHILDCARE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Credit Score": {
+            "compiledSql": "SELECT\n  AVG(\"v1_CREDIT_SCORE\") AS m1\nFROM (\n  SELECT\n    \"v1_CREDIT_SCORE\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.CREDIT_SCORE AS \"v1_CREDIT_SCORE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Days to Decision": {
+            "compiledSql": "SELECT\n  AVG(\"v1_DAYS_TO_DECISION\") AS m1\nFROM (\n  SELECT\n    \"v1_DAYS_TO_DECISION\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.DAYS_TO_DECISION AS \"v1_DAYS_TO_DECISION\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Discretionary Spend": {
+            "compiledSql": "SELECT\n  AVG(\"v1_DISCRETIONARY_SPEND\") AS m1\nFROM (\n  SELECT\n    \"v1_DISCRETIONARY_SPEND\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.DISCRETIONARY_SPEND AS \"v1_DISCRETIONARY_SPEND\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Disposable After Loan": {
+            "compiledSql": "SELECT\n  AVG(\"v1_DISPOSABLE_AFTER_LOAN\") AS m1\nFROM (\n  SELECT\n    \"v1_DISPOSABLE_AFTER_LOAN\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.DISPOSABLE_AFTER_LOAN AS \"v1_DISPOSABLE_AFTER_LOAN\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Essential Expenses": {
+            "compiledSql": "SELECT\n  AVG(\"v1_ESSENTIAL_EXPENSES\") AS m1\nFROM (\n  SELECT\n    \"v1_ESSENTIAL_EXPENSES\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.ESSENTIAL_EXPENSES AS \"v1_ESSENTIAL_EXPENSES\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Existing Debt": {
+            "compiledSql": "SELECT\n  AVG(\"v1_EXISTING_DEBT_PAYMENTS\") AS m1\nFROM (\n  SELECT\n    \"v1_EXISTING_DEBT_PAYMENTS\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.EXISTING_DEBT_PAYMENTS AS \"v1_EXISTING_DEBT_PAYMENTS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Groceries": {
+            "compiledSql": "SELECT\n  AVG(\"v1_GROCERIES\") AS m1\nFROM (\n  SELECT\n    \"v1_GROCERIES\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.GROCERIES AS \"v1_GROCERIES\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Housing Cost": {
+            "compiledSql": "SELECT\n  AVG(\"v1_HOUSING_COST\") AS m1\nFROM (\n  SELECT\n    \"v1_HOUSING_COST\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.HOUSING_COST AS \"v1_HOUSING_COST\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Monthly Income": {
+            "compiledSql": "SELECT\n  AVG(\"v1_MONTHLY_NET_INCOME\") AS m1\nFROM (\n  SELECT\n    \"v1_MONTHLY_NET_INCOME\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.MONTHLY_NET_INCOME AS \"v1_MONTHLY_NET_INCOME\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Proposed Repayment": {
+            "compiledSql": "SELECT\n  AVG(\"v1_PROPOSED_REPAYMENT\") AS m1\nFROM (\n  SELECT\n    \"v1_PROPOSED_REPAYMENT\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.PROPOSED_REPAYMENT AS \"v1_PROPOSED_REPAYMENT\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Requested Amount": {
+            "compiledSql": "SELECT\n  AVG(\"v1_REQUESTED_AMOUNT\") AS m1\nFROM (\n  SELECT\n    \"v1_REQUESTED_AMOUNT\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.REQUESTED_AMOUNT AS \"v1_REQUESTED_AMOUNT\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Total Expenses": {
+            "compiledSql": "SELECT\n  AVG(\"v1_TOTAL_EXPENSES\") AS m1\nFROM (\n  SELECT\n    \"v1_TOTAL_EXPENSES\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.TOTAL_EXPENSES AS \"v1_TOTAL_EXPENSES\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Transport": {
+            "compiledSql": "SELECT\n  AVG(\"v1_TRANSPORT\") AS m1\nFROM (\n  SELECT\n    \"v1_TRANSPORT\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.TRANSPORT AS \"v1_TRANSPORT\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Utilities": {
+            "compiledSql": "SELECT\n  AVG(\"v1_UTILITIES_COUNCIL_TAX\") AS m1\nFROM (\n  SELECT\n    \"v1_UTILITIES_COUNCIL_TAX\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.UTILITIES_COUNCIL_TAX AS \"v1_UTILITIES_COUNCIL_TAX\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Debt to Income": {
+            "compiledSql": "SELECT\n  (CASE WHEN COALESCE(SUM(\"v1_EXISTING_DEBT_PAYMENTS\"), SUM(\"v1_PROPOSED_REPAYMENT\")) IS NULL THEN NULL ELSE COALESCE(SUM(\"v1_EXISTING_DEBT_PAYMENTS\"), 0) + COALESCE(SUM(\"v1_PROPOSED_REPAYMENT\"), 0) END) / NULLIF(SUM(\"v1_MONTHLY_NET_INCOME\"), 0) AS m1\nFROM (\n  SELECT\n    \"v1_EXISTING_DEBT_PAYMENTS\", \"v1_PROPOSED_REPAYMENT\", \"v1_MONTHLY_NET_INCOME\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.EXISTING_DEBT_PAYMENTS AS \"v1_EXISTING_DEBT_PAYMENTS\",\n      v1.PROPOSED_REPAYMENT AS \"v1_PROPOSED_REPAYMENT\",\n      v1.MONTHLY_NET_INCOME AS \"v1_MONTHLY_NET_INCOME\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Expense Ratio": {
+            "compiledSql": "SELECT\n  SUM(\"v1_TOTAL_EXPENSES\") / NULLIF(SUM(\"v1_MONTHLY_NET_INCOME\"), 0) AS m1\nFROM (\n  SELECT\n    \"v1_TOTAL_EXPENSES\", \"v1_MONTHLY_NET_INCOME\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.TOTAL_EXPENSES AS \"v1_TOTAL_EXPENSES\",\n      v1.MONTHLY_NET_INCOME AS \"v1_MONTHLY_NET_INCOME\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Open Applications": {
+            "compiledSql": "SELECT\n  SUM(\"v1_IS_OPEN\") AS m1\nFROM (\n  SELECT\n    \"v1_IS_OPEN\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.IS_OPEN AS \"v1_IS_OPEN\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Pass Rate": {
+            "compiledSql": "SELECT\n  SUM(\"v1_IS_PASS\") / NULLIF(SUM(\"v1_APP_COUNT\"), 0) AS m1\nFROM (\n  SELECT\n    \"v1_IS_PASS\", \"v1_APP_COUNT\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.IS_PASS AS \"v1_IS_PASS\",\n      v1.APP_COUNT AS \"v1_APP_COUNT\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Proposal Upheld Rate": {
+            "compiledSql": "SELECT\n  SUM(\"v1_PROPOSAL_UPHELD\") / NULLIF(SUM(\"v1_IS_DECIDED\"), 0) AS m1\nFROM (\n  SELECT\n    \"v1_PROPOSAL_UPHELD\", \"v1_IS_DECIDED\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.PROPOSAL_UPHELD AS \"v1_PROPOSAL_UPHELD\",\n      v1.IS_DECIDED AS \"v1_IS_DECIDED\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Requested Lending": {
+            "compiledSql": "SELECT\n  SUM(\"v1_REQUESTED_AMOUNT\") AS m1\nFROM (\n  SELECT\n    \"v1_REQUESTED_AMOUNT\"\n  FROM (\n    SELECT -- GRAIN Applications\n      v1.REQUESTED_AMOUNT AS \"v1_REQUESTED_AMOUNT\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.LENDING_AFFORDABILITY AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          }
+        },
+        "namespace": "ASTRATO",
+        "ossieSpecVersion": "0.1.1",
+        "projectionFingerprint": {
+          "algorithm": "SHA-256",
+          "canonicalization": "astrato-stable-json-v1",
+          "value": "9ce1b49a617bb40ea6aad729eb5d5ab26b654748be9b37e9debfe6a377ddfe7a"
+        },
+        "runtimeVendor": "snowflake"
+      }

@@ -1,0 +1,81 @@
+slug: league-table-planner
+title: League Table Climb Planner
+company: None (a published third-party UK university league table; redistribution terms unconfirmed, see DATA-SOURCES.md)
+layer: uk-university-rankings
+summary: >-
+  A Director of Strategy at a mid-ranked UK university (Kent by default, switchable) decides which
+  component measures and which rival universities to focus on to climb the table: where we stand
+  against the universities around us, which measures cost us places, what a higher total score
+  would buy, and a focus plan proposed to the Vice-Chancellor for approval. Built by an agent from
+  this repo in a clean environment as a test run, then brought up to standard: it shows what the
+  playbook produces.
+industry: education
+function: strategy
+persona: Director of Strategy, mid-ranked UK university
+archetype: planner
+look: >-
+  light; deep navy masthead (#0B2545) with the our-university picker and an Excel report button;
+  one teal (#0E9F9A) for "us" on every chart, navy-blue (#1F4E79) otherwise, red/green only for
+  falls and climbs; white rounded cards on a pale grey page (#F3F6F9); page text in Inter / Segoe UI
+  / system-ui (Inter is not bundled), Roboto from npm inside charts; a sticky selection bar (Nation,
+  University group and Rank band dropdowns, the library filter bar with chips and Clear all, a
+  "Rivals: ±10 places" reset) above four underlined tabs; each tab fits one 1440 screen
+tabs:
+  - Where we stand — where do we rank, how far have we moved since 2026 and 2025, and how did the rivals within 10 places of us move?
+  - What costs us places — where does each rival rank within the set on each component measure, and how far above or below the rivals' average is each on prospects, experience, research and entry?
+  - What it takes — if our total score rose by N points, what rank would it buy, whom would we overtake, and how far ahead is each rival?
+  - Focus plan — which measures and rivals do we commit to, and has the Vice-Chancellor approved it?
+patterns:
+  - governed-business-questions
+  - kpi-sparkline-comparison
+  - selection-bar
+  - preload-tabs
+  - what-if-parameters
+  - query-scheduler
+  - table-sparklines
+  - role-switcher
+  - xlsx-export
+charts: [kpi, sparkline, bar, line, table, table-sparklines]
+interactions: [click-to-filter, selection-bar, tabs, sliders, compare, role-switcher, deep-link]
+workflows: [maker-checker-approval]
+writeback: false
+exports: [xlsx]
+objects: 29  # 3 filter dropdowns + 14 on Where we stand (4 values, 4 change rows, 4 mini charts, a bar, a table) + 5 on What costs us places + 5 on What it takes + 2 on Focus plan, all mounted at load; plus the library filter bar
+start_here:
+  - project/src/app.js — boot, the league query and hero sentence, shell, selection groups mirrored per tab, the what-if slider, mount lanes, resize refit, ten self-checks
+  - project/src/catalogue.js — every object as data (a stored question plus presentation), the selection groups, the rank and moving-average calculations
+  - project/src/prepare.js — the one pre-mount path (theme, governed parameters, relabel, widths) shared with tools/compile-adapter.mjs
+  - project/src/workflow.js — the focus plan: propose, approve or return, four-eyes rule, audit trail (browser-only)
+capabilities:
+  - what-if — project/src/app.js:305
+  - narrative-headline — project/src/app.js:147
+  - simulated-workflow — project/src/workflow.js:32
+  - excel-export — project/src/export.js:22
+stealable:
+  - "A selection group per tab, mirrored from main by difference and only while the tab is visible, so a click re-queries only what is on screen; a self-check holds queries per selection to the visible objects — project/src/app.js:253"
+  - "Chart clicks arrive as pending selections in the tab's group and are handed to main after 200 ms, so every tab and the chips follow — project/src/app.js:284"
+  - "What-if through the layer: the slider sets the governed `score` parameter of Projected Rank at Score on the mounted object, with no remount — project/src/app.js:314"
+  - "The same slider writes a governed `between` selection on Total Score (2027) into an `overtake` group, so the overtaken count and table are governed rows — project/src/app.js:247"
+  - "One pre-mount path for every tile (theme, governed parameters such as our score as `benchmark`, relabel by position), shared with the offline compile adapter so the check runs what the browser runs — project/src/prepare.js:63"
+  - "A stored question's rank-within-set and 2-edition moving average carried onto the tile as advanced-calculation operations — project/src/catalogue.js:84"
+  - "Table column widths from header length at the font size, a wrapping name column sized for the longest name, row height from its line count; re-applied on resize without a remount (src/app.js:322) — project/src/prepare.js:18"
+  - "Bar charts narrower than 220 px drop their data labels rather than ellipsise them — project/src/prepare.js:89"
+  - "Rank-history sparkline column on the league table, from the joined history view's Edition Date — project/src/catalogue.js:167"
+  - "Seven-sheet Excel report from each mounted object's own data (handle.getData), following the filters — project/src/export.js:22"
+caveats:
+  - No screenshots in this repo, and no data: bring your own tables shaped like the layer's schema/ddl.sql.
+  - "Built by an agent from this repo in a clean environment as a test run, then brought up to standard: read it as what the playbook produces, not as a hand-polished demo."
+  - "Third-party published data (licence unconfirmed, see DATA-SOURCES.md): 130 UK universities, 2027 edition, with the two prior overall ranks and a rank-history view (2025–2027). University names are public. The total score's component weights are not in the data, so the app shows gaps per component, not a modelled points bridge."
+  - "The focus plan is not written back. Plan, decisions and audit trail live in localStorage (key climb-planner-plan-v1, src/workflow.js:22), and the screen says so."
+  - "The two what-if KPIs (projected rank, universities overtaken) are bare numbers, with no comparison or mini chart (src/app.js:190, src/app.js:191). Projected rank does not break ties."
+  - "The rank-on-measure table has no sparkline column; only the league table on Where we stand carries one."
+  - "The hero's \"N points of total score separate us from the top 50\" is a subtraction in the app of two governed values (src/app.js:150), not a stored measure."
+  - "Some bars draw no data label (in the test run, one of the largest movers on Who moved most, and most gap bars on What costs us places)."
+  - "Indicator columns (Moved, the within-set ranks) draw the same small up caret before every value, falls included; only the colour carries direction."
+  - "Wrapped university names make table rows taller at 1280 and 1024, so fewer rows show without scrolling."
+  - "Clicks on the KPI mini charts and on the moving-average line are untested."
+  - "Changing our university reloads the page with ?uni= (src/app.js:132)."
+  - "Inert leftovers: questions.js carries two questions no object uses (climbersBand, fallersBand); throttle.js exports a prefetch helper nothing calls, and its header comment still mentions a timetable."
+  - "Checked in staging: smoke test PASS at 1440, 1280 and 1024, 29 objects, landing-ready in 5.8 s (24 s before compile and theming ran in parallel), 10 app checks (a Nation filter on each of the first three tabs with queries per selection held to the visible objects, a chart click that the next tab follows, the what-if, the focus table, the workflow, an empty selection, the Excel report, no overflow); compile-check 29/29; build passes. Not published, so no live smoke."
+  - Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite.
+  - astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too.

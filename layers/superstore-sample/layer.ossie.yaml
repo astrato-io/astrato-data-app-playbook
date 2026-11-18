@@ -1,0 +1,1005 @@
+version: 0.1.1
+name: Superstore Sample
+datasets:
+  - name: Orders
+    source: '"superstore"."orders"'
+    description: >-
+      Order lines from Ryan Sleeper's Super Sample Superstore extract: 12,420 lines across 5,009 orders, 2016-01-03 to
+      2019-12-30.
+    fields:
+      - name: Sales
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"sales"'
+      - name: State
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"state"'
+      - name: Profit
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"profit"'
+      - name: Region
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"region"'
+        dimension: {}
+        description: 'Sales region: Central, East, South, West.'
+        ai_context:
+          instructions: 'Sales region: Central, East, South, West.'
+      - name: Country
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"country"'
+      - name: Segment
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"segment"'
+        dimension: {}
+        description: 'Customer segment: Consumer, Corporate, Home Office.'
+        ai_context:
+          instructions: 'Customer segment: Consumer, Corporate, Home Office.'
+      - name: Category
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"category"'
+        dimension: {}
+        description: 'Product category: Furniture, Office Supplies, Technology.'
+        ai_context:
+          instructions: 'Product category: Furniture, Office Supplies, Technology.'
+      - name: Discount
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"discount"'
+      - name: Order ID
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"order_id"'
+      - name: Quantity
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"quantity"'
+      - name: Returned
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"returned"'
+      - name: Ship Date
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"ship_date"'
+      - name: Ship Mode
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"ship_mode"'
+      - name: Order Date
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"order_date"'
+        dimension:
+          is_time: true
+        description: >-
+          Date the order was placed. 2016-01-03 to 2019-12-30 - the extract's own dates, not the source workbook's
+          four-year shift.
+        ai_context:
+          instructions: >-
+            Date the order was placed. 2016-01-03 to 2019-12-30 - the extract's own dates, not the source workbook's
+            four-year shift.
+      - name: Product Name
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"product_name"'
+      - name: Sub-Category
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"sub_category"'
+        dimension: {}
+        description: The seventeen product sub-categories. Machines and Tables are the loss-makers.
+        ai_context:
+          instructions: The seventeen product sub-categories. Machines and Tables are the loss-makers.
+      - name: Customer Name
+        expression:
+          dialects:
+            - dialect: ANSI_SQL
+              expression: '"customer_name"'
+metrics:
+  - name: Orders
+    expression:
+      dialects:
+        - dialect: ANSI_SQL
+          expression: COUNT(DISTINCT "v1_order_id")
+    description: >-
+      Distinct orders. An order has many lines, so this is a distinct count of Order ID, not a row count: 12,420 lines
+      across 5,009 orders.
+    ai_context:
+      instructions: >-
+        Distinct orders. An order has many lines, so this is a distinct count of Order ID, not a row count: 12,420 lines
+        across 5,009 orders.
+  - name: Profit
+    expression:
+      dialects:
+        - dialect: ANSI_SQL
+          expression: SUM("v1_profit")
+    description: Profit on order lines, in USD. Negative on discounted furniture and on most of the Machines sub-category.
+    ai_context:
+      instructions: Profit on order lines, in USD. Negative on discounted furniture and on most of the Machines sub-category.
+  - name: Profit Ratio
+    expression:
+      dialects:
+        - dialect: ANSI_SQL
+          expression: SUM("v1_profit") / NULLIF(SUM("v1_sales"), 0)::Nullable(Float64)
+    description: >-
+      Profit as a share of sales. Both operands are Float64 in ClickHouse, not Decimal, so the division keeps its
+      precision.
+    ai_context:
+      instructions: >-
+        Profit as a share of sales. Both operands are Float64 in ClickHouse, not Decimal, so the division keeps its
+        precision.
+  - name: Returns
+    expression:
+      dialects:
+        - dialect: ANSI_SQL
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Returns uses advanced semantics that Apache Ossie cannot represent as one
+            reusable metric expression. The engine-generated query below is context for people and AI agents; it is not
+            directly executable as this metric.
+
+            -- SELECT
+
+            --   COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v1_returned" = 'Yes'
+
+            --     THEN "v1_order_id"
+
+            --     END
+
+            --   ) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v1_order_id", "v1_returned"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN Orders
+
+            --       v1.order_id AS "v1_order_id",
+
+            --       v1.returned AS "v1_returned"
+
+            --     FROM superstore.orders AS v1
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: >-
+      Orders with a returned line. The flag is set on every line of a returned order, never on part of one: 3,226
+      flagged lines across exactly 296 orders.
+    ai_context:
+      instructions: >-
+        Orders with a returned line. The flag is set on every line of a returned order, never on part of one: 3,226
+        flagged lines across exactly 296 orders.
+  - name: Sales
+    expression:
+      dialects:
+        - dialect: ANSI_SQL
+          expression: SUM("v1_sales")
+    description: Net sales value of order lines, in USD.
+    ai_context:
+      instructions: Net sales value of order lines, in USD.
+custom_extensions:
+  - vendor_name: COMMON
+    data: |-
+      {
+        "datasourceDriver": "clickhouse",
+        "diagnostics": [
+          {
+            "code": "EXTENSION_ONLY_DIMENSION",
+            "entityKey": "Category > Sub-Category > Product",
+            "entityType": "dimension",
+            "message": "Drill-through dimensions are preserved only in the Astrato extension.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Returns",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          }
+        ],
+        "document": {
+          "businessQuestions": {
+            "Does discounting cost us profit?": {
+              "businessValue": "Tests the assumption that a discount buys volume worth having.",
+              "categories": [
+                "Profitability"
+              ],
+              "description": "Sales and profit at each discount level.",
+              "dimensions": [
+                {
+                  "key": "Discount",
+                  "reference": {
+                    "field": "Discount",
+                    "view": "Orders"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "Sales",
+                  "reference": {
+                    "measure": "Sales"
+                  }
+                },
+                {
+                  "key": "Profit",
+                  "reference": {
+                    "measure": "Profit"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "Discount"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "reason": "Sales as volume against profit as the consequence, on one discount axis.",
+                  "type": "combo"
+                }
+              ],
+              "question": "Does discounting cost us profit?"
+            },
+            "How did sales and profit move through the year?": {
+              "businessValue": "Shows whether profit follows sales or drifts away from it.",
+              "categories": [
+                "Trend"
+              ],
+              "description": "Sales and profit over the order date.",
+              "dimensions": [
+                {
+                  "key": "Order Date",
+                  "reference": {
+                    "dimension": "Order Date"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "Sales",
+                  "reference": {
+                    "measure": "Sales"
+                  }
+                },
+                {
+                  "key": "Profit",
+                  "reference": {
+                    "measure": "Profit"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "dimension": "Order Date"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "reason": "Two series on a time axis.",
+                  "type": "line"
+                }
+              ],
+              "question": "How did sales and profit move through the year?"
+            },
+            "How do the segments compare on sales and margin?": {
+              "businessValue": "Separates size from quality: the biggest segment is not always the best margin.",
+              "categories": [
+                "Customers"
+              ],
+              "description": "Sales, profit and profit ratio for Consumer, Corporate and Home Office.",
+              "dimensions": [
+                {
+                  "key": "Segment",
+                  "reference": {
+                    "dimension": "Segment"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "Sales",
+                  "reference": {
+                    "measure": "Sales"
+                  }
+                },
+                {
+                  "key": "Profit",
+                  "reference": {
+                    "measure": "Profit"
+                  }
+                },
+                {
+                  "key": "Profit Ratio",
+                  "reference": {
+                    "measure": "Profit Ratio"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "Sales"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "reason": "Three categories, several measures.",
+                  "type": "bar"
+                }
+              ],
+              "question": "How do the segments compare on sales and margin?"
+            },
+            "What does each ship mode deliver?": {
+              "businessValue": "Shows what the faster shipping options actually earn once their volume is taken into account.",
+              "categories": [
+                "Operations"
+              ],
+              "description": "Orders, sales and profit by ship mode.",
+              "dimensions": [
+                {
+                  "key": "Ship Mode",
+                  "reference": {
+                    "field": "Ship Mode",
+                    "view": "Orders"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "Sales",
+                  "reference": {
+                    "measure": "Sales"
+                  }
+                },
+                {
+                  "key": "Orders",
+                  "reference": {
+                    "measure": "Orders"
+                  }
+                },
+                {
+                  "key": "Profit",
+                  "reference": {
+                    "measure": "Profit"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "Sales"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "reason": "Four modes side by side.",
+                  "type": "bar"
+                }
+              ],
+              "question": "What does each ship mode deliver?"
+            },
+            "Where do sales and profit sit by category?": {
+              "businessValue": "The standard roll-up: which category carries the business, and which part of it.",
+              "categories": [
+                "Profitability"
+              ],
+              "description": "Sales and profit for each category broken down by sub-category.",
+              "dimensions": [
+                {
+                  "key": "Category",
+                  "reference": {
+                    "dimension": "Category"
+                  }
+                },
+                {
+                  "key": "Sub-Category",
+                  "reference": {
+                    "dimension": "Sub-Category"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "Sales",
+                  "reference": {
+                    "measure": "Sales"
+                  }
+                },
+                {
+                  "key": "Profit",
+                  "reference": {
+                    "measure": "Profit"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "Sales"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "reason": "Sub-categories inside their category.",
+                  "type": "stacked_bar"
+                },
+                {
+                  "reason": "Two levels with two measures reads as well in a table.",
+                  "type": "table"
+                }
+              ],
+              "question": "Where do sales and profit sit by category?"
+            },
+            "Which states sell the most?": {
+              "businessValue": "Ranks the territory, which the map shows as colour but does not put in order.",
+              "categories": [
+                "Geography"
+              ],
+              "defaults": {
+                "othersLabel": "Other states",
+                "showOthers": true,
+                "topN": 15
+              },
+              "description": "Sales and profit by state, largest sales first.",
+              "dimensions": [
+                {
+                  "key": "State",
+                  "reference": {
+                    "field": "State",
+                    "view": "Orders"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "Sales",
+                  "reference": {
+                    "measure": "Sales"
+                  }
+                },
+                {
+                  "key": "Profit",
+                  "reference": {
+                    "measure": "Profit"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "Sales"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "reason": "A ranked list of places reads as a bar chart, not a map.",
+                  "type": "bar"
+                }
+              ],
+              "question": "Which states sell the most?"
+            },
+            "Which sub-categories lose money?": {
+              "businessValue": "Finds the lines that are sold at a loss and would otherwise hide inside a healthy category total.",
+              "categories": [
+                "Profitability"
+              ],
+              "description": "Profit and sales for every sub-category, worst profit first.",
+              "dimensions": [
+                {
+                  "key": "Sub-Category",
+                  "reference": {
+                    "dimension": "Sub-Category"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "Sales",
+                  "reference": {
+                    "measure": "Sales"
+                  }
+                },
+                {
+                  "key": "Profit",
+                  "reference": {
+                    "measure": "Profit"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "ascending",
+                  "reference": {
+                    "measure": "Profit"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "reason": "One bar per sub-category, ordered, so the negative ones sit together at one end.",
+                  "type": "bar"
+                }
+              ],
+              "question": "Which sub-categories lose money?"
+            },
+            "Who are the most profitable customers?": {
+              "businessValue": "Names the accounts worth keeping, which no category or region total can.",
+              "categories": [
+                "Customers"
+              ],
+              "defaults": {
+                "topN": 10
+              },
+              "description": "The ten customers contributing the most profit, with their sales.",
+              "dimensions": [
+                {
+                  "key": "Customer Name",
+                  "reference": {
+                    "field": "Customer Name",
+                    "view": "Orders"
+                  }
+                }
+              ],
+              "measures": [
+                {
+                  "key": "Sales",
+                  "reference": {
+                    "measure": "Sales"
+                  }
+                },
+                {
+                  "key": "Profit",
+                  "reference": {
+                    "measure": "Profit"
+                  }
+                }
+              ],
+              "orderBy": [
+                {
+                  "direction": "descending",
+                  "reference": {
+                    "measure": "Profit"
+                  }
+                }
+              ],
+              "preferredCharts": [
+                {
+                  "reason": "Ten named rows, ordered.",
+                  "type": "bar"
+                }
+              ],
+              "question": "Who are the most profitable customers?"
+            }
+          },
+          "datasource": "00000000-0000-0000-0000-000000000000",
+          "dimensions": {
+            "Category": {
+              "description": "Product category: Furniture, Office Supplies, Technology.",
+              "kind": "field",
+              "reference": {
+                "field": "Category",
+                "view": "Orders"
+              },
+              "resultType": "string"
+            },
+            "Category > Sub-Category > Product": {
+              "description": "The product hierarchy, for drilling from a category bar down to the individual product.",
+              "kind": "drillthrough",
+              "levels": [
+                {
+                  "reference": {
+                    "field": "Category",
+                    "view": "Orders"
+                  }
+                },
+                {
+                  "reference": {
+                    "field": "Sub-Category",
+                    "view": "Orders"
+                  }
+                },
+                {
+                  "reference": {
+                    "field": "Product Name",
+                    "view": "Orders"
+                  }
+                }
+              ]
+            },
+            "Order Date": {
+              "description": "Date the order was placed. 2016-01-03 to 2019-12-30 - the extract's own dates, not the source workbook's four-year shift.",
+              "kind": "field",
+              "reference": {
+                "field": "Order Date",
+                "view": "Orders"
+              },
+              "resultType": "date"
+            },
+            "Region": {
+              "description": "Sales region: Central, East, South, West.",
+              "kind": "field",
+              "reference": {
+                "field": "Region",
+                "view": "Orders"
+              },
+              "resultType": "string"
+            },
+            "Segment": {
+              "description": "Customer segment: Consumer, Corporate, Home Office.",
+              "kind": "field",
+              "reference": {
+                "field": "Segment",
+                "view": "Orders"
+              },
+              "resultType": "string"
+            },
+            "Sub-Category": {
+              "description": "The seventeen product sub-categories. Machines and Tables are the loss-makers.",
+              "kind": "field",
+              "reference": {
+                "field": "Sub-Category",
+                "view": "Orders"
+              },
+              "resultType": "string"
+            }
+          },
+          "fileVersion": 3,
+          "joins": [],
+          "layout": {},
+          "locale": {
+            "calendar": {
+              "dayNames": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+              ],
+              "dayNamesAbbr": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+              ],
+              "monthNames": [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+              ],
+              "monthNamesAbbr": [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"
+              ]
+            },
+            "formats": {
+              "date": "yyyy-mm-dd",
+              "datetime": "yyyy-mm-dd hh:mm:ss",
+              "money": "$#,###.00",
+              "number": "#,##0.00",
+              "numberInt": "#,##0",
+              "time": "hh:mm:ss"
+            },
+            "number": {
+              "decimalSep": ".",
+              "thousandSep": ","
+            },
+            "timezone": "Europe/London"
+          },
+          "measures": {
+            "Orders": {
+              "description": "Distinct orders. An order has many lines, so this is a distinct count of Order ID, not a row count: 12,420 lines across 5,009 orders.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Order ID",
+                      "view": "Orders"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "int"
+            },
+            "Profit": {
+              "description": "Profit on order lines, in USD. Negative on discounted furniture and on most of the Machines sub-category.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "$#,###.00"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Profit",
+                      "view": "Orders"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Profit Ratio": {
+              "description": "Profit as a share of sales. Both operands are Float64 in ClickHouse, not Decimal, so the division keeps its precision.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "##0.0%"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Profit",
+                      "view": "Orders"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Sales",
+                      "view": "Orders"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Returns": {
+              "description": "Orders with a returned line. The flag is set on every line of a returned order, never on part of one: 3,226 flagged lines across exactly 296 orders.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Order ID",
+                      "view": "Orders"
+                    }
+                  }
+                ],
+                "distinct": true,
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Returned",
+                          "view": "Orders"
+                        }
+                      },
+                      {
+                        "dataType": "string",
+                        "value": "Yes"
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "resultType": "int"
+            },
+            "Sales": {
+              "description": "Net sales value of order lines, in USD.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "$#,###.00"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Sales",
+                      "view": "Orders"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            }
+          },
+          "name": "Superstore Sample",
+          "udfs": {},
+          "views": {
+            "Orders": {
+              "description": "Order lines from Ryan Sleeper's Super Sample Superstore extract: 12,420 lines across 5,009 orders, 2016-01-03 to 2019-12-30.",
+              "fields": {
+                "Category": {
+                  "dataType": "string",
+                  "source": "category"
+                },
+                "Country": {
+                  "dataType": "string",
+                  "source": "country"
+                },
+                "Customer Name": {
+                  "dataType": "string",
+                  "source": "customer_name"
+                },
+                "Discount": {
+                  "dataType": "float",
+                  "source": "discount"
+                },
+                "Order Date": {
+                  "dataType": "date",
+                  "source": "order_date"
+                },
+                "Order ID": {
+                  "dataType": "string",
+                  "source": "order_id"
+                },
+                "Product Name": {
+                  "dataType": "string",
+                  "source": "product_name"
+                },
+                "Profit": {
+                  "dataType": "float",
+                  "source": "profit"
+                },
+                "Quantity": {
+                  "dataType": "int",
+                  "source": "quantity"
+                },
+                "Region": {
+                  "dataType": "string",
+                  "source": "region"
+                },
+                "Returned": {
+                  "dataType": "string",
+                  "source": "returned"
+                },
+                "Sales": {
+                  "dataType": "float",
+                  "source": "sales"
+                },
+                "Segment": {
+                  "dataType": "string",
+                  "source": "segment"
+                },
+                "Ship Date": {
+                  "dataType": "date",
+                  "source": "ship_date"
+                },
+                "Ship Mode": {
+                  "dataType": "string",
+                  "source": "ship_mode"
+                },
+                "State": {
+                  "dataType": "string",
+                  "source": "state"
+                },
+                "Sub-Category": {
+                  "dataType": "string",
+                  "source": "sub_category"
+                }
+              },
+              "source": {
+                "objectType": "BASE TABLE",
+                "schema": "superstore",
+                "table": "orders",
+                "type": "table"
+              }
+            }
+          }
+        },
+        "documentRevision": "4",
+        "exportMode": "permissive",
+        "formatVersion": 1,
+        "measures": {
+          "Orders": {
+            "compiledSql": "SELECT\n  COUNT(DISTINCT \"v1_order_id\") AS m1\nFROM (\n  SELECT\n    \"v1_order_id\"\n  FROM (\n    SELECT -- GRAIN Orders\n      v1.order_id AS \"v1_order_id\"\n    FROM superstore.orders AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Profit": {
+            "compiledSql": "SELECT\n  SUM(\"v1_profit\") AS m1\nFROM (\n  SELECT\n    \"v1_profit\"\n  FROM (\n    SELECT -- GRAIN Orders\n      v1.profit AS \"v1_profit\"\n    FROM superstore.orders AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Profit Ratio": {
+            "compiledSql": "SELECT\n  SUM(\"v1_profit\") / NULLIF(SUM(\"v1_sales\"), 0)::Nullable(Float64) AS m1\nFROM (\n  SELECT\n    \"v1_profit\", \"v1_sales\"\n  FROM (\n    SELECT -- GRAIN Orders\n      v1.profit AS \"v1_profit\",\n      v1.sales AS \"v1_sales\"\n    FROM superstore.orders AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Returns": {
+            "compiledSql": "SELECT\n  COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v1_returned\" = 'Yes'\n    THEN \"v1_order_id\"\n    END\n  ) AS m1\nFROM (\n  SELECT\n    \"v1_order_id\", \"v1_returned\"\n  FROM (\n    SELECT -- GRAIN Orders\n      v1.order_id AS \"v1_order_id\",\n      v1.returned AS \"v1_returned\"\n    FROM superstore.orders AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Sales": {
+            "compiledSql": "SELECT\n  SUM(\"v1_sales\") AS m1\nFROM (\n  SELECT\n    \"v1_sales\"\n  FROM (\n    SELECT -- GRAIN Orders\n      v1.sales AS \"v1_sales\"\n    FROM superstore.orders AS v1\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          }
+        },
+        "namespace": "ASTRATO",
+        "ossieSpecVersion": "0.1.1",
+        "projectionFingerprint": {
+          "algorithm": "SHA-256",
+          "canonicalization": "astrato-stable-json-v1",
+          "value": "3b8a8564a68893366d6900daa1f0c37d44b67449e025131e87e8c5e4ebade00b"
+        },
+        "runtimeVendor": "clickhouse"
+      }

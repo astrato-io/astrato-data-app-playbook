@@ -1,0 +1,4450 @@
+version: 0.1.1
+name: Thessaloniki on the Move
+datasets:
+  - name: Categories
+    source: SELECT DISTINCT CATEGORY AS CATEGORY_KEY FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES
+    description: 'Conformed line-category dimension (5 rows): joins Lines and Fleet so one category filter reaches both.'
+    fields:
+      - name: CATEGORY_KEY
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CATEGORY_KEY"'
+  - name: Fleet
+    source: '"ASTRATO_GALLERY"."MOCK_DATA"."TH_FLEET_MINUTE"'
+    fields:
+      - name: Sim Day
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SIM_DAY"'
+      - name: Category
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CATEGORY"'
+      - name: Clock Hour
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CLOCK_HOUR"'
+        dimension: {}
+        description: Hour of the day, reference weekday.
+        ai_context:
+          instructions: Hour of the day, reference weekday.
+      - name: Clock Time
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CLOCK_TIME"'
+      - name: Buses Active
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"BUSES_ACTIVE"'
+      - name: Ten Min Slot
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"TEN_MIN_SLOT"'
+      - name: Two Min Slot
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"TWO_MIN_SLOT"'
+      - name: Five Min Slot
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"FIVE_MIN_SLOT"'
+      - name: Minute Of Day
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"MINUTE_OF_DAY"'
+      - name: Trips Departing
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"TRIPS_DEPARTING"'
+      - name: Fifteen Min Slot
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"FIFTEEN_MIN_SLOT"'
+      - name: Fleet Category
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CATEGORY"'
+        dimension: {}
+        description: Line category of the buses in service.
+        ai_context:
+          instructions: Line category of the buses in service.
+      - name: Ten-Minute Slot
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"TEN_MIN_SLOT"'
+        dimension: {}
+        description: Clock time rounded down to 10 minutes, reference weekday.
+        ai_context:
+          instructions: Clock time rounded down to 10 minutes, reference weekday.
+  - name: Hours
+    source: >-
+      SELECT LPAD(SEQ4()::STRING, 2, '0') || ':00' AS HOUR_KEY, CASE WHEN SEQ4() < 6 THEN '1. Night (0–6)' WHEN SEQ4() <
+      10 THEN '2. AM peak (6–10)' WHEN SEQ4() < 14 THEN '3. Midday (10–14)' WHEN SEQ4() < 18 THEN '4. PM peak (14–18)'
+      WHEN SEQ4() < 21 THEN '5. Evening (18–21)' ELSE '6. Late (21–24)' END AS HOUR_BAND FROM TABLE(GENERATOR(ROWCOUNT
+      => 24))
+    description: 'Conformed hour-of-day dimension (24 rows, 00:00–23:00): joins Service and Fleet so time-of-day filters reach both.'
+    fields:
+      - name: HOUR_KEY
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"HOUR_KEY"'
+      - name: HOUR_BAND
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"HOUR_BAND"'
+  - name: Line Stops
+    source: '"ASTRATO_GALLERY"."MOCK_DATA"."TH_LINE_STOPS"'
+    fields:
+      - name: Line
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LINE"'
+      - name: Stop Id
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOP_ID"'
+      - name: Stop Lat
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOP_LAT"'
+      - name: Stop Lon
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOP_LON"'
+      - name: Stop Label
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOP_LABEL"'
+      - name: Line Stop Id
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LINE_STOP_ID"'
+      - name: Stop Sequence
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOP_SEQUENCE"'
+      - name: Weekday Calls
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"WEEKDAY_CALLS"'
+      - name: Route Stop
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOP_LABEL"'
+        dimension: {}
+        description: A stop on the selected line.
+        ai_context:
+          instructions: A stop on the selected line.
+  - name: Lines
+    source: '"ASTRATO_GALLERY"."MOCK_DATA"."TH_LINES"'
+    fields:
+      - name: City
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CITY"'
+      - name: Line
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LINE"'
+        dimension: {}
+        description: OSETH line number (route_short_name), e.g. 01X, 31, 52.
+        ai_context:
+          instructions: OSETH line number (route_short_name), e.g. 01X, 31, 52.
+      - name: Category
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CATEGORY"'
+      - name: Route Km
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"ROUTE_KM"'
+      - name: Line Name
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LINE_NAME"'
+        dimension: {}
+        description: Route name in Greek as published by OSETH.
+        ai_context:
+          instructions: Route name in Greek as published by OSETH.
+      - name: Line Color
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LINE_COLOR"'
+      - name: Line Label
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LINE_LABEL"'
+        dimension: {}
+        description: Line number and English route name.
+        ai_context:
+          instructions: Line number and English route name.
+      - name: Span Hours
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SPAN_HOURS"'
+      - name: Speed Band
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SPEED_BAND"'
+        dimension: {}
+        description: Scheduled commercial speed of a typical weekday trip.
+        ai_context:
+          instructions: Scheduled commercial speed of a typical weekday trip.
+      - name: Line Name En
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LINE_NAME_EN"'
+      - name: Stops Served
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOPS_SERVED"'
+      - name: Trip Minutes
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"TRIP_MINUTES"'
+      - name: Avg Speed Kmh
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"AVG_SPEED_KMH"'
+      - name: Weekday Trips
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"WEEKDAY_TRIPS"'
+      - name: Frequency Tier
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"FREQUENCY_TIER"'
+        dimension: {}
+        description: 'Weekday 07–10 headway in the main direction: ≤10, 11–20, 21–40, >40 min, or no AM service.'
+        ai_context:
+          instructions: 'Weekday 07–10 headway in the main direction: ≤10, 11–20, 21–40, >40 min, or no AM service.'
+      - name: Last Departure
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LAST_DEPARTURE"'
+      - name: First Departure
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"FIRST_DEPARTURE"'
+      - name: Buses On Road 8am
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"BUSES_ON_ROAD_8AM"'
+      - name: Midday Headway Min
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"MIDDAY_HEADWAY_MIN"'
+      - name: AM Peak Headway Min
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"AM_PEAK_HEADWAY_MIN"'
+      - name: Line Category
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CATEGORY"'
+        dimension: {}
+        description: >-
+          Urban core (<50), Suburban (50–79), Regional (80+), Night (…N), Airport (01X/01N). Approximate grouping from
+          the line number.
+        ai_context:
+          instructions: >-
+            Urban core (<50), Suburban (50–79), Regional (80+), Night (…N), Airport (01X/01N). Approximate grouping from
+            the line number.
+      - name: Line City
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CITY"'
+        dimension: {}
+        description: 'Constant: Thessaloniki. Anchors network totals.'
+        ai_context:
+          instructions: 'Constant: Thessaloniki. Anchors network totals.'
+  - name: Service
+    source: '"ASTRATO_GALLERY"."MOCK_DATA"."TH_SERVICE"'
+    fields:
+      - name: Hour
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"HOUR_LABEL"'
+        dimension: {}
+        description: Hour of day the trip departs its first stop (00:00 … 23:00).
+        ai_context:
+          instructions: Hour of day the trip departs its first stop (00:00 … 23:00).
+      - name: Line
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LINE"'
+      - name: Trips
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"TRIPS"'
+      - name: Dow Num
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DOW_NUM"'
+      - name: Is Peak
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"IS_PEAK"'
+      - name: Day Type
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DAY_TYPE"'
+        dimension: {}
+        description: Weekday, Saturday or Sunday.
+        ai_context:
+          instructions: Weekday, Saturday or Sunday.
+      - name: Day Label
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DAY_LABEL"'
+      - name: Time Band
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"TIME_BAND"'
+        dimension: {}
+        description: Night 0–6, AM peak 6–10, Midday 10–14, PM peak 14–18, Evening 18–21, Late 21–24.
+        ai_context:
+          instructions: Night 0–6, AM peak 6–10, Midday 10–14, PM peak 14–18, Evening 18–21, Late 21–24.
+      - name: Date Label
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DATE_LABEL"'
+      - name: Hour Label
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"HOUR_LABEL"'
+      - name: Stop Calls
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOP_CALLS"'
+      - name: Vehicle Km
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"VEHICLE_KM"'
+      - name: Day Of Week
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DAY_OF_WEEK"'
+      - name: Service Date
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SERVICE_DATE"'
+        dimension:
+          is_time: true
+        description: Calendar date of scheduled service, 14 Jul – 3 Aug 2026.
+        ai_context:
+          instructions: Calendar date of scheduled service, 14 Jul – 3 Aug 2026.
+      - name: Service Week
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SERVICE_WEEK"'
+        dimension: {}
+        description: Week 1–3 of the timetable period, Tuesday to Monday.
+        ai_context:
+          instructions: Week 1–3 of the timetable period, Tuesday to Monday.
+      - name: Vehicle Hours
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"VEHICLE_HOURS"'
+      - name: Day of Week
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DAY_OF_WEEK"'
+        dimension: {}
+        description: Mon … Sun (sort by Day Order).
+        ai_context:
+          instructions: Mon … Sun (sort by Day Order).
+      - name: Service Day
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DATE_LABEL"'
+        dimension: {}
+        description: MM-DD and weekday, sorts in date order.
+        ai_context:
+          instructions: MM-DD and weekday, sorts in date order.
+      - name: Weekday
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DAY_LABEL"'
+        dimension: {}
+        description: 1 Mon … 7 Sun, sorts in week order.
+        ai_context:
+          instructions: 1 Mon … 7 Sun, sorts in week order.
+  - name: Stops
+    source: '"ASTRATO_GALLERY"."MOCK_DATA"."TH_STOPS"'
+    fields:
+      - name: Lat
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LAT"'
+      - name: Lon
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LON"'
+      - name: City
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CITY"'
+      - name: Sector
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SECTOR"'
+        dimension: {}
+        description: Compass sector from Aristotelous Square; Centre within 2 km.
+        ai_context:
+          instructions: Compass sector from Aristotelous Square; Centre within 2 km.
+      - name: Stop Id
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOP_ID"'
+      - name: Dist Band
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DIST_BAND"'
+      - name: Stop Code
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOP_CODE"'
+      - name: Stop Name
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOP_NAME"'
+      - name: Stop Label
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOP_LABEL"'
+      - name: Is Frequent
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"IS_FREQUENT"'
+      - name: Connectivity
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CONNECTIVITY"'
+        dimension: {}
+        description: Number of lines calling at the stop.
+        ai_context:
+          instructions: Number of lines calling at the stop.
+      - name: Stop Name En
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOP_NAME_EN"'
+      - name: Lines Serving
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LINES_SERVING"'
+      - name: Service Level
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SERVICE_LEVEL"'
+        dimension: {}
+        description: Weekday 07–10 departures per hour at the stop, all lines.
+        ai_context:
+          instructions: Weekday 07–10 departures per hour at the stop, all lines.
+      - name: Dist Centre Km
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DIST_CENTRE_KM"'
+      - name: Is Underserved
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"IS_UNDERSERVED"'
+      - name: No Sunday Service
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"NO_SUNDAY_SERVICE"'
+      - name: Sunday Departures
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SUNDAY_DEPARTURES"'
+      - name: Weekday Departures
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"WEEKDAY_DEPARTURES"'
+      - name: Saturday Departures
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"SATURDAY_DEPARTURES"'
+      - name: AM Peak Buses Per Hour
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"AM_PEAK_BUSES_PER_HOUR"'
+      - name: Longest Daytime Gap Min
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"LONGEST_DAYTIME_GAP_MIN"'
+      - name: Distance Band
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"DIST_BAND"'
+        dimension: {}
+        description: Straight-line distance from Aristotelous Square.
+        ai_context:
+          instructions: Straight-line distance from Aristotelous Square.
+      - name: Stop
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOP_LABEL"'
+        dimension: {}
+        description: Stop name (English transliteration) · stop code.
+        ai_context:
+          instructions: Stop name (English transliteration) · stop code.
+      - name: Stop City
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"CITY"'
+        dimension: {}
+        description: 'Constant: Thessaloniki. Anchors stop totals.'
+        ai_context:
+          instructions: 'Constant: Thessaloniki. Anchors stop totals.'
+      - name: Stop Name (Greek)
+        expression:
+          dialects:
+            - dialect: SNOWFLAKE
+              expression: '"STOP_NAME"'
+        dimension: {}
+        description: Stop name in Greek.
+        ai_context:
+          instructions: Stop name in Greek.
+relationships:
+  - name: relationship_1_Fleet_to_Categories
+    from: Fleet
+    to: Categories
+    from_columns:
+      - Category
+    to_columns:
+      - CATEGORY_KEY
+  - name: relationship_2_Lines_to_Categories
+    from: Lines
+    to: Categories
+    from_columns:
+      - Category
+    to_columns:
+      - CATEGORY_KEY
+  - name: relationship_3_Fleet_to_Hours
+    from: Fleet
+    to: Hours
+    from_columns:
+      - Clock Hour
+    to_columns:
+      - HOUR_KEY
+  - name: relationship_4_Service_to_Hours
+    from: Service
+    to: Hours
+    from_columns:
+      - Hour Label
+    to_columns:
+      - HOUR_KEY
+  - name: relationship_5_Line Stops_to_Lines
+    from: Line Stops
+    to: Lines
+    from_columns:
+      - Line
+    to_columns:
+      - Line
+  - name: relationship_6_Line Stops_to_Stops
+    from: Line Stops
+    to: Stops
+    from_columns:
+      - Stop Id
+    to_columns:
+      - Stop Id
+  - name: relationship_7_Service_to_Lines
+    from: Service
+    to: Lines
+    from_columns:
+      - Line
+    to_columns:
+      - Line
+metrics:
+  - name: AM Buses per Hour
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v7_AM_PEAK_BUSES_PER_HOUR")
+    description: Mean weekday 07–10 buses per hour at a stop.
+    ai_context:
+      instructions: Mean weekday 07–10 buses per hour at a stop.
+  - name: AM Headway
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v5_AM_PEAK_HEADWAY_MIN")
+    description: Mean weekday 07–10 headway, minutes (main direction).
+    ai_context:
+      instructions: Mean weekday 07–10 headway, minutes (main direction).
+  - name: Active Lines
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: COUNT(DISTINCT "v6_LINE")
+    description: Lines with at least one scheduled trip in scope.
+    ai_context:
+      instructions: Lines with at least one scheduled trip in scope.
+  - name: Avg Longest Gap
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v7_LONGEST_DAYTIME_GAP_MIN")
+    description: Mean longest daytime gap across stops, minutes.
+    ai_context:
+      instructions: Mean longest daytime gap across stops, minutes.
+  - name: Avg Route Km
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v5_ROUTE_KM")
+    description: Mean typical route length, km.
+    ai_context:
+      instructions: Mean typical route length, km.
+  - name: Avg Trip Km
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v6_VEHICLE_KM") / NULLIF(SUM("v6_TRIPS"), 0)
+    description: Vehicle-km ÷ trips.
+    ai_context:
+      instructions: Vehicle-km ÷ trips.
+  - name: Avg Trip Minutes
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v6_VEHICLE_HOURS") * 60 / NULLIF(SUM("v6_TRIPS"), 0)
+    description: Vehicle-hours × 60 ÷ trips.
+    ai_context:
+      instructions: Vehicle-hours × 60 ÷ trips.
+  - name: Buses at 8am
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v5_BUSES_ON_ROAD_8AM")
+    description: Buses in service at 08:00 on the reference weekday.
+    ai_context:
+      instructions: Buses in service at 08:00 on the reference weekday.
+  - name: Buses in Service
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v2_BUSES_ACTIVE") / NULLIF(COUNT(DISTINCT "v2_MINUTE_OF_DAY"), 0)
+    description: >-
+      Average buses on the road per minute in scope: SUM(buses active) ÷ COUNT DISTINCT(minute). Additive across
+      categories.
+    ai_context:
+      instructions: >-
+        Average buses on the road per minute in scope: SUM(buses active) ÷ COUNT DISTINCT(minute). Additive across
+        categories.
+  - name: Commercial Speed
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v6_VEHICLE_KM") / NULLIF(SUM("v6_VEHICLE_HOURS"), 0)
+    description: Scheduled vehicle-km ÷ vehicle-hours (km/h).
+    ai_context:
+      instructions: Scheduled vehicle-km ÷ vehicle-hours (km/h).
+  - name: Day Order
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: MIN("v6_DOW_NUM")
+    description: Monday = 1 … Sunday = 7, for sorting.
+    ai_context:
+      instructions: Monday = 1 … Sunday = 7, for sorting.
+  - name: Departures per Stop
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v7_WEEKDAY_DEPARTURES") / NULLIF(COUNT(DISTINCT "v7_STOP_ID"), 0)
+    description: Weekday departures ÷ stops.
+    ai_context:
+      instructions: Weekday departures ÷ stops.
+  - name: Distance from Centre
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v7_DIST_CENTRE_KM")
+    description: Mean straight-line km from Aristotelous Square.
+    ai_context:
+      instructions: Mean straight-line km from Aristotelous Square.
+  - name: First Bus
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: MIN("v5_FIRST_DEPARTURE")
+    description: Earliest weekday departure.
+    ai_context:
+      instructions: Earliest weekday departure.
+  - name: Frequent Stop Share
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v7_IS_FREQUENT") / NULLIF(COUNT(DISTINCT "v7_STOP_ID"), 0)
+    description: Frequent stops ÷ stops.
+    ai_context:
+      instructions: Frequent stops ÷ stops.
+  - name: Frequent Stops
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v7_IS_FREQUENT")
+    description: Stops with ≥6 buses an hour in the weekday AM peak.
+    ai_context:
+      instructions: Stops with ≥6 buses an hour in the weekday AM peak.
+  - name: Last Bus
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: MAX("v5_LAST_DEPARTURE")
+    description: Latest weekday departure.
+    ai_context:
+      instructions: Latest weekday departure.
+  - name: Line Color
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: MAX("v5_LINE_COLOR")
+    description: OSETH route colour.
+    ai_context:
+      instructions: OSETH route colour.
+  - name: Line Speed
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v5_AVG_SPEED_KMH")
+    description: Mean scheduled speed of a typical weekday trip, km/h.
+    ai_context:
+      instructions: Mean scheduled speed of a typical weekday trip, km/h.
+  - name: Line Stops Served
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v5_STOPS_SERVED")
+    description: Stops served by the line (both directions).
+    ai_context:
+      instructions: Stops served by the line (both directions).
+  - name: Line Weekday Trips
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v5_WEEKDAY_TRIPS")
+    description: Trips on the reference weekday (Tue 21 Jul 2026).
+    ai_context:
+      instructions: Trips on the reference weekday (Tue 21 Jul 2026).
+  - name: Lines
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: COUNT(DISTINCT "v5_LINE")
+    description: Distinct lines.
+    ai_context:
+      instructions: Distinct lines.
+  - name: Lines per Stop
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v7_LINES_SERVING")
+    description: Mean number of lines calling at a stop.
+    ai_context:
+      instructions: Mean number of lines calling at a stop.
+  - name: Longest Gap
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: MAX("v7_LONGEST_DAYTIME_GAP_MIN")
+    description: Longest weekday 07–20 wait between buses at the stop, minutes.
+    ai_context:
+      instructions: Longest weekday 07–20 wait between buses at the stop, minutes.
+  - name: Midday Headway
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v5_MIDDAY_HEADWAY_MIN")
+    description: Mean weekday 10–14 headway, minutes (main direction).
+    ai_context:
+      instructions: Mean weekday 10–14 headway, minutes (main direction).
+  - name: Network Route Km
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v5_ROUTE_KM")
+    description: Sum of typical route lengths (one direction).
+    ai_context:
+      instructions: Sum of typical route lengths (one direction).
+  - name: Peak Buses per Hour
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: MAX("v7_AM_PEAK_BUSES_PER_HOUR")
+    description: Stop weekday 07–10 buses per hour (max across rows).
+    ai_context:
+      instructions: Stop weekday 07–10 buses per hour (max across rows).
+  - name: Peak Minute Buses
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: MAX("v2_BUSES_ACTIVE")
+    description: Largest per-row buses active (per minute and category).
+    ai_context:
+      instructions: Largest per-row buses active (per minute and category).
+  - name: Peak Share
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Peak Share uses advanced semantics that Apache Ossie cannot represent as
+            one reusable metric expression. The engine-generated query below is context for people and AI agents; it is
+            not directly executable as this metric.
+
+            -- SELECT
+
+            --   SUM(
+
+            --     CASE WHEN -- FILTER
+
+            --       "v6_IS_PEAK" = 1
+
+            --     THEN "v6_TRIPS"
+
+            --     ELSE 0
+
+            --     END
+
+            --   ) / NULLIF(SUM("v6_TRIPS"), 0) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v6_TRIPS", "v6_IS_PEAK"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN Service
+
+            --       v6.TRIPS AS "v6_TRIPS",
+
+            --       v6.IS_PEAK AS "v6_IS_PEAK"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Peak trips ÷ all trips.
+    ai_context:
+      instructions: Peak trips ÷ all trips.
+  - name: Peak Trips
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Peak Trips uses advanced semantics that Apache Ossie cannot represent as
+            one reusable metric expression. The engine-generated query below is context for people and AI agents; it is
+            not directly executable as this metric.
+
+            -- SELECT
+
+            --   SUM(
+
+            --     CASE WHEN -- FILTER
+
+            --       "v6_IS_PEAK" = 1
+
+            --     THEN "v6_TRIPS"
+
+            --     ELSE 0
+
+            --     END
+
+            --   ) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v6_TRIPS", "v6_IS_PEAK"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN Service
+
+            --       v6.TRIPS AS "v6_TRIPS",
+
+            --       v6.IS_PEAK AS "v6_IS_PEAK"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Trips departing 07–10 or 14–17.
+    ai_context:
+      instructions: Trips departing 07–10 or 14–17.
+  - name: Route Stop Calls
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v4_WEEKDAY_CALLS")
+    description: Weekday calls of the line at the stop.
+    ai_context:
+      instructions: Weekday calls of the line at the stop.
+  - name: Route Stop Lat
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v4_STOP_LAT")
+    description: Latitude of a stop on the line.
+    ai_context:
+      instructions: Latitude of a stop on the line.
+  - name: Route Stop Lon
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v4_STOP_LON")
+    description: Longitude of a stop on the line.
+    ai_context:
+      instructions: Longitude of a stop on the line.
+  - name: Route Stops
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: COUNT(DISTINCT "v4_STOP_ID")
+    description: Distinct stops on the line(s).
+    ai_context:
+      instructions: Distinct stops on the line(s).
+  - name: Saturday Departures
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v7_SATURDAY_DEPARTURES")
+    description: Departures on the reference Saturday.
+    ai_context:
+      instructions: Departures on the reference Saturday.
+  - name: Saturday Trips per Day
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Saturday Trips per Day uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   SUM(
+
+            --     CASE WHEN -- FILTER
+
+            --       "v6_DAY_TYPE" = 'Saturday'
+
+            --     THEN "v6_TRIPS"
+
+            --     ELSE 0
+
+            --     END
+
+            --   ) / NULLIF(COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v6_DAY_TYPE" = 'Saturday'
+
+            --     THEN "v6_SERVICE_DATE"
+
+            --     END
+
+            --   ), 0) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v6_TRIPS", "v6_DAY_TYPE", "v6_SERVICE_DATE"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN Service
+
+            --       v6.TRIPS AS "v6_TRIPS",
+
+            --       v6.DAY_TYPE AS "v6_DAY_TYPE",
+
+            --       v6.SERVICE_DATE AS "v6_SERVICE_DATE"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Average trips per Saturday.
+    ai_context:
+      instructions: Average trips per Saturday.
+  - name: Service Days
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: COUNT(DISTINCT "v6_SERVICE_DATE")
+    description: Distinct service dates in scope.
+    ai_context:
+      instructions: Distinct service dates in scope.
+  - name: Service Span
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v5_SPAN_HOURS")
+    description: Hours from first to last departure, weekday.
+    ai_context:
+      instructions: Hours from first to last departure, weekday.
+  - name: Share of Departures
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Share of Departures uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   SUM("v7_WEEKDAY_DEPARTURES") / NULLIF(SUM("v7_WEEKDAY_DEPARTURES"), 0) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v7_WEEKDAY_DEPARTURES"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN Stops
+
+            --       v7.WEEKDAY_DEPARTURES AS "v7_WEEKDAY_DEPARTURES"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Weekday departures ÷ departures of the whole answer.
+    ai_context:
+      instructions: Weekday departures ÷ departures of the whole answer.
+  - name: Share of Trips
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Share of Trips uses advanced semantics that Apache Ossie cannot represent
+            as one reusable metric expression. The engine-generated query below is context for people and AI agents; it
+            is not directly executable as this metric.
+
+            -- SELECT
+
+            --   SUM("v6_TRIPS") / NULLIF(SUM("v6_TRIPS"), 0) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v6_TRIPS"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN Service
+
+            --       v6.TRIPS AS "v6_TRIPS"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Trips ÷ trips of the whole answer (share of total).
+    ai_context:
+      instructions: Trips ÷ trips of the whole answer (share of total).
+  - name: Share of Vehicle Km
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Share of Vehicle Km uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   SUM("v6_VEHICLE_KM") / NULLIF(SUM("v6_VEHICLE_KM"), 0) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v6_VEHICLE_KM"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN Service
+
+            --       v6.VEHICLE_KM AS "v6_VEHICLE_KM"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Vehicle-km ÷ vehicle-km of the whole answer.
+    ai_context:
+      instructions: Vehicle-km ÷ vehicle-km of the whole answer.
+  - name: Stop Calls
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v6_STOP_CALLS")
+    description: 'Scheduled bus calls at stops: the network’s boarding opportunities.'
+    ai_context:
+      instructions: 'Scheduled bus calls at stops: the network’s boarding opportunities.'
+  - name: Stop Calls per Day
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v6_STOP_CALLS") / NULLIF(COUNT(DISTINCT "v6_SERVICE_DATE"), 0)
+    description: Average scheduled stop calls per service day.
+    ai_context:
+      instructions: Average scheduled stop calls per service day.
+  - name: Stop Lat
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v7_LAT")
+    description: Stop latitude.
+    ai_context:
+      instructions: Stop latitude.
+  - name: Stop Lon
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v7_LON")
+    description: Stop longitude.
+    ai_context:
+      instructions: Stop longitude.
+  - name: Stop Sunday Retention
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v7_SUNDAY_DEPARTURES") / NULLIF(SUM("v7_WEEKDAY_DEPARTURES"), 0)
+    description: Sunday departures ÷ weekday departures at stops.
+    ai_context:
+      instructions: Sunday departures ÷ weekday departures at stops.
+  - name: Stops
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: COUNT(DISTINCT "v7_STOP_ID")
+    description: Distinct bus stops.
+    ai_context:
+      instructions: Distinct bus stops.
+  - name: Stops Without Sunday Bus
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v7_NO_SUNDAY_SERVICE")
+    description: Stops with weekday service but no bus on the reference Sunday.
+    ai_context:
+      instructions: Stops with weekday service but no bus on the reference Sunday.
+  - name: Sunday Departures
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v7_SUNDAY_DEPARTURES")
+    description: Departures on the reference Sunday.
+    ai_context:
+      instructions: Departures on the reference Sunday.
+  - name: Sunday Retention
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Sunday Retention uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   (SUM(
+
+            --     CASE WHEN -- FILTER
+
+            --       "v6_DAY_TYPE" = 'Sunday'
+
+            --     THEN "v6_TRIPS"
+
+            --     ELSE 0
+
+            --     END
+
+            --   ) / NULLIF(COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v6_DAY_TYPE" = 'Sunday'
+
+            --     THEN "v6_SERVICE_DATE"
+
+            --     END
+
+            --   ), 0)) / NULLIF((SUM(
+
+            --     CASE WHEN -- FILTER
+
+            --       "v6_DAY_TYPE" = 'Weekday'
+
+            --     THEN "v6_TRIPS"
+
+            --     ELSE 0
+
+            --     END
+
+            --   ) / NULLIF(COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v6_DAY_TYPE" = 'Weekday'
+
+            --     THEN "v6_SERVICE_DATE"
+
+            --     END
+
+            --   ), 0)), 0) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v6_TRIPS", "v6_DAY_TYPE", "v6_SERVICE_DATE"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN Service
+
+            --       v6.TRIPS AS "v6_TRIPS",
+
+            --       v6.DAY_TYPE AS "v6_DAY_TYPE",
+
+            --       v6.SERVICE_DATE AS "v6_SERVICE_DATE"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: 'Sunday trips per day ÷ weekday trips per day: how much of the weekday network survives on Sunday.'
+    ai_context:
+      instructions: 'Sunday trips per day ÷ weekday trips per day: how much of the weekday network survives on Sunday.'
+  - name: Sunday Trips per Day
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Sunday Trips per Day uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   SUM(
+
+            --     CASE WHEN -- FILTER
+
+            --       "v6_DAY_TYPE" = 'Sunday'
+
+            --     THEN "v6_TRIPS"
+
+            --     ELSE 0
+
+            --     END
+
+            --   ) / NULLIF(COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v6_DAY_TYPE" = 'Sunday'
+
+            --     THEN "v6_SERVICE_DATE"
+
+            --     END
+
+            --   ), 0) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v6_TRIPS", "v6_DAY_TYPE", "v6_SERVICE_DATE"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN Service
+
+            --       v6.TRIPS AS "v6_TRIPS",
+
+            --       v6.DAY_TYPE AS "v6_DAY_TYPE",
+
+            --       v6.SERVICE_DATE AS "v6_SERVICE_DATE"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Average trips per Sunday.
+    ai_context:
+      instructions: Average trips per Sunday.
+  - name: Trip Minutes
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: AVG("v5_TRIP_MINUTES")
+    description: Typical end-to-end trip, minutes.
+    ai_context:
+      instructions: Typical end-to-end trip, minutes.
+  - name: Trips
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v6_TRIPS")
+    description: Scheduled bus trips (departures from the first stop).
+    ai_context:
+      instructions: Scheduled bus trips (departures from the first stop).
+  - name: Trips Departing
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v2_TRIPS_DEPARTING")
+    description: Trips leaving their first stop, reference weekday.
+    ai_context:
+      instructions: Trips leaving their first stop, reference weekday.
+  - name: Trips per Day
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v6_TRIPS") / NULLIF(COUNT(DISTINCT "v6_SERVICE_DATE"), 0)
+    description: Average scheduled trips per service day (ratio of aggregates).
+    ai_context:
+      instructions: Average scheduled trips per service day (ratio of aggregates).
+  - name: Underserved Share
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v7_IS_UNDERSERVED") / NULLIF(COUNT(DISTINCT "v7_STOP_ID"), 0)
+    description: Underserved stops ÷ stops.
+    ai_context:
+      instructions: Underserved stops ÷ stops.
+  - name: Underserved Stops
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v7_IS_UNDERSERVED")
+    description: Served stops with fewer than 3 buses an hour in the weekday AM peak.
+    ai_context:
+      instructions: Served stops with fewer than 3 buses an hour in the weekday AM peak.
+  - name: Vehicle Hours
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v6_VEHICLE_HOURS")
+    description: Scheduled in-service bus hours (first to last stop).
+    ai_context:
+      instructions: Scheduled in-service bus hours (first to last stop).
+  - name: Vehicle Hours per Day
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v6_VEHICLE_HOURS") / NULLIF(COUNT(DISTINCT "v6_SERVICE_DATE"), 0)
+    description: Average scheduled vehicle-hours per service day.
+    ai_context:
+      instructions: Average scheduled vehicle-hours per service day.
+  - name: Vehicle Km
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v6_VEHICLE_KM")
+    description: Scheduled in-service bus kilometres (shape length × trips).
+    ai_context:
+      instructions: Scheduled in-service bus kilometres (shape length × trips).
+  - name: Vehicle Km per Day
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v6_VEHICLE_KM") / NULLIF(COUNT(DISTINCT "v6_SERVICE_DATE"), 0)
+    description: Average scheduled vehicle-km per service day.
+    ai_context:
+      instructions: Average scheduled vehicle-km per service day.
+  - name: Weekday Departures
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: SUM("v7_WEEKDAY_DEPARTURES")
+    description: Bus departures from the stop on the reference weekday, all lines.
+    ai_context:
+      instructions: Bus departures from the stop on the reference weekday, all lines.
+  - name: Weekday Trips per Day
+    expression:
+      dialects:
+        - dialect: SNOWFLAKE
+          expression: >-
+            -- ASTRATO_REFERENCE_ONLY_MEASURE: Weekday Trips per Day uses advanced semantics that Apache Ossie cannot
+            represent as one reusable metric expression. The engine-generated query below is context for people and AI
+            agents; it is not directly executable as this metric.
+
+            -- SELECT
+
+            --   SUM(
+
+            --     CASE WHEN -- FILTER
+
+            --       "v6_DAY_TYPE" = 'Weekday'
+
+            --     THEN "v6_TRIPS"
+
+            --     ELSE 0
+
+            --     END
+
+            --   ) / NULLIF(COUNT(DISTINCT
+
+            --     CASE WHEN -- FILTER
+
+            --       "v6_DAY_TYPE" = 'Weekday'
+
+            --     THEN "v6_SERVICE_DATE"
+
+            --     END
+
+            --   ), 0) AS m1
+
+            -- FROM (
+
+            --   SELECT
+
+            --     "v6_TRIPS", "v6_DAY_TYPE", "v6_SERVICE_DATE"
+
+            --   FROM (
+
+            --     SELECT -- GRAIN Service
+
+            --       v6.TRIPS AS "v6_TRIPS",
+
+            --       v6.DAY_TYPE AS "v6_DAY_TYPE",
+
+            --       v6.SERVICE_DATE AS "v6_SERVICE_DATE"
+
+            --     FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6
+
+            --   ) AS u1
+
+            -- ) AS u1
+
+            -- ;
+    description: Average trips per weekday.
+    ai_context:
+      instructions: Average trips per weekday.
+custom_extensions:
+  - vendor_name: COMMON
+    data: |-
+      {
+        "datasourceDriver": "snowflake",
+        "diagnostics": [
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Peak Share",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Peak Trips",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Saturday Trips per Day",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Share of Departures",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Share of Trips",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Share of Vehicle Km",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Sunday Retention",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Sunday Trips per Day",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          },
+          {
+            "code": "REFERENCE_ONLY_MEASURE",
+            "entityKey": "Weekday Trips per Day",
+            "entityType": "measure",
+            "message": "Advanced engine SQL is emitted as commented reference material and is not directly executable as an Ossie metric.",
+            "severity": "warning"
+          }
+        ],
+        "document": {
+          "businessQuestions": {},
+          "datasource": "00000000-0000-0000-0000-000000000000",
+          "dimensions": {
+            "Clock Hour": {
+              "description": "Hour of the day, reference weekday.",
+              "kind": "field",
+              "reference": {
+                "field": "Clock Hour",
+                "view": "Fleet"
+              },
+              "resultType": "string"
+            },
+            "Connectivity": {
+              "description": "Number of lines calling at the stop.",
+              "kind": "field",
+              "reference": {
+                "field": "Connectivity",
+                "view": "Stops"
+              },
+              "resultType": "string"
+            },
+            "Day Type": {
+              "description": "Weekday, Saturday or Sunday.",
+              "kind": "field",
+              "reference": {
+                "field": "Day Type",
+                "view": "Service"
+              },
+              "resultType": "string"
+            },
+            "Day of Week": {
+              "description": "Mon … Sun (sort by Day Order).",
+              "kind": "field",
+              "reference": {
+                "field": "Day Of Week",
+                "view": "Service"
+              },
+              "resultType": "string"
+            },
+            "Distance Band": {
+              "description": "Straight-line distance from Aristotelous Square.",
+              "kind": "field",
+              "reference": {
+                "field": "Dist Band",
+                "view": "Stops"
+              },
+              "resultType": "string"
+            },
+            "Fleet Category": {
+              "description": "Line category of the buses in service.",
+              "kind": "field",
+              "reference": {
+                "field": "Category",
+                "view": "Fleet"
+              },
+              "resultType": "string"
+            },
+            "Frequency Tier": {
+              "description": "Weekday 07–10 headway in the main direction: ≤10, 11–20, 21–40, >40 min, or no AM service.",
+              "kind": "field",
+              "reference": {
+                "field": "Frequency Tier",
+                "view": "Lines"
+              },
+              "resultType": "string"
+            },
+            "Hour": {
+              "description": "Hour of day the trip departs its first stop (00:00 … 23:00).",
+              "kind": "field",
+              "reference": {
+                "field": "Hour Label",
+                "view": "Service"
+              },
+              "resultType": "string"
+            },
+            "Line": {
+              "description": "OSETH line number (route_short_name), e.g. 01X, 31, 52.",
+              "kind": "field",
+              "reference": {
+                "field": "Line",
+                "view": "Lines"
+              },
+              "resultType": "string"
+            },
+            "Line Category": {
+              "description": "Urban core (<50), Suburban (50–79), Regional (80+), Night (…N), Airport (01X/01N). Approximate grouping from the line number.",
+              "kind": "field",
+              "reference": {
+                "field": "Category",
+                "view": "Lines"
+              },
+              "resultType": "string"
+            },
+            "Line City": {
+              "description": "Constant: Thessaloniki. Anchors network totals.",
+              "kind": "field",
+              "reference": {
+                "field": "City",
+                "view": "Lines"
+              },
+              "resultType": "string"
+            },
+            "Line Label": {
+              "description": "Line number and English route name.",
+              "kind": "field",
+              "reference": {
+                "field": "Line Label",
+                "view": "Lines"
+              },
+              "resultType": "string"
+            },
+            "Line Name": {
+              "description": "Route name in Greek as published by OSETH.",
+              "kind": "field",
+              "reference": {
+                "field": "Line Name",
+                "view": "Lines"
+              },
+              "resultType": "string"
+            },
+            "Route Stop": {
+              "description": "A stop on the selected line.",
+              "kind": "field",
+              "reference": {
+                "field": "Stop Label",
+                "view": "Line Stops"
+              },
+              "resultType": "string"
+            },
+            "Sector": {
+              "description": "Compass sector from Aristotelous Square; Centre within 2 km.",
+              "kind": "field",
+              "reference": {
+                "field": "Sector",
+                "view": "Stops"
+              },
+              "resultType": "string"
+            },
+            "Service Date": {
+              "description": "Calendar date of scheduled service, 14 Jul – 3 Aug 2026.",
+              "kind": "field",
+              "reference": {
+                "field": "Service Date",
+                "view": "Service"
+              },
+              "resultType": "date"
+            },
+            "Service Day": {
+              "description": "MM-DD and weekday, sorts in date order.",
+              "kind": "field",
+              "reference": {
+                "field": "Date Label",
+                "view": "Service"
+              },
+              "resultType": "string"
+            },
+            "Service Level": {
+              "description": "Weekday 07–10 departures per hour at the stop, all lines.",
+              "kind": "field",
+              "reference": {
+                "field": "Service Level",
+                "view": "Stops"
+              },
+              "resultType": "string"
+            },
+            "Service Week": {
+              "description": "Week 1–3 of the timetable period, Tuesday to Monday.",
+              "kind": "field",
+              "reference": {
+                "field": "Service Week",
+                "view": "Service"
+              },
+              "resultType": "string"
+            },
+            "Speed Band": {
+              "description": "Scheduled commercial speed of a typical weekday trip.",
+              "kind": "field",
+              "reference": {
+                "field": "Speed Band",
+                "view": "Lines"
+              },
+              "resultType": "string"
+            },
+            "Stop": {
+              "description": "Stop name (English transliteration) · stop code.",
+              "kind": "field",
+              "reference": {
+                "field": "Stop Label",
+                "view": "Stops"
+              },
+              "resultType": "string"
+            },
+            "Stop City": {
+              "description": "Constant: Thessaloniki. Anchors stop totals.",
+              "kind": "field",
+              "reference": {
+                "field": "City",
+                "view": "Stops"
+              },
+              "resultType": "string"
+            },
+            "Stop Name (Greek)": {
+              "description": "Stop name in Greek.",
+              "kind": "field",
+              "reference": {
+                "field": "Stop Name",
+                "view": "Stops"
+              },
+              "resultType": "string"
+            },
+            "Ten-Minute Slot": {
+              "description": "Clock time rounded down to 10 minutes, reference weekday.",
+              "kind": "field",
+              "reference": {
+                "field": "Ten Min Slot",
+                "view": "Fleet"
+              },
+              "resultType": "string"
+            },
+            "Time Band": {
+              "description": "Night 0–6, AM peak 6–10, Midday 10–14, PM peak 14–18, Evening 18–21, Late 21–24.",
+              "kind": "field",
+              "reference": {
+                "field": "Time Band",
+                "view": "Service"
+              },
+              "resultType": "string"
+            },
+            "Weekday": {
+              "description": "1 Mon … 7 Sun, sorts in week order.",
+              "kind": "field",
+              "reference": {
+                "field": "Day Label",
+                "view": "Service"
+              },
+              "resultType": "string"
+            }
+          },
+          "fileVersion": 3,
+          "joins": [
+            {
+              "cardinality": "many-to-one",
+              "conditions": [
+                {
+                  "arguments": [
+                    {
+                      "reference": {
+                        "field": "Category",
+                        "view": "Fleet"
+                      }
+                    },
+                    {
+                      "reference": {
+                        "field": "CATEGORY_KEY",
+                        "view": "Categories"
+                      }
+                    }
+                  ],
+                  "operator": "equals"
+                }
+              ],
+              "views": [
+                "Fleet",
+                "Categories"
+              ]
+            },
+            {
+              "cardinality": "many-to-one",
+              "conditions": [
+                {
+                  "arguments": [
+                    {
+                      "reference": {
+                        "field": "Category",
+                        "view": "Lines"
+                      }
+                    },
+                    {
+                      "reference": {
+                        "field": "CATEGORY_KEY",
+                        "view": "Categories"
+                      }
+                    }
+                  ],
+                  "operator": "equals"
+                }
+              ],
+              "views": [
+                "Lines",
+                "Categories"
+              ]
+            },
+            {
+              "cardinality": "many-to-one",
+              "conditions": [
+                {
+                  "arguments": [
+                    {
+                      "reference": {
+                        "field": "Clock Hour",
+                        "view": "Fleet"
+                      }
+                    },
+                    {
+                      "reference": {
+                        "field": "HOUR_KEY",
+                        "view": "Hours"
+                      }
+                    }
+                  ],
+                  "operator": "equals"
+                }
+              ],
+              "views": [
+                "Fleet",
+                "Hours"
+              ]
+            },
+            {
+              "cardinality": "many-to-one",
+              "conditions": [
+                {
+                  "arguments": [
+                    {
+                      "reference": {
+                        "field": "Hour Label",
+                        "view": "Service"
+                      }
+                    },
+                    {
+                      "reference": {
+                        "field": "HOUR_KEY",
+                        "view": "Hours"
+                      }
+                    }
+                  ],
+                  "operator": "equals"
+                }
+              ],
+              "views": [
+                "Service",
+                "Hours"
+              ]
+            },
+            {
+              "cardinality": "many-to-one",
+              "conditions": [
+                {
+                  "arguments": [
+                    {
+                      "reference": {
+                        "field": "Line",
+                        "view": "Line Stops"
+                      }
+                    },
+                    {
+                      "reference": {
+                        "field": "Line",
+                        "view": "Lines"
+                      }
+                    }
+                  ],
+                  "operator": "equals"
+                }
+              ],
+              "views": [
+                "Line Stops",
+                "Lines"
+              ]
+            },
+            {
+              "cardinality": "many-to-one",
+              "conditions": [
+                {
+                  "arguments": [
+                    {
+                      "reference": {
+                        "field": "Stop Id",
+                        "view": "Line Stops"
+                      }
+                    },
+                    {
+                      "reference": {
+                        "field": "Stop Id",
+                        "view": "Stops"
+                      }
+                    }
+                  ],
+                  "operator": "equals"
+                }
+              ],
+              "views": [
+                "Line Stops",
+                "Stops"
+              ]
+            },
+            {
+              "cardinality": "many-to-one",
+              "conditions": [
+                {
+                  "arguments": [
+                    {
+                      "reference": {
+                        "field": "Line",
+                        "view": "Service"
+                      }
+                    },
+                    {
+                      "reference": {
+                        "field": "Line",
+                        "view": "Lines"
+                      }
+                    }
+                  ],
+                  "operator": "equals"
+                }
+              ],
+              "views": [
+                "Service",
+                "Lines"
+              ]
+            }
+          ],
+          "layout": {},
+          "locale": {
+            "calendar": {
+              "dayNames": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday"
+              ],
+              "dayNamesAbbr": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri",
+                "Sat",
+                "Sun"
+              ],
+              "monthNames": [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+              ],
+              "monthNamesAbbr": [
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec"
+              ]
+            },
+            "formats": {
+              "date": "yyyy-mm-dd",
+              "datetime": "yyyy-mm-dd hh:mm:ss",
+              "money": "$#,###.00",
+              "number": "#,##0.00",
+              "numberInt": "#,##0",
+              "time": "hh:mm:ss"
+            },
+            "number": {
+              "decimalSep": ".",
+              "thousandSep": ","
+            },
+            "timezone": "Europe/London"
+          },
+          "measures": {
+            "AM Buses per Hour": {
+              "description": "Mean weekday 07–10 buses per hour at a stop.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "AM Peak Buses Per Hour",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "AM Headway": {
+              "description": "Mean weekday 07–10 headway, minutes (main direction).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "AM Peak Headway Min",
+                      "view": "Lines"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Active Lines": {
+              "description": "Lines with at least one scheduled trip in scope.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Line",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "int"
+            },
+            "Avg Longest Gap": {
+              "description": "Mean longest daytime gap across stops, minutes.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Longest Daytime Gap Min",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Route Km": {
+              "description": "Mean typical route length, km.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Route Km",
+                      "view": "Lines"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Trip Km": {
+              "description": "Vehicle-km ÷ trips.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Vehicle Km",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Avg Trip Minutes": {
+              "description": "Vehicle-hours × 60 ÷ trips.",
+              "expression": "{m1} * 60 / {m2}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Vehicle Hours",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Buses at 8am": {
+              "description": "Buses in service at 08:00 on the reference weekday.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Buses On Road 8am",
+                      "view": "Lines"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Buses in Service": {
+              "description": "Average buses on the road per minute in scope: SUM(buses active) ÷ COUNT DISTINCT(minute). Additive across categories.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Buses Active",
+                      "view": "Fleet"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Minute Of Day",
+                      "view": "Fleet"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "float"
+            },
+            "Commercial Speed": {
+              "description": "Scheduled vehicle-km ÷ vehicle-hours (km/h).",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Vehicle Km",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Vehicle Hours",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Day Order": {
+              "description": "Monday = 1 … Sunday = 7, for sorting.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "MIN",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Dow Num",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Departures per Stop": {
+              "description": "Weekday departures ÷ stops.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Weekday Departures",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Stop Id",
+                      "view": "Stops"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "float"
+            },
+            "Distance from Centre": {
+              "description": "Mean straight-line km from Aristotelous Square.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Dist Centre Km",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "First Bus": {
+              "description": "Earliest weekday departure.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "@"
+              },
+              "m1": {
+                "aggregate": "MIN",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "First Departure",
+                      "view": "Lines"
+                    }
+                  }
+                ]
+              },
+              "resultType": "string"
+            },
+            "Frequent Stop Share": {
+              "description": "Frequent stops ÷ stops.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "0.0%"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Is Frequent",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Stop Id",
+                      "view": "Stops"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "float"
+            },
+            "Frequent Stops": {
+              "description": "Stops with ≥6 buses an hour in the weekday AM peak.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Is Frequent",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Last Bus": {
+              "description": "Latest weekday departure.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "@"
+              },
+              "m1": {
+                "aggregate": "MAX",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Last Departure",
+                      "view": "Lines"
+                    }
+                  }
+                ]
+              },
+              "resultType": "string"
+            },
+            "Line Color": {
+              "description": "OSETH route colour.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "@"
+              },
+              "m1": {
+                "aggregate": "MAX",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Line Color",
+                      "view": "Lines"
+                    }
+                  }
+                ]
+              },
+              "resultType": "string"
+            },
+            "Line Speed": {
+              "description": "Mean scheduled speed of a typical weekday trip, km/h.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Avg Speed Kmh",
+                      "view": "Lines"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Line Stops Served": {
+              "description": "Stops served by the line (both directions).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Stops Served",
+                      "view": "Lines"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Line Weekday Trips": {
+              "description": "Trips on the reference weekday (Tue 21 Jul 2026).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Weekday Trips",
+                      "view": "Lines"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Lines": {
+              "description": "Distinct lines.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Line",
+                      "view": "Lines"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "int"
+            },
+            "Lines per Stop": {
+              "description": "Mean number of lines calling at a stop.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Lines Serving",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Longest Gap": {
+              "description": "Longest weekday 07–20 wait between buses at the stop, minutes.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "MAX",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Longest Daytime Gap Min",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Midday Headway": {
+              "description": "Mean weekday 10–14 headway, minutes (main direction).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Midday Headway Min",
+                      "view": "Lines"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Network Route Km": {
+              "description": "Sum of typical route lengths (one direction).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Route Km",
+                      "view": "Lines"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Peak Buses per Hour": {
+              "description": "Stop weekday 07–10 buses per hour (max across rows).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "MAX",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "AM Peak Buses Per Hour",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Peak Minute Buses": {
+              "description": "Largest per-row buses active (per minute and category).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "MAX",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Buses Active",
+                      "view": "Fleet"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Peak Share": {
+              "description": "Peak trips ÷ all trips.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "0.0%"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Is Peak",
+                          "view": "Service"
+                        }
+                      },
+                      {
+                        "dataType": "int",
+                        "value": 1
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "m2": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Peak Trips": {
+              "description": "Trips departing 07–10 or 14–17.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Is Peak",
+                          "view": "Service"
+                        }
+                      },
+                      {
+                        "dataType": "int",
+                        "value": 1
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "resultType": "int"
+            },
+            "Route Stop Calls": {
+              "description": "Weekday calls of the line at the stop.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Weekday Calls",
+                      "view": "Line Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Route Stop Lat": {
+              "description": "Latitude of a stop on the line.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.00000"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Stop Lat",
+                      "view": "Line Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Route Stop Lon": {
+              "description": "Longitude of a stop on the line.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.00000"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Stop Lon",
+                      "view": "Line Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Route Stops": {
+              "description": "Distinct stops on the line(s).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Stop Id",
+                      "view": "Line Stops"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "int"
+            },
+            "Saturday Departures": {
+              "description": "Departures on the reference Saturday.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Saturday Departures",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Saturday Trips per Day": {
+              "description": "Average trips per Saturday.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Day Type",
+                          "view": "Service"
+                        }
+                      },
+                      {
+                        "dataType": "string",
+                        "value": "Saturday"
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "m2": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Service Date",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "distinct": true,
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Day Type",
+                          "view": "Service"
+                        }
+                      },
+                      {
+                        "dataType": "string",
+                        "value": "Saturday"
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "resultType": "float"
+            },
+            "Service Days": {
+              "description": "Distinct service dates in scope.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Service Date",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "int"
+            },
+            "Service Span": {
+              "description": "Hours from first to last departure, weekday.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Span Hours",
+                      "view": "Lines"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Share of Departures": {
+              "description": "Weekday departures ÷ departures of the whole answer.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "0.0%"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Weekday Departures",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Weekday Departures",
+                      "view": "Stops"
+                    }
+                  }
+                ],
+                "scope": "total"
+              },
+              "resultType": "float"
+            },
+            "Share of Trips": {
+              "description": "Trips ÷ trips of the whole answer (share of total).",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "0.0%"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "scope": "total"
+              },
+              "resultType": "float"
+            },
+            "Share of Vehicle Km": {
+              "description": "Vehicle-km ÷ vehicle-km of the whole answer.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "0.0%"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Vehicle Km",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Vehicle Km",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "scope": "total"
+              },
+              "resultType": "float"
+            },
+            "Stop Calls": {
+              "description": "Scheduled bus calls at stops: the network’s boarding opportunities.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Stop Calls",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Stop Calls per Day": {
+              "description": "Average scheduled stop calls per service day.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Stop Calls",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Service Date",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "float"
+            },
+            "Stop Lat": {
+              "description": "Stop latitude.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.00000"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Lat",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Stop Lon": {
+              "description": "Stop longitude.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0.00000"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Lon",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Stop Sunday Retention": {
+              "description": "Sunday departures ÷ weekday departures at stops.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "0.0%"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Sunday Departures",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Weekday Departures",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Stops": {
+              "description": "Distinct bus stops.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Stop Id",
+                      "view": "Stops"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "int"
+            },
+            "Stops Without Sunday Bus": {
+              "description": "Stops with weekday service but no bus on the reference Sunday.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "No Sunday Service",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Sunday Departures": {
+              "description": "Departures on the reference Sunday.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Sunday Departures",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Sunday Retention": {
+              "description": "Sunday trips per day ÷ weekday trips per day: how much of the weekday network survives on Sunday.",
+              "expression": "({m1} / {m2}) / ({m3} / {m4})",
+              "format": {
+                "pattern": "0.0%"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Day Type",
+                          "view": "Service"
+                        }
+                      },
+                      {
+                        "dataType": "string",
+                        "value": "Sunday"
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "m2": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Service Date",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "distinct": true,
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Day Type",
+                          "view": "Service"
+                        }
+                      },
+                      {
+                        "dataType": "string",
+                        "value": "Sunday"
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "m3": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Day Type",
+                          "view": "Service"
+                        }
+                      },
+                      {
+                        "dataType": "string",
+                        "value": "Weekday"
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "m4": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Service Date",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "distinct": true,
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Day Type",
+                          "view": "Service"
+                        }
+                      },
+                      {
+                        "dataType": "string",
+                        "value": "Weekday"
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "resultType": "float"
+            },
+            "Sunday Trips per Day": {
+              "description": "Average trips per Sunday.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Day Type",
+                          "view": "Service"
+                        }
+                      },
+                      {
+                        "dataType": "string",
+                        "value": "Sunday"
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "m2": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Service Date",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "distinct": true,
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Day Type",
+                          "view": "Service"
+                        }
+                      },
+                      {
+                        "dataType": "string",
+                        "value": "Sunday"
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "resultType": "float"
+            },
+            "Trip Minutes": {
+              "description": "Typical end-to-end trip, minutes.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "0"
+              },
+              "m1": {
+                "aggregate": "AVG",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trip Minutes",
+                      "view": "Lines"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Trips": {
+              "description": "Scheduled bus trips (departures from the first stop).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Trips Departing": {
+              "description": "Trips leaving their first stop, reference weekday.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips Departing",
+                      "view": "Fleet"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Trips per Day": {
+              "description": "Average scheduled trips per service day (ratio of aggregates).",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Service Date",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "float"
+            },
+            "Underserved Share": {
+              "description": "Underserved stops ÷ stops.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "0.0%"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Is Underserved",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Stop Id",
+                      "view": "Stops"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "float"
+            },
+            "Underserved Stops": {
+              "description": "Served stops with fewer than 3 buses an hour in the weekday AM peak.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Is Underserved",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Vehicle Hours": {
+              "description": "Scheduled in-service bus hours (first to last stop).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Vehicle Hours",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Vehicle Hours per Day": {
+              "description": "Average scheduled vehicle-hours per service day.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Vehicle Hours",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Service Date",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "float"
+            },
+            "Vehicle Km": {
+              "description": "Scheduled in-service bus kilometres (shape length × trips).",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Vehicle Km",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "resultType": "float"
+            },
+            "Vehicle Km per Day": {
+              "description": "Average scheduled vehicle-km per service day.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Vehicle Km",
+                      "view": "Service"
+                    }
+                  }
+                ]
+              },
+              "m2": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Service Date",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "distinct": true
+              },
+              "resultType": "float"
+            },
+            "Weekday Departures": {
+              "description": "Bus departures from the stop on the reference weekday, all lines.",
+              "expression": "{m1}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Weekday Departures",
+                      "view": "Stops"
+                    }
+                  }
+                ]
+              },
+              "resultType": "int"
+            },
+            "Weekday Trips per Day": {
+              "description": "Average trips per weekday.",
+              "expression": "{m1} / {m2}",
+              "format": {
+                "pattern": "#,##0"
+              },
+              "m1": {
+                "aggregate": "SUM",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Trips",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Day Type",
+                          "view": "Service"
+                        }
+                      },
+                      {
+                        "dataType": "string",
+                        "value": "Weekday"
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "m2": {
+                "aggregate": "COUNT",
+                "arguments": [
+                  {
+                    "reference": {
+                      "field": "Service Date",
+                      "view": "Service"
+                    }
+                  }
+                ],
+                "distinct": true,
+                "filter": {
+                  "expression": "{f1}",
+                  "f1": {
+                    "arguments": [
+                      {
+                        "reference": {
+                          "field": "Day Type",
+                          "view": "Service"
+                        }
+                      },
+                      {
+                        "dataType": "string",
+                        "value": "Weekday"
+                      }
+                    ],
+                    "operator": "equals"
+                  }
+                }
+              },
+              "resultType": "float"
+            }
+          },
+          "name": "Thessaloniki on the Move",
+          "udfs": {},
+          "views": {
+            "Categories": {
+              "description": "Conformed line-category dimension (5 rows): joins Lines and Fleet so one category filter reaches both.",
+              "fields": {
+                "CATEGORY_KEY": {
+                  "dataType": "string",
+                  "source": "CATEGORY_KEY"
+                }
+              },
+              "source": {
+                "statement": "SELECT DISTINCT CATEGORY AS CATEGORY_KEY FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES",
+                "type": "sql"
+              }
+            },
+            "Fleet": {
+              "fields": {
+                "Buses Active": {
+                  "dataType": "int",
+                  "source": "BUSES_ACTIVE"
+                },
+                "Category": {
+                  "dataType": "string",
+                  "source": "CATEGORY"
+                },
+                "Clock Hour": {
+                  "dataType": "string",
+                  "source": "CLOCK_HOUR"
+                },
+                "Clock Time": {
+                  "dataType": "string",
+                  "source": "CLOCK_TIME"
+                },
+                "Fifteen Min Slot": {
+                  "dataType": "string",
+                  "source": "FIFTEEN_MIN_SLOT"
+                },
+                "Five Min Slot": {
+                  "dataType": "string",
+                  "source": "FIVE_MIN_SLOT"
+                },
+                "Minute Of Day": {
+                  "dataType": "int",
+                  "source": "MINUTE_OF_DAY"
+                },
+                "Sim Day": {
+                  "dataType": "string",
+                  "source": "SIM_DAY"
+                },
+                "Ten Min Slot": {
+                  "dataType": "string",
+                  "source": "TEN_MIN_SLOT"
+                },
+                "Trips Departing": {
+                  "dataType": "int",
+                  "source": "TRIPS_DEPARTING"
+                },
+                "Two Min Slot": {
+                  "dataType": "string",
+                  "source": "TWO_MIN_SLOT"
+                }
+              },
+              "source": {
+                "database": "ASTRATO_GALLERY",
+                "schema": "MOCK_DATA",
+                "table": "TH_FLEET_MINUTE",
+                "type": "table"
+              }
+            },
+            "Hours": {
+              "description": "Conformed hour-of-day dimension (24 rows, 00:00–23:00): joins Service and Fleet so time-of-day filters reach both.",
+              "fields": {
+                "HOUR_BAND": {
+                  "dataType": "string",
+                  "source": "HOUR_BAND"
+                },
+                "HOUR_KEY": {
+                  "dataType": "string",
+                  "source": "HOUR_KEY"
+                }
+              },
+              "source": {
+                "statement": "SELECT LPAD(SEQ4()::STRING, 2, '0') || ':00' AS HOUR_KEY, CASE WHEN SEQ4() < 6 THEN '1. Night (0–6)' WHEN SEQ4() < 10 THEN '2. AM peak (6–10)' WHEN SEQ4() < 14 THEN '3. Midday (10–14)' WHEN SEQ4() < 18 THEN '4. PM peak (14–18)' WHEN SEQ4() < 21 THEN '5. Evening (18–21)' ELSE '6. Late (21–24)' END AS HOUR_BAND FROM TABLE(GENERATOR(ROWCOUNT => 24))",
+                "type": "sql"
+              }
+            },
+            "Line Stops": {
+              "fields": {
+                "Line": {
+                  "dataType": "string",
+                  "source": "LINE"
+                },
+                "Line Stop Id": {
+                  "dataType": "string",
+                  "source": "LINE_STOP_ID"
+                },
+                "Stop Id": {
+                  "dataType": "string",
+                  "source": "STOP_ID"
+                },
+                "Stop Label": {
+                  "dataType": "string",
+                  "source": "STOP_LABEL"
+                },
+                "Stop Lat": {
+                  "dataType": "float",
+                  "source": "STOP_LAT"
+                },
+                "Stop Lon": {
+                  "dataType": "float",
+                  "source": "STOP_LON"
+                },
+                "Stop Sequence": {
+                  "dataType": "int",
+                  "source": "STOP_SEQUENCE"
+                },
+                "Weekday Calls": {
+                  "dataType": "int",
+                  "source": "WEEKDAY_CALLS"
+                }
+              },
+              "source": {
+                "database": "ASTRATO_GALLERY",
+                "schema": "MOCK_DATA",
+                "table": "TH_LINE_STOPS",
+                "type": "table"
+              }
+            },
+            "Lines": {
+              "fields": {
+                "AM Peak Headway Min": {
+                  "dataType": "float",
+                  "source": "AM_PEAK_HEADWAY_MIN"
+                },
+                "Avg Speed Kmh": {
+                  "dataType": "float",
+                  "source": "AVG_SPEED_KMH"
+                },
+                "Buses On Road 8am": {
+                  "dataType": "int",
+                  "source": "BUSES_ON_ROAD_8AM"
+                },
+                "Category": {
+                  "dataType": "string",
+                  "source": "CATEGORY"
+                },
+                "City": {
+                  "dataType": "string",
+                  "source": "CITY"
+                },
+                "First Departure": {
+                  "dataType": "string",
+                  "source": "FIRST_DEPARTURE"
+                },
+                "Frequency Tier": {
+                  "dataType": "string",
+                  "source": "FREQUENCY_TIER"
+                },
+                "Last Departure": {
+                  "dataType": "string",
+                  "source": "LAST_DEPARTURE"
+                },
+                "Line": {
+                  "dataType": "string",
+                  "source": "LINE"
+                },
+                "Line Color": {
+                  "dataType": "string",
+                  "source": "LINE_COLOR"
+                },
+                "Line Label": {
+                  "dataType": "string",
+                  "source": "LINE_LABEL"
+                },
+                "Line Name": {
+                  "dataType": "string",
+                  "source": "LINE_NAME"
+                },
+                "Line Name En": {
+                  "dataType": "string",
+                  "source": "LINE_NAME_EN"
+                },
+                "Midday Headway Min": {
+                  "dataType": "float",
+                  "source": "MIDDAY_HEADWAY_MIN"
+                },
+                "Route Km": {
+                  "dataType": "float",
+                  "source": "ROUTE_KM"
+                },
+                "Span Hours": {
+                  "dataType": "float",
+                  "source": "SPAN_HOURS"
+                },
+                "Speed Band": {
+                  "dataType": "string",
+                  "source": "SPEED_BAND"
+                },
+                "Stops Served": {
+                  "dataType": "int",
+                  "source": "STOPS_SERVED"
+                },
+                "Trip Minutes": {
+                  "dataType": "float",
+                  "source": "TRIP_MINUTES"
+                },
+                "Weekday Trips": {
+                  "dataType": "int",
+                  "source": "WEEKDAY_TRIPS"
+                }
+              },
+              "source": {
+                "database": "ASTRATO_GALLERY",
+                "schema": "MOCK_DATA",
+                "table": "TH_LINES",
+                "type": "table"
+              }
+            },
+            "Service": {
+              "fields": {
+                "Date Label": {
+                  "dataType": "string",
+                  "source": "DATE_LABEL"
+                },
+                "Day Label": {
+                  "dataType": "string",
+                  "source": "DAY_LABEL"
+                },
+                "Day Of Week": {
+                  "dataType": "string",
+                  "source": "DAY_OF_WEEK"
+                },
+                "Day Type": {
+                  "dataType": "string",
+                  "source": "DAY_TYPE"
+                },
+                "Dow Num": {
+                  "dataType": "int",
+                  "source": "DOW_NUM"
+                },
+                "Hour": {
+                  "dataType": "int",
+                  "source": "HOUR"
+                },
+                "Hour Label": {
+                  "dataType": "string",
+                  "source": "HOUR_LABEL"
+                },
+                "Is Peak": {
+                  "dataType": "int",
+                  "source": "IS_PEAK"
+                },
+                "Line": {
+                  "dataType": "string",
+                  "source": "LINE"
+                },
+                "Service Date": {
+                  "dataType": "date",
+                  "source": "SERVICE_DATE"
+                },
+                "Service Week": {
+                  "dataType": "string",
+                  "source": "SERVICE_WEEK"
+                },
+                "Stop Calls": {
+                  "dataType": "int",
+                  "source": "STOP_CALLS"
+                },
+                "Time Band": {
+                  "dataType": "string",
+                  "source": "TIME_BAND"
+                },
+                "Trips": {
+                  "dataType": "int",
+                  "source": "TRIPS"
+                },
+                "Vehicle Hours": {
+                  "dataType": "float",
+                  "source": "VEHICLE_HOURS"
+                },
+                "Vehicle Km": {
+                  "dataType": "float",
+                  "source": "VEHICLE_KM"
+                }
+              },
+              "source": {
+                "database": "ASTRATO_GALLERY",
+                "schema": "MOCK_DATA",
+                "table": "TH_SERVICE",
+                "type": "table"
+              }
+            },
+            "Stops": {
+              "fields": {
+                "AM Peak Buses Per Hour": {
+                  "dataType": "float",
+                  "source": "AM_PEAK_BUSES_PER_HOUR"
+                },
+                "City": {
+                  "dataType": "string",
+                  "source": "CITY"
+                },
+                "Connectivity": {
+                  "dataType": "string",
+                  "source": "CONNECTIVITY"
+                },
+                "Dist Band": {
+                  "dataType": "string",
+                  "source": "DIST_BAND"
+                },
+                "Dist Centre Km": {
+                  "dataType": "float",
+                  "source": "DIST_CENTRE_KM"
+                },
+                "Is Frequent": {
+                  "dataType": "int",
+                  "source": "IS_FREQUENT"
+                },
+                "Is Underserved": {
+                  "dataType": "int",
+                  "source": "IS_UNDERSERVED"
+                },
+                "Lat": {
+                  "dataType": "float",
+                  "source": "LAT"
+                },
+                "Lines Serving": {
+                  "dataType": "int",
+                  "source": "LINES_SERVING"
+                },
+                "Lon": {
+                  "dataType": "float",
+                  "source": "LON"
+                },
+                "Longest Daytime Gap Min": {
+                  "dataType": "float",
+                  "source": "LONGEST_DAYTIME_GAP_MIN"
+                },
+                "No Sunday Service": {
+                  "dataType": "int",
+                  "source": "NO_SUNDAY_SERVICE"
+                },
+                "Saturday Departures": {
+                  "dataType": "int",
+                  "source": "SATURDAY_DEPARTURES"
+                },
+                "Sector": {
+                  "dataType": "string",
+                  "source": "SECTOR"
+                },
+                "Service Level": {
+                  "dataType": "string",
+                  "source": "SERVICE_LEVEL"
+                },
+                "Stop Code": {
+                  "dataType": "string",
+                  "source": "STOP_CODE"
+                },
+                "Stop Id": {
+                  "dataType": "string",
+                  "source": "STOP_ID"
+                },
+                "Stop Label": {
+                  "dataType": "string",
+                  "source": "STOP_LABEL"
+                },
+                "Stop Name": {
+                  "dataType": "string",
+                  "source": "STOP_NAME"
+                },
+                "Stop Name En": {
+                  "dataType": "string",
+                  "source": "STOP_NAME_EN"
+                },
+                "Sunday Departures": {
+                  "dataType": "int",
+                  "source": "SUNDAY_DEPARTURES"
+                },
+                "Weekday Departures": {
+                  "dataType": "int",
+                  "source": "WEEKDAY_DEPARTURES"
+                }
+              },
+              "source": {
+                "database": "ASTRATO_GALLERY",
+                "schema": "MOCK_DATA",
+                "table": "TH_STOPS",
+                "type": "table"
+              }
+            }
+          }
+        },
+        "documentRevision": "10",
+        "exportMode": "permissive",
+        "formatVersion": 1,
+        "measures": {
+          "AM Buses per Hour": {
+            "compiledSql": "SELECT\n  AVG(\"v7_AM_PEAK_BUSES_PER_HOUR\") AS m1\nFROM (\n  SELECT\n    \"v7_AM_PEAK_BUSES_PER_HOUR\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.AM_PEAK_BUSES_PER_HOUR AS \"v7_AM_PEAK_BUSES_PER_HOUR\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "AM Headway": {
+            "compiledSql": "SELECT\n  AVG(\"v5_AM_PEAK_HEADWAY_MIN\") AS m1\nFROM (\n  SELECT\n    \"v5_AM_PEAK_HEADWAY_MIN\"\n  FROM (\n    SELECT -- GRAIN Lines\n      v5.AM_PEAK_HEADWAY_MIN AS \"v5_AM_PEAK_HEADWAY_MIN\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES AS v5\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Active Lines": {
+            "compiledSql": "SELECT\n  COUNT(DISTINCT \"v6_LINE\") AS m1\nFROM (\n  SELECT\n    \"v6_LINE\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.LINE AS \"v6_LINE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Longest Gap": {
+            "compiledSql": "SELECT\n  AVG(\"v7_LONGEST_DAYTIME_GAP_MIN\") AS m1\nFROM (\n  SELECT\n    \"v7_LONGEST_DAYTIME_GAP_MIN\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.LONGEST_DAYTIME_GAP_MIN AS \"v7_LONGEST_DAYTIME_GAP_MIN\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Route Km": {
+            "compiledSql": "SELECT\n  AVG(\"v5_ROUTE_KM\") AS m1\nFROM (\n  SELECT\n    \"v5_ROUTE_KM\"\n  FROM (\n    SELECT -- GRAIN Lines\n      v5.ROUTE_KM AS \"v5_ROUTE_KM\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES AS v5\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Trip Km": {
+            "compiledSql": "SELECT\n  SUM(\"v6_VEHICLE_KM\") / NULLIF(SUM(\"v6_TRIPS\"), 0) AS m1\nFROM (\n  SELECT\n    \"v6_VEHICLE_KM\", \"v6_TRIPS\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.VEHICLE_KM AS \"v6_VEHICLE_KM\",\n      v6.TRIPS AS \"v6_TRIPS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Avg Trip Minutes": {
+            "compiledSql": "SELECT\n  SUM(\"v6_VEHICLE_HOURS\") * 60 / NULLIF(SUM(\"v6_TRIPS\"), 0) AS m1\nFROM (\n  SELECT\n    \"v6_VEHICLE_HOURS\", \"v6_TRIPS\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.VEHICLE_HOURS AS \"v6_VEHICLE_HOURS\",\n      v6.TRIPS AS \"v6_TRIPS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Buses at 8am": {
+            "compiledSql": "SELECT\n  SUM(\"v5_BUSES_ON_ROAD_8AM\") AS m1\nFROM (\n  SELECT\n    \"v5_BUSES_ON_ROAD_8AM\"\n  FROM (\n    SELECT -- GRAIN Lines\n      v5.BUSES_ON_ROAD_8AM AS \"v5_BUSES_ON_ROAD_8AM\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES AS v5\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Buses in Service": {
+            "compiledSql": "SELECT\n  SUM(\"v2_BUSES_ACTIVE\") / NULLIF(COUNT(DISTINCT \"v2_MINUTE_OF_DAY\"), 0) AS m1\nFROM (\n  SELECT\n    \"v2_BUSES_ACTIVE\", \"v2_MINUTE_OF_DAY\"\n  FROM (\n    SELECT -- GRAIN Fleet\n      v2.BUSES_ACTIVE AS \"v2_BUSES_ACTIVE\",\n      v2.MINUTE_OF_DAY AS \"v2_MINUTE_OF_DAY\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_FLEET_MINUTE AS v2\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Commercial Speed": {
+            "compiledSql": "SELECT\n  SUM(\"v6_VEHICLE_KM\") / NULLIF(SUM(\"v6_VEHICLE_HOURS\"), 0) AS m1\nFROM (\n  SELECT\n    \"v6_VEHICLE_KM\", \"v6_VEHICLE_HOURS\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.VEHICLE_KM AS \"v6_VEHICLE_KM\",\n      v6.VEHICLE_HOURS AS \"v6_VEHICLE_HOURS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Day Order": {
+            "compiledSql": "SELECT\n  MIN(\"v6_DOW_NUM\") AS m1\nFROM (\n  SELECT\n    \"v6_DOW_NUM\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.DOW_NUM AS \"v6_DOW_NUM\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Departures per Stop": {
+            "compiledSql": "SELECT\n  SUM(\"v7_WEEKDAY_DEPARTURES\") / NULLIF(COUNT(DISTINCT \"v7_STOP_ID\"), 0) AS m1\nFROM (\n  SELECT\n    \"v7_WEEKDAY_DEPARTURES\", \"v7_STOP_ID\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.WEEKDAY_DEPARTURES AS \"v7_WEEKDAY_DEPARTURES\",\n      v7.STOP_ID AS \"v7_STOP_ID\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Distance from Centre": {
+            "compiledSql": "SELECT\n  AVG(\"v7_DIST_CENTRE_KM\") AS m1\nFROM (\n  SELECT\n    \"v7_DIST_CENTRE_KM\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.DIST_CENTRE_KM AS \"v7_DIST_CENTRE_KM\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "First Bus": {
+            "compiledSql": "SELECT\n  MIN(\"v5_FIRST_DEPARTURE\") AS m1\nFROM (\n  SELECT\n    \"v5_FIRST_DEPARTURE\"\n  FROM (\n    SELECT -- GRAIN Lines\n      v5.FIRST_DEPARTURE AS \"v5_FIRST_DEPARTURE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES AS v5\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Frequent Stop Share": {
+            "compiledSql": "SELECT\n  SUM(\"v7_IS_FREQUENT\") / NULLIF(COUNT(DISTINCT \"v7_STOP_ID\"), 0) AS m1\nFROM (\n  SELECT\n    \"v7_IS_FREQUENT\", \"v7_STOP_ID\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.IS_FREQUENT AS \"v7_IS_FREQUENT\",\n      v7.STOP_ID AS \"v7_STOP_ID\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Frequent Stops": {
+            "compiledSql": "SELECT\n  SUM(\"v7_IS_FREQUENT\") AS m1\nFROM (\n  SELECT\n    \"v7_IS_FREQUENT\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.IS_FREQUENT AS \"v7_IS_FREQUENT\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Last Bus": {
+            "compiledSql": "SELECT\n  MAX(\"v5_LAST_DEPARTURE\") AS m1\nFROM (\n  SELECT\n    \"v5_LAST_DEPARTURE\"\n  FROM (\n    SELECT -- GRAIN Lines\n      v5.LAST_DEPARTURE AS \"v5_LAST_DEPARTURE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES AS v5\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Line Color": {
+            "compiledSql": "SELECT\n  MAX(\"v5_LINE_COLOR\") AS m1\nFROM (\n  SELECT\n    \"v5_LINE_COLOR\"\n  FROM (\n    SELECT -- GRAIN Lines\n      v5.LINE_COLOR AS \"v5_LINE_COLOR\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES AS v5\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Line Speed": {
+            "compiledSql": "SELECT\n  AVG(\"v5_AVG_SPEED_KMH\") AS m1\nFROM (\n  SELECT\n    \"v5_AVG_SPEED_KMH\"\n  FROM (\n    SELECT -- GRAIN Lines\n      v5.AVG_SPEED_KMH AS \"v5_AVG_SPEED_KMH\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES AS v5\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Line Stops Served": {
+            "compiledSql": "SELECT\n  SUM(\"v5_STOPS_SERVED\") AS m1\nFROM (\n  SELECT\n    \"v5_STOPS_SERVED\"\n  FROM (\n    SELECT -- GRAIN Lines\n      v5.STOPS_SERVED AS \"v5_STOPS_SERVED\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES AS v5\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Line Weekday Trips": {
+            "compiledSql": "SELECT\n  SUM(\"v5_WEEKDAY_TRIPS\") AS m1\nFROM (\n  SELECT\n    \"v5_WEEKDAY_TRIPS\"\n  FROM (\n    SELECT -- GRAIN Lines\n      v5.WEEKDAY_TRIPS AS \"v5_WEEKDAY_TRIPS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES AS v5\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Lines": {
+            "compiledSql": "SELECT\n  COUNT(DISTINCT \"v5_LINE\") AS m1\nFROM (\n  SELECT\n    \"v5_LINE\"\n  FROM (\n    SELECT -- GRAIN Lines\n      v5.LINE AS \"v5_LINE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES AS v5\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Lines per Stop": {
+            "compiledSql": "SELECT\n  AVG(\"v7_LINES_SERVING\") AS m1\nFROM (\n  SELECT\n    \"v7_LINES_SERVING\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.LINES_SERVING AS \"v7_LINES_SERVING\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Longest Gap": {
+            "compiledSql": "SELECT\n  MAX(\"v7_LONGEST_DAYTIME_GAP_MIN\") AS m1\nFROM (\n  SELECT\n    \"v7_LONGEST_DAYTIME_GAP_MIN\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.LONGEST_DAYTIME_GAP_MIN AS \"v7_LONGEST_DAYTIME_GAP_MIN\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Midday Headway": {
+            "compiledSql": "SELECT\n  AVG(\"v5_MIDDAY_HEADWAY_MIN\") AS m1\nFROM (\n  SELECT\n    \"v5_MIDDAY_HEADWAY_MIN\"\n  FROM (\n    SELECT -- GRAIN Lines\n      v5.MIDDAY_HEADWAY_MIN AS \"v5_MIDDAY_HEADWAY_MIN\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES AS v5\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Network Route Km": {
+            "compiledSql": "SELECT\n  SUM(\"v5_ROUTE_KM\") AS m1\nFROM (\n  SELECT\n    \"v5_ROUTE_KM\"\n  FROM (\n    SELECT -- GRAIN Lines\n      v5.ROUTE_KM AS \"v5_ROUTE_KM\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES AS v5\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Peak Buses per Hour": {
+            "compiledSql": "SELECT\n  MAX(\"v7_AM_PEAK_BUSES_PER_HOUR\") AS m1\nFROM (\n  SELECT\n    \"v7_AM_PEAK_BUSES_PER_HOUR\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.AM_PEAK_BUSES_PER_HOUR AS \"v7_AM_PEAK_BUSES_PER_HOUR\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Peak Minute Buses": {
+            "compiledSql": "SELECT\n  MAX(\"v2_BUSES_ACTIVE\") AS m1\nFROM (\n  SELECT\n    \"v2_BUSES_ACTIVE\"\n  FROM (\n    SELECT -- GRAIN Fleet\n      v2.BUSES_ACTIVE AS \"v2_BUSES_ACTIVE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_FLEET_MINUTE AS v2\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Peak Share": {
+            "compiledSql": "SELECT\n  SUM(\n    CASE WHEN -- FILTER\n      \"v6_IS_PEAK\" = 1\n    THEN \"v6_TRIPS\"\n    ELSE 0\n    END\n  ) / NULLIF(SUM(\"v6_TRIPS\"), 0) AS m1\nFROM (\n  SELECT\n    \"v6_TRIPS\", \"v6_IS_PEAK\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.TRIPS AS \"v6_TRIPS\",\n      v6.IS_PEAK AS \"v6_IS_PEAK\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Peak Trips": {
+            "compiledSql": "SELECT\n  SUM(\n    CASE WHEN -- FILTER\n      \"v6_IS_PEAK\" = 1\n    THEN \"v6_TRIPS\"\n    ELSE 0\n    END\n  ) AS m1\nFROM (\n  SELECT\n    \"v6_TRIPS\", \"v6_IS_PEAK\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.TRIPS AS \"v6_TRIPS\",\n      v6.IS_PEAK AS \"v6_IS_PEAK\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Route Stop Calls": {
+            "compiledSql": "SELECT\n  SUM(\"v4_WEEKDAY_CALLS\") AS m1\nFROM (\n  SELECT\n    \"v4_WEEKDAY_CALLS\"\n  FROM (\n    SELECT -- GRAIN Line Stops\n      v4.WEEKDAY_CALLS AS \"v4_WEEKDAY_CALLS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINE_STOPS AS v4\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Route Stop Lat": {
+            "compiledSql": "SELECT\n  AVG(\"v4_STOP_LAT\") AS m1\nFROM (\n  SELECT\n    \"v4_STOP_LAT\"\n  FROM (\n    SELECT -- GRAIN Line Stops\n      v4.STOP_LAT AS \"v4_STOP_LAT\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINE_STOPS AS v4\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Route Stop Lon": {
+            "compiledSql": "SELECT\n  AVG(\"v4_STOP_LON\") AS m1\nFROM (\n  SELECT\n    \"v4_STOP_LON\"\n  FROM (\n    SELECT -- GRAIN Line Stops\n      v4.STOP_LON AS \"v4_STOP_LON\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINE_STOPS AS v4\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Route Stops": {
+            "compiledSql": "SELECT\n  COUNT(DISTINCT \"v4_STOP_ID\") AS m1\nFROM (\n  SELECT\n    \"v4_STOP_ID\"\n  FROM (\n    SELECT -- GRAIN Line Stops\n      v4.STOP_ID AS \"v4_STOP_ID\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINE_STOPS AS v4\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Saturday Departures": {
+            "compiledSql": "SELECT\n  SUM(\"v7_SATURDAY_DEPARTURES\") AS m1\nFROM (\n  SELECT\n    \"v7_SATURDAY_DEPARTURES\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.SATURDAY_DEPARTURES AS \"v7_SATURDAY_DEPARTURES\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Saturday Trips per Day": {
+            "compiledSql": "SELECT\n  SUM(\n    CASE WHEN -- FILTER\n      \"v6_DAY_TYPE\" = 'Saturday'\n    THEN \"v6_TRIPS\"\n    ELSE 0\n    END\n  ) / NULLIF(COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v6_DAY_TYPE\" = 'Saturday'\n    THEN \"v6_SERVICE_DATE\"\n    END\n  ), 0) AS m1\nFROM (\n  SELECT\n    \"v6_TRIPS\", \"v6_DAY_TYPE\", \"v6_SERVICE_DATE\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.TRIPS AS \"v6_TRIPS\",\n      v6.DAY_TYPE AS \"v6_DAY_TYPE\",\n      v6.SERVICE_DATE AS \"v6_SERVICE_DATE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Service Days": {
+            "compiledSql": "SELECT\n  COUNT(DISTINCT \"v6_SERVICE_DATE\") AS m1\nFROM (\n  SELECT\n    \"v6_SERVICE_DATE\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.SERVICE_DATE AS \"v6_SERVICE_DATE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Service Span": {
+            "compiledSql": "SELECT\n  AVG(\"v5_SPAN_HOURS\") AS m1\nFROM (\n  SELECT\n    \"v5_SPAN_HOURS\"\n  FROM (\n    SELECT -- GRAIN Lines\n      v5.SPAN_HOURS AS \"v5_SPAN_HOURS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES AS v5\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Share of Departures": {
+            "compiledSql": "SELECT\n  SUM(\"v7_WEEKDAY_DEPARTURES\") / NULLIF(SUM(\"v7_WEEKDAY_DEPARTURES\"), 0) AS m1\nFROM (\n  SELECT\n    \"v7_WEEKDAY_DEPARTURES\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.WEEKDAY_DEPARTURES AS \"v7_WEEKDAY_DEPARTURES\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Share of Trips": {
+            "compiledSql": "SELECT\n  SUM(\"v6_TRIPS\") / NULLIF(SUM(\"v6_TRIPS\"), 0) AS m1\nFROM (\n  SELECT\n    \"v6_TRIPS\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.TRIPS AS \"v6_TRIPS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Share of Vehicle Km": {
+            "compiledSql": "SELECT\n  SUM(\"v6_VEHICLE_KM\") / NULLIF(SUM(\"v6_VEHICLE_KM\"), 0) AS m1\nFROM (\n  SELECT\n    \"v6_VEHICLE_KM\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.VEHICLE_KM AS \"v6_VEHICLE_KM\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Stop Calls": {
+            "compiledSql": "SELECT\n  SUM(\"v6_STOP_CALLS\") AS m1\nFROM (\n  SELECT\n    \"v6_STOP_CALLS\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.STOP_CALLS AS \"v6_STOP_CALLS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Stop Calls per Day": {
+            "compiledSql": "SELECT\n  SUM(\"v6_STOP_CALLS\") / NULLIF(COUNT(DISTINCT \"v6_SERVICE_DATE\"), 0) AS m1\nFROM (\n  SELECT\n    \"v6_STOP_CALLS\", \"v6_SERVICE_DATE\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.STOP_CALLS AS \"v6_STOP_CALLS\",\n      v6.SERVICE_DATE AS \"v6_SERVICE_DATE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Stop Lat": {
+            "compiledSql": "SELECT\n  AVG(\"v7_LAT\") AS m1\nFROM (\n  SELECT\n    \"v7_LAT\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.LAT AS \"v7_LAT\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Stop Lon": {
+            "compiledSql": "SELECT\n  AVG(\"v7_LON\") AS m1\nFROM (\n  SELECT\n    \"v7_LON\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.LON AS \"v7_LON\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Stop Sunday Retention": {
+            "compiledSql": "SELECT\n  SUM(\"v7_SUNDAY_DEPARTURES\") / NULLIF(SUM(\"v7_WEEKDAY_DEPARTURES\"), 0) AS m1\nFROM (\n  SELECT\n    \"v7_SUNDAY_DEPARTURES\", \"v7_WEEKDAY_DEPARTURES\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.SUNDAY_DEPARTURES AS \"v7_SUNDAY_DEPARTURES\",\n      v7.WEEKDAY_DEPARTURES AS \"v7_WEEKDAY_DEPARTURES\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Stops": {
+            "compiledSql": "SELECT\n  COUNT(DISTINCT \"v7_STOP_ID\") AS m1\nFROM (\n  SELECT\n    \"v7_STOP_ID\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.STOP_ID AS \"v7_STOP_ID\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Stops Without Sunday Bus": {
+            "compiledSql": "SELECT\n  SUM(\"v7_NO_SUNDAY_SERVICE\") AS m1\nFROM (\n  SELECT\n    \"v7_NO_SUNDAY_SERVICE\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.NO_SUNDAY_SERVICE AS \"v7_NO_SUNDAY_SERVICE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Sunday Departures": {
+            "compiledSql": "SELECT\n  SUM(\"v7_SUNDAY_DEPARTURES\") AS m1\nFROM (\n  SELECT\n    \"v7_SUNDAY_DEPARTURES\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.SUNDAY_DEPARTURES AS \"v7_SUNDAY_DEPARTURES\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Sunday Retention": {
+            "compiledSql": "SELECT\n  (SUM(\n    CASE WHEN -- FILTER\n      \"v6_DAY_TYPE\" = 'Sunday'\n    THEN \"v6_TRIPS\"\n    ELSE 0\n    END\n  ) / NULLIF(COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v6_DAY_TYPE\" = 'Sunday'\n    THEN \"v6_SERVICE_DATE\"\n    END\n  ), 0)) / NULLIF((SUM(\n    CASE WHEN -- FILTER\n      \"v6_DAY_TYPE\" = 'Weekday'\n    THEN \"v6_TRIPS\"\n    ELSE 0\n    END\n  ) / NULLIF(COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v6_DAY_TYPE\" = 'Weekday'\n    THEN \"v6_SERVICE_DATE\"\n    END\n  ), 0)), 0) AS m1\nFROM (\n  SELECT\n    \"v6_TRIPS\", \"v6_DAY_TYPE\", \"v6_SERVICE_DATE\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.TRIPS AS \"v6_TRIPS\",\n      v6.DAY_TYPE AS \"v6_DAY_TYPE\",\n      v6.SERVICE_DATE AS \"v6_SERVICE_DATE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Sunday Trips per Day": {
+            "compiledSql": "SELECT\n  SUM(\n    CASE WHEN -- FILTER\n      \"v6_DAY_TYPE\" = 'Sunday'\n    THEN \"v6_TRIPS\"\n    ELSE 0\n    END\n  ) / NULLIF(COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v6_DAY_TYPE\" = 'Sunday'\n    THEN \"v6_SERVICE_DATE\"\n    END\n  ), 0) AS m1\nFROM (\n  SELECT\n    \"v6_TRIPS\", \"v6_DAY_TYPE\", \"v6_SERVICE_DATE\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.TRIPS AS \"v6_TRIPS\",\n      v6.DAY_TYPE AS \"v6_DAY_TYPE\",\n      v6.SERVICE_DATE AS \"v6_SERVICE_DATE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          },
+          "Trip Minutes": {
+            "compiledSql": "SELECT\n  AVG(\"v5_TRIP_MINUTES\") AS m1\nFROM (\n  SELECT\n    \"v5_TRIP_MINUTES\"\n  FROM (\n    SELECT -- GRAIN Lines\n      v5.TRIP_MINUTES AS \"v5_TRIP_MINUTES\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_LINES AS v5\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Trips": {
+            "compiledSql": "SELECT\n  SUM(\"v6_TRIPS\") AS m1\nFROM (\n  SELECT\n    \"v6_TRIPS\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.TRIPS AS \"v6_TRIPS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Trips Departing": {
+            "compiledSql": "SELECT\n  SUM(\"v2_TRIPS_DEPARTING\") AS m1\nFROM (\n  SELECT\n    \"v2_TRIPS_DEPARTING\"\n  FROM (\n    SELECT -- GRAIN Fleet\n      v2.TRIPS_DEPARTING AS \"v2_TRIPS_DEPARTING\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_FLEET_MINUTE AS v2\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Trips per Day": {
+            "compiledSql": "SELECT\n  SUM(\"v6_TRIPS\") / NULLIF(COUNT(DISTINCT \"v6_SERVICE_DATE\"), 0) AS m1\nFROM (\n  SELECT\n    \"v6_TRIPS\", \"v6_SERVICE_DATE\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.TRIPS AS \"v6_TRIPS\",\n      v6.SERVICE_DATE AS \"v6_SERVICE_DATE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Underserved Share": {
+            "compiledSql": "SELECT\n  SUM(\"v7_IS_UNDERSERVED\") / NULLIF(COUNT(DISTINCT \"v7_STOP_ID\"), 0) AS m1\nFROM (\n  SELECT\n    \"v7_IS_UNDERSERVED\", \"v7_STOP_ID\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.IS_UNDERSERVED AS \"v7_IS_UNDERSERVED\",\n      v7.STOP_ID AS \"v7_STOP_ID\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Underserved Stops": {
+            "compiledSql": "SELECT\n  SUM(\"v7_IS_UNDERSERVED\") AS m1\nFROM (\n  SELECT\n    \"v7_IS_UNDERSERVED\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.IS_UNDERSERVED AS \"v7_IS_UNDERSERVED\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Vehicle Hours": {
+            "compiledSql": "SELECT\n  SUM(\"v6_VEHICLE_HOURS\") AS m1\nFROM (\n  SELECT\n    \"v6_VEHICLE_HOURS\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.VEHICLE_HOURS AS \"v6_VEHICLE_HOURS\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Vehicle Hours per Day": {
+            "compiledSql": "SELECT\n  SUM(\"v6_VEHICLE_HOURS\") / NULLIF(COUNT(DISTINCT \"v6_SERVICE_DATE\"), 0) AS m1\nFROM (\n  SELECT\n    \"v6_VEHICLE_HOURS\", \"v6_SERVICE_DATE\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.VEHICLE_HOURS AS \"v6_VEHICLE_HOURS\",\n      v6.SERVICE_DATE AS \"v6_SERVICE_DATE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Vehicle Km": {
+            "compiledSql": "SELECT\n  SUM(\"v6_VEHICLE_KM\") AS m1\nFROM (\n  SELECT\n    \"v6_VEHICLE_KM\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.VEHICLE_KM AS \"v6_VEHICLE_KM\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Vehicle Km per Day": {
+            "compiledSql": "SELECT\n  SUM(\"v6_VEHICLE_KM\") / NULLIF(COUNT(DISTINCT \"v6_SERVICE_DATE\"), 0) AS m1\nFROM (\n  SELECT\n    \"v6_VEHICLE_KM\", \"v6_SERVICE_DATE\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.VEHICLE_KM AS \"v6_VEHICLE_KM\",\n      v6.SERVICE_DATE AS \"v6_SERVICE_DATE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Weekday Departures": {
+            "compiledSql": "SELECT\n  SUM(\"v7_WEEKDAY_DEPARTURES\") AS m1\nFROM (\n  SELECT\n    \"v7_WEEKDAY_DEPARTURES\"\n  FROM (\n    SELECT -- GRAIN Stops\n      v7.WEEKDAY_DEPARTURES AS \"v7_WEEKDAY_DEPARTURES\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_STOPS AS v7\n  ) AS u1\n) AS u1\n;",
+            "portability": "portable"
+          },
+          "Weekday Trips per Day": {
+            "compiledSql": "SELECT\n  SUM(\n    CASE WHEN -- FILTER\n      \"v6_DAY_TYPE\" = 'Weekday'\n    THEN \"v6_TRIPS\"\n    ELSE 0\n    END\n  ) / NULLIF(COUNT(DISTINCT\n    CASE WHEN -- FILTER\n      \"v6_DAY_TYPE\" = 'Weekday'\n    THEN \"v6_SERVICE_DATE\"\n    END\n  ), 0) AS m1\nFROM (\n  SELECT\n    \"v6_TRIPS\", \"v6_DAY_TYPE\", \"v6_SERVICE_DATE\"\n  FROM (\n    SELECT -- GRAIN Service\n      v6.TRIPS AS \"v6_TRIPS\",\n      v6.DAY_TYPE AS \"v6_DAY_TYPE\",\n      v6.SERVICE_DATE AS \"v6_SERVICE_DATE\"\n    FROM ASTRATO_GALLERY.MOCK_DATA.TH_SERVICE AS v6\n  ) AS u1\n) AS u1\n;",
+            "portability": "reference-only"
+          }
+        },
+        "namespace": "ASTRATO",
+        "ossieSpecVersion": "0.1.1",
+        "projectionFingerprint": {
+          "algorithm": "SHA-256",
+          "canonicalization": "astrato-stable-json-v1",
+          "value": "3d3b25677dee7e56aa85e954a4757f1664159f2d335182ab7e2b03c90012fb16"
+        },
+        "runtimeVendor": "snowflake"
+      }

@@ -1,0 +1,10 @@
+node_modules/
+denylist.local.txt
+**/app/vendor/
+**/dist/
+.smoke-profile/
+shots/
+publication.local.json
+.chrome-profile/
+examples/*/project/public/sim-day.json
+examples/*/project/load/

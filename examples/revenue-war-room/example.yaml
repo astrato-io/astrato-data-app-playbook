@@ -1,0 +1,56 @@
+slug: revenue-war-room
+title: Pipeline War Room
+company: Velmora (fictional SaaS)
+layer: live-gallery
+summary: >-
+  A CRO's Q4 forecast room: is the quarter going to land, which open deals close the
+  $1.29m gap to target, which reps need coaching, and what managers commit on the Monday
+  forecast call.
+industry: saas
+function: sales
+persona: CRO
+archetype: command-centre
+look: >-
+  light, Salesforce-like white cards on a #F3F3F3 page, #0176D3 blue accent, green/red
+  good/bad ink, one screen per tab with no page scroll above 1100px, sentence headline on every tab
+tabs:
+  - Command — will we hit Q4? gap bridge vs target, four forecast categories with week-over-week change, region cards, weekly trajectory
+  - Deals — which open deals close the gap? top 15 by recovery score stacked against the gap, recovery list, deal drawer with actions
+  - Coaching — how does one rep compare with their team? five rep-vs-team-average cards, forecast vs quota for every rep, activity mix, pipeline by stage
+  - Forecast call — what do managers commit per rep against the system forecast and target? editable commit/best case, roll-up, submit
+  - Trends — how do bookings, win rate and deal size trend by closed quarter, by deal size band and by product?
+patterns: [kpi-sparkline-comparison, selection-bar, reference-lines, preload-tabs, query-scheduler, drawer-detail, offset-bar-waterfall]
+charts: [waterfall, bar, stacked-bar, line, combo, table, sparkline]
+interactions: [click-to-filter, selection-bar, drawer, tabs, deep-link]
+workflows: [deal-actions, forecast-call-submission, decision-log]
+writeback: false
+exports: []
+objects: 21
+start_here:
+  - project/src/app.js — object list, governed queries, reference lines, selection hand-offs, mock writeback
+  - project/src/charts.js — tile builders (bar, line, combo, spark, table) and compilation to vSpecs
+  - project/src/objects.js — the tile list and the compile, theme and reference-line path, importable by the offline compile check
+  - project/src/lib/theme.js — appearance operations applied to each vSpec before mount
+capabilities:
+  - narrative-headline — project/src/app.js:197
+  - record-drawer — project/src/app.js:523
+  - simulated-workflow — project/src/app.js:55
+stealable:
+  - Forecast bridge as a waterfall from an offset-layout bar, sorted by a hidden supporting measure — project/src/objects.js:39
+  - Reference lines whose values come from governed queries, injected into vSpec.refLines and re-pushed with updateInstance on selection change — project/src/objects.js:119
+  - Engine query gate (max 4 in flight) plus memo of identical getData bodies — project/src/app.js:102
+  - Chart click hand-off — a pending selection on Opp Name is removed and opens the deal drawer instead of filtering — project/src/app.js:523
+  - Separate selection groups (all-reps hero, rep focus) with the region mirrored in from the main group — project/src/app.js:531
+  - Visible tab mounts first, then the rest in three lanes on hidden (visibility) pages — project/src/app.js:561
+caveats:
+  - No screenshots in this repo, and no data: bring your own tables shaped like the layer's schema/ddl.sql.
+  - Writeback is mocked in localStorage (key nb-war-room-v1); no app.writeback call, no warehouse table
+  - Charts are declared against measure and column names, not stored business questions, although the layer holds matching ones (e.g. "Which deals can close the Q4 gap?")
+  - KPI values, region numbers and coaching cards are HTML text from engine.getData queries, not native number objects; only their sparklines are native
+  - The forecast-call grid and deal drawer are hand-built HTML, not native tables
+  - Dates are hard-coded (as-of Mon 5 Oct 2026, Close Quarter 2026-Q4, closed quarters 2024-Q1..2026-Q3)
+  - getData memo assumes data is static for the session; do not copy it for live data
+  - Below 1100px wide inactive pages switch to display:none, unlike the visibility-hidden preload on desktop
+  - project/README.md over-claims (activity sparklines in the recovery list, mean ± σ on the trajectory); stale comments call the design dark
+  - Runs on @astrato-io/visualizations and app-runtime 0.8.0 with Vite; ported from 0.5 and checked in headless Chrome with the kit smoke test (2026-11)
+  - One selection re-queries objects on every tab: all tabs share one selection group

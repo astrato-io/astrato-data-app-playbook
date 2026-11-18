@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Smoke fixture</title>
+<style>
+  body { margin: 0; font: 14px system-ui, sans-serif; }
+  .pane { height: 600px; padding: 16px; }
+  .pane[hidden] { display: none; }
+  .wide { width: 3000px; height: 20px; background: #ddd; }
+</style>
+</head>
+<body>
+<!-- A stand-in app for testing smoke.mjs. ?fail=1 makes it break in every way the test checks. -->
+<div class="pane" id="overview">Overview <span id="kpi">100</span></div>
+<div class="pane" id="detail" hidden>Detail</div>
+<script type="module">
+  import { appState } from '../app-state.js';
+  const fail = new URLSearchParams(location.search).has('fail');
+  const show = (id) => { for (const p of document.querySelectorAll('.pane')) p.hidden = p.id !== id; };
+  appState.tab('overview', () => show('overview'));
+  appState.tab('detail', () => show('detail'));
+  for (const [id, tab] of [['kpi', 'overview'], ['trend', 'overview'], ['table', 'detail']]) appState.declare(id, tab);
+  setTimeout(() => { appState.settle('kpi', 'rendered'); appState.query('kpi', 40); }, 200);
+  setTimeout(() => { appState.settle('trend', 'rendered'); appState.mark('landing-ready'); }, 400);
+  setTimeout(() => appState.settle('table', fail ? 'error' : 'rendered', { message: 'query refused' }), 600);
+  appState.check('selection moves the KPI', async () => {
+    const before = document.getElementById('kpi').textContent;
+    if (!fail) document.getElementById('kpi').textContent = '42';
+    appState.query('kpi', 35);
+    return { pass: document.getElementById('kpi').textContent !== before, detail: `${before} -> ${document.getElementById('kpi').textContent}` };
+  });
+  if (fail) {
+    console.error('fixture console error');
+    fetch('./missing.json').catch(() => {});
+    document.getElementById('detail').insertAdjacentHTML('beforeend', '<p>Visualization failed to render</p><div class="wide"></div>');
+  }
+</script>
+</body>
+</html>

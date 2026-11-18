@@ -1,0 +1,68 @@
+# Fill in every field; tools/catalog.mjs validates this file.
+slug: portfolio-os
+title: Private Markets Portfolio OS
+company: Northstar Capital Partners (fictional private-equity firm)
+layer: northstar-portfolio
+summary: >-
+  A private-equity deal and portfolio team's quarterly workbench across 36 investments in 4 funds:
+  collect and validate monitoring packs, propose and approve fair values, model scenarios, run
+  value-creation initiatives and take decisions to the Investment Committee. The story in its data is
+  whether to accept a ~$180m downside to the stake in Meridian Cloud Systems.
+industry: private-markets
+function: finance
+persona: Investment Director / deal team (also Valuation Committee, Portfolio Operations)
+archetype: workbench
+look: >-
+  light; institutional fintech: deep-navy left rail, warm-white paper, white
+  cards, muted sea-green accent; Inter body with Libre Baskerville serif headings and
+  wordmark; Material Icons; dense spreadsheet-style HTML sheets next to native charts
+tabs:
+  - Portfolio — which investments need review, and what are returns and fair value on approved marks?
+  - Companies — everything about one investment (statements with drill-down, thesis, valuation, debt, KPIs)
+  - Quarterly Monitoring — which packs are in, do they pass validation rules, who must review or approve?
+  - Financial Analysis — what drove EBITDA (price/volume/mix/cost bridge), leverage, liquidity, forecast accuracy?
+  - Valuations — what is each company worth under six methods, and is the Q3 mark approved?
+  - Scenario Lab — what happens to fair value, MOIC, IRR and the fund if the drivers move?
+  - Value Creation — which initiatives are approved, and are they delivering planned EBITDA?
+  - Investment Committee — which decision packages await a decision, and what do decisions change?
+  - Workflows & Approvals — my queue, all records, role permissions, rules and the audit trail
+  - Nash AI — keyword-routed governed business questions answered as native tables plus computed narrative
+patterns: [governed-business-questions, kpi-sparkline-comparison, selection-bar, table-sparklines, writeback-workflow, what-if-parameters, xlsx-export, preload-tabs, query-scheduler, role-switcher, in-app-calc-engine, drawer-detail]
+charts: [bar, line, combo, scatter, pie, table, table-sparklines, kpi, sparkline]
+interactions: [click-to-filter, selection-bar, drawer, tabs, role-switcher, sliders, search, compare, deep-link, chat]
+workflows: [quarterly-monitoring, valuation-approval, scenario-approval, value-creation-initiative, investment-committee-decision, action-tracking, saved-views]
+writeback: true
+exports: [xlsx, pdf]
+objects: 71   # approx.: declared in src/catalogue.js and mounted across 6 tabs, plus ad-hoc tables on Nash AI
+start_here:
+  - project/src/app.js — boot, governed query helper, writeback, selection groups, static-filter mirror, mounting
+  - project/src/core.js — roles/permissions, workflow store written through app.writeback with audit events
+  - project/src/engine.js — deterministic XIRR, multiple valuation, DCF, 5-year scenario model, validation rules
+  - project/src/catalogue.js — every native object declared as data (KPI cards, tables with sparklines, filters)
+capabilities:
+  - writeback-workflow — project/src/core.js:176
+  - what-if — project/src/pages/scenario.js:56
+  - excel-export — project/src/xlsx.js:207
+  - pdf-export — project/src/export.js:48
+  - assistant — project/src/pages/nash.js:18
+  - role-switcher — project/src/core.js:46
+  - record-drawer — project/src/core.js:94
+stealable:
+  - Workflow store on two governed views (records + audit events) via app.writeback, falling back to labelled browser persistence — project/src/core.js:176
+  - KPI card = native number + native sparkline + one-row prior-period table with red/green indicator bands — project/src/catalogue.js:63
+  - Measure-only objects (KPIs, delta tables) mirror the page's selections as static filters, limited to views they can join — project/src/app.js:218
+  - One deterministic engine shared by the data build and the app, so the stored $180m downside reproduces live — project/src/engine.js:70
+  - Query lanes with 429 backoff, timeout retry and a session cache wrapped around engine.getData — project/src/throttle.js:110
+  - Dependency-free styled .xlsx writer (fills, number formats, frozen panes) — project/src/xlsx.js:207
+caveats:
+  - No screenshots in this repo, and no data: bring your own tables shaped like the layer's schema/ddl.sql.
+  - Runs on @astrato-io/visualizations and app-runtime 0.8.0 with Vite; ported from 0.5 and checked in headless Chrome with the kit smoke test (2026-11)
+  - The KPI static-filter mirror is not needed for number objects on 0.8 (tested); it is kept for the one-row delta tables, which were not tested without it
+  - Some KPI comparison labels are cut off, and the table sparkline column shows dots rather than lines, probably because the table is filtered to one quarter (knowledge/tables.md)
+  - tools/layer.mjs needs ASTRATO_MCP_URL and ASTRATO_PAT for the bundled tools/mcp.mjs, and tools/types.txt (generate with tools/types.mjs); ASTRATO_GALLERY.MOCK_DATA is hard-coded
+  - Native charts query layer measures directly; only Nash uses the stored business questions, from its own copy in src/questions.js. Nash routes by keyword overlap, not a language model
+  - Reporting dates are hard-coded (Q3 2026, TODAY 2026-11-09 in core.js:42, 12 quarters in data.js:65); the Q4 2026 period is simulated
+  - The currency switch changes HTML workbench figures only; native objects stay in USD
+  - The Reset demo button deletes every non-seed workflow record for all users; the warehouse reset copies the *_SEED tables back (README, Rebuild from nothing)
+  - prefetchSelections in throttle.js is never called (the prefetch.js its comments mention does not exist)
+  - Valuation bridge, EBITDA bridge and scenario waterfalls are hand-drawn SVG (src/ui.js:32), not native objects

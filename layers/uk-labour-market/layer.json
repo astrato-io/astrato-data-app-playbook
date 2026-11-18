@@ -1,0 +1,5998 @@
+{
+  "fileVersion": 3,
+  "name": "UK Labour Market (ONS LMS)",
+  "datasource": "00000000-0000-0000-0000-000000000000",
+  "locale": {
+    "number": {
+      "decimalSep": ".",
+      "thousandSep": ","
+    },
+    "formats": {
+      "date": "yyyy-mm-dd",
+      "time": "hh:mm:ss",
+      "money": "$#,###.00",
+      "number": "#,##0.00",
+      "datetime": "yyyy-mm-dd hh:mm:ss",
+      "numberInt": "#,##0"
+    },
+    "calendar": {
+      "dayNames": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "monthNames": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      "dayNamesAbbr": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ],
+      "monthNamesAbbr": [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+      ]
+    },
+    "timezone": "Europe/London"
+  },
+  "views": {
+    "Labour Market": {
+      "fields": {
+        "Sex": {
+          "source": "SEX",
+          "dataType": "string"
+        },
+        "Cdid": {
+          "source": "CDID",
+          "dataType": "string"
+        },
+        "Unit": {
+          "source": "UNIT",
+          "dataType": "string"
+        },
+        "Theme": {
+          "source": "THEME",
+          "dataType": "string"
+        },
+        "Value": {
+          "source": "VALUE",
+          "dataType": "float"
+        },
+        "Method": {
+          "source": "METHOD",
+          "dataType": "string"
+        },
+        "Geography": {
+          "source": "GEOGRAPHY",
+          "dataType": "string"
+        },
+        "Indicator": {
+          "source": "INDICATOR",
+          "dataType": "string"
+        },
+        "Ons Title": {
+          "source": "ONS_TITLE",
+          "dataType": "string"
+        },
+        "Period Date": {
+          "source": "PERIOD_DATE",
+          "dataType": "date"
+        },
+        "Period Year": {
+          "source": "PERIOD_YEAR",
+          "dataType": "int"
+        },
+        "Period Label": {
+          "source": "PERIOD_LABEL",
+          "dataType": "string"
+        },
+        "Period Status": {
+          "source": "PERIOD_STATUS",
+          "dataType": "string"
+        },
+        "Value Prev Year": {
+          "source": "VALUE_PREV_YEAR",
+          "dataType": "float"
+        },
+        "Value Pre Pandemic": {
+          "source": "VALUE_PRE_PANDEMIC",
+          "dataType": "float"
+        },
+        "Value Prev Quarter": {
+          "source": "VALUE_PREV_QUARTER",
+          "dataType": "float"
+        },
+        "Months Before Latest": {
+          "source": "MONTHS_BEFORE_LATEST",
+          "dataType": "int"
+        }
+      },
+      "source": {
+        "type": "table",
+        "table": "LMS_FACT",
+        "schema": "MOCK_DATA",
+        "objectType": "VIEW"
+      },
+      "description": "ONS Labour Market Statistics (LMS), release 15 Sep 2026. One row per series per month (Jan 2015 onward), with the value 3 months earlier, 12 months earlier and in Feb 2020 (pre-pandemic, Dec-Feb 2020 for LFS). LFS series are rolling 3-month averages labelled by their final month. Each series (CDID) has its own unit: never add values across indicators."
+    }
+  },
+  "joins": [],
+  "dimensions": {
+    "Geography": {
+      "kind": "field",
+      "reference": {
+        "view": "Labour Market",
+        "field": "Geography"
+      },
+      "resultType": "string",
+      "description": "United Kingdom or region/nation"
+    },
+    "Indicator": {
+      "kind": "field",
+      "reference": {
+        "view": "Labour Market",
+        "field": "Indicator"
+      },
+      "resultType": "string",
+      "description": "Short indicator name"
+    },
+    "Period": {
+      "kind": "field",
+      "reference": {
+        "view": "Labour Market",
+        "field": "Period Date"
+      },
+      "resultType": "date",
+      "description": "First day of the final month of the period"
+    },
+    "Period Label": {
+      "kind": "field",
+      "reference": {
+        "view": "Labour Market",
+        "field": "Period Label"
+      },
+      "resultType": "string",
+      "description": "e.g. Apr-Jun 2026 for LFS rolling quarters"
+    },
+    "Period Status": {
+      "kind": "field",
+      "reference": {
+        "view": "Labour Market",
+        "field": "Period Status"
+      },
+      "resultType": "string",
+      "description": "Latest or History, per series"
+    },
+    "Sector": {
+      "kind": "mapping",
+      "groups": [
+        {
+          "value": "Construction",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "Labour Market",
+                    "field": "Indicator"
+                  }
+                },
+                {
+                  "value": "Vacancies: Construction",
+                  "dataType": "string"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "Health & social work",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "Labour Market",
+                    "field": "Indicator"
+                  }
+                },
+                {
+                  "value": "Vacancies: Health & social work",
+                  "dataType": "string"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "Hospitality",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "Labour Market",
+                    "field": "Indicator"
+                  }
+                },
+                {
+                  "value": "Vacancies: Hospitality",
+                  "dataType": "string"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "Information & comms",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "Labour Market",
+                    "field": "Indicator"
+                  }
+                },
+                {
+                  "value": "Vacancies: Information & comms",
+                  "dataType": "string"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "Manufacturing",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "Labour Market",
+                    "field": "Indicator"
+                  }
+                },
+                {
+                  "value": "Vacancies: Manufacturing",
+                  "dataType": "string"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "Public admin & defence",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "Labour Market",
+                    "field": "Indicator"
+                  }
+                },
+                {
+                  "value": "Vacancies: Public admin & defence",
+                  "dataType": "string"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        },
+        {
+          "value": "Wholesale & retail",
+          "filter": {
+            "f1": {
+              "operator": "equals",
+              "arguments": [
+                {
+                  "reference": {
+                    "view": "Labour Market",
+                    "field": "Indicator"
+                  }
+                },
+                {
+                  "value": "Vacancies: Wholesale & retail",
+                  "dataType": "string"
+                }
+              ]
+            },
+            "expression": "{f1}"
+          },
+          "dataType": "string"
+        }
+      ],
+      "reference": {
+        "view": "Labour Market",
+        "field": "Indicator"
+      },
+      "categories": [
+        "Vacancies"
+      ],
+      "resultType": "string",
+      "description": "Industry sector of a sector vacancy series, without the \"Vacancies: \" prefix. Empty for every other indicator."
+    },
+    "Series ID": {
+      "kind": "field",
+      "reference": {
+        "view": "Labour Market",
+        "field": "Cdid"
+      },
+      "resultType": "string",
+      "description": "ONS four-character series identifier (CDID)"
+    },
+    "Sex": {
+      "kind": "field",
+      "reference": {
+        "view": "Labour Market",
+        "field": "Sex"
+      },
+      "resultType": "string",
+      "description": "All, Male or Female"
+    },
+    "Theme": {
+      "kind": "field",
+      "reference": {
+        "view": "Labour Market",
+        "field": "Theme"
+      },
+      "resultType": "string",
+      "description": "Employment, Unemployment, Inactivity, Pay, Vacancies, Regional"
+    },
+    "Unit": {
+      "kind": "field",
+      "reference": {
+        "view": "Labour Market",
+        "field": "Unit"
+      },
+      "resultType": "string",
+      "description": "Unit of the series"
+    },
+    "Year": {
+      "kind": "field",
+      "reference": {
+        "view": "Labour Market",
+        "field": "Period Year"
+      },
+      "resultType": "int",
+      "description": "Calendar year of the period end"
+    }
+  },
+  "measures": {
+    "Change on Quarter": {
+      "description": "Value minus the value 3 months earlier, in the series' own unit (percentage points for rates).",
+      "categories": [
+        "Generic"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ]
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Quarter"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Change on Year": {
+      "description": "Value minus the value 12 months earlier, in the series' own unit.",
+      "categories": [
+        "Generic"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ]
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Change on a Year Earlier": {
+      "description": "Value minus the value 12 months earlier in the series' own unit, counting only rows that have a reading a year earlier (unlike Change on Year, which returns the value itself when there is none).",
+      "categories": [
+        "Generic"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+#,##0.0;-#,##0.0;0.0"
+      }
+    },
+    "Change vs Pre-Pandemic": {
+      "description": "Value minus the Feb 2020 value (Dec-Feb 2020 for LFS series).",
+      "categories": [
+        "Generic"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ]
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Pre Pandemic"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Employment Level (000s)": {
+      "description": "People in employment aged 16+, thousands. ONS series MGRZ.",
+      "categories": [
+        "Employment"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "MGRZ",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Employment Rate": {
+      "description": "UK employment rate, aged 16-64, %, rolling 3 months. ONS series LF24.",
+      "categories": [
+        "Employment"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "LF24",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Growth on Year %": {
+      "description": "Percentage growth on a year; use for level series (000s, £).",
+      "categories": [
+        "Generic"
+      ],
+      "resultType": "float",
+      "expression": "({m1} / {m2} - 1) * 100",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ]
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Implied CPIH Inflation": {
+      "description": "Nominal regular pay growth (KAI9) minus real regular pay growth (A2FA), %: the CPIH inflation rate ONS used to deflate pay, to rounding.",
+      "categories": [
+        "Pay"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "KAI9",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "A2FA",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "0.0\"%\""
+      }
+    },
+    "Inactivity Rate": {
+      "description": "UK economic inactivity rate, aged 16-64, %. ONS series LF2S.",
+      "categories": [
+        "Inactivity"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "LF2S",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Latest Change on Quarter": {
+      "description": "Latest reading minus the reading 3 months earlier, in the series' own unit.",
+      "categories": [
+        "Generic"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Quarter"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+#,##0.0;-#,##0.0;0.0"
+      }
+    },
+    "Latest Change on a Year Earlier": {
+      "description": "Latest reading minus the reading 12 months earlier, in the series' own unit.",
+      "categories": [
+        "Generic"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+#,##0.0;-#,##0.0;0.0"
+      }
+    },
+    "Latest Change vs Pre-Pandemic": {
+      "description": "Latest reading minus the Feb 2020 reading (Dec-Feb 2020 for LFS series).",
+      "categories": [
+        "Generic"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Pre Pandemic"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+#,##0.0;-#,##0.0;0.0"
+      }
+    },
+    "Latest Regional Employment Change on a Year Earlier": {
+      "description": "Change in a region's 16-64 employment rate on a year earlier, latest release, pp.",
+      "categories": [
+        "Regional"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2} AND {f3} AND {f4}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          },
+          "f3": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f4": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Employment rate (16-64)",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2} AND {f3} AND {f4}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          },
+          "f3": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f4": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Employment rate (16-64)",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.0\" pp\";-0.0\" pp\";0.0\" pp\""
+      }
+    },
+    "Latest Regional Employment Rate": {
+      "description": "16-64 employment rate of a region or nation in the latest release, %.",
+      "categories": [
+        "Regional"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2} AND {f3}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f3": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Employment rate (16-64)",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Latest Regional Unemployment Change on a Year Earlier": {
+      "description": "Change in a region's unemployment rate on a year earlier, latest release, pp.",
+      "categories": [
+        "Regional"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2} AND {f3} AND {f4}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          },
+          "f3": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f4": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Unemployment rate",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2} AND {f3} AND {f4}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          },
+          "f3": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f4": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Unemployment rate",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.0\" pp\";-0.0\" pp\";0.0\" pp\""
+      }
+    },
+    "Latest Regional Unemployment Change vs Pre-Pandemic": {
+      "description": "Change in a region's unemployment rate since Dec-Feb 2020, latest release, pp.",
+      "categories": [
+        "Regional"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2} AND {f3}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f3": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Unemployment rate",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Pre Pandemic"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2} AND {f3}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f3": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Unemployment rate",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.0\" pp\";-0.0\" pp\";0.0\" pp\""
+      }
+    },
+    "Latest Regional Unemployment Rate": {
+      "description": "Unemployment rate of a region or nation in the latest release, %.",
+      "categories": [
+        "Regional"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2} AND {f3}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f3": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Unemployment rate",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Latest Share of Sector Vacancies": {
+      "description": "A sector's share of the seven sectors' vacancies in the latest release.",
+      "categories": [
+        "Vacancies"
+      ],
+      "resultType": "float",
+      "expression": "{m1} / {m2}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "like",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Vacancies: *",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "scope": "total",
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "like",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Vacancies: *",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "0.0%"
+      }
+    },
+    "Latest Value": {
+      "description": "The latest published reading of a series (Period Status = Latest), whatever period is selected. Only meaningful with one series in context.",
+      "categories": [
+        "Generic"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Period Status"
+                }
+              },
+              {
+                "value": "Latest",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Long-term Sick (000s)": {
+      "description": "Economically inactive because of long-term sickness, aged 16-64, thousands. ONS series LF69.",
+      "categories": [
+        "Inactivity"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "LF69",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Pay Award vs Private Sector Pay Growth": {
+      "description": "What-if: a pay award of \"Pay Award %\" minus private sector regular pay growth (KAJ4), percentage points. Positive means the award beats the going rate.",
+      "categories": [
+        "Pay",
+        "What-if"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "reference": {
+          "parameter": "Pay Award %"
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "KAJ4",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.0\" pp\";-0.0\" pp\";0.0\" pp\""
+      },
+      "parameters": {
+        "Pay Award %": {
+          "default": 4,
+          "dataType": "float"
+        }
+      }
+    },
+    "Private Sector Pay Growth": {
+      "description": "Private sector regular pay growth, 3-month average on a year, %. ONS series KAJ4.",
+      "categories": [
+        "Pay"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "KAJ4",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Private Sector Pay Growth Change on Year": {
+      "description": "Private sector regular pay growth (KAJ4) minus its value 12 months earlier, percentage points. Empty where there is no prior year.",
+      "categories": [
+        "Pay"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "KAJ4",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "KAJ4",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.0\" pp\";-0.0\" pp\";0.0\" pp\""
+      }
+    },
+    "Public Sector Pay Growth": {
+      "description": "Public sector regular pay growth, 3-month average on a year, %. ONS series KAJ7.",
+      "categories": [
+        "Pay"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "KAJ7",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Real Pay Growth Change on Year": {
+      "description": "Real regular pay growth (A2FA) minus its value 12 months earlier, percentage points. Empty where there is no prior year.",
+      "categories": [
+        "Pay"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "A2FA",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "A2FA",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.0\" pp\";-0.0\" pp\";0.0\" pp\""
+      }
+    },
+    "Real Regular Pay Growth": {
+      "description": "Real (CPIH-deflated) regular pay growth, 3-month average on a year, %. ONS series A2FA.",
+      "categories": [
+        "Pay"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "A2FA",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Real Value of Pay Award": {
+      "description": "What-if: a pay award of \"Pay Award %\" minus implied CPIH inflation (KAI9 - A2FA), percentage points. Positive means the award beats inflation.",
+      "categories": [
+        "Pay",
+        "What-if"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - ({m2} - {m3})",
+      "m1": {
+        "reference": {
+          "parameter": "Pay Award %"
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "KAI9",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "m3": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "A2FA",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.0\" pp\";-0.0\" pp\";0.0\" pp\""
+      },
+      "parameters": {
+        "Pay Award %": {
+          "default": 4,
+          "dataType": "float"
+        }
+      }
+    },
+    "Redundancies (000s)": {
+      "description": "UK redundancies in the three months to the period, thousands (indicator \"Redundancies\").",
+      "categories": [
+        "Unemployment"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Redundancies",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0\"k\""
+      }
+    },
+    "Redundancies Change on Year (000s)": {
+      "description": "UK redundancies (000s) minus the value 12 months earlier. Empty where there is no prior year.",
+      "categories": [
+        "Unemployment"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Redundancies",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Redundancies",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+#,##0\"k\";-#,##0\"k\";0\"k\""
+      }
+    },
+    "Regional Employment Change on Year": {
+      "description": "Change in a region's 16-64 employment rate on a year earlier, percentage points.",
+      "categories": [
+        "Regional"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Employment rate (16-64)",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Employment rate (16-64)",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.0;-0.0;0.0"
+      }
+    },
+    "Regional Employment Change on a Year Earlier": {
+      "description": "Change in a region's 16-64 employment rate on a year earlier, percentage points, counting only rows with a reading a year earlier.",
+      "categories": [
+        "Regional"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2} AND {f3}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Employment rate (16-64)",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f3": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2} AND {f3}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Employment rate (16-64)",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f3": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.0\" pp\";-0.0\" pp\";0.0\" pp\""
+      }
+    },
+    "Regional Employment Rate": {
+      "description": "Employment rate aged 16-64 for a region or nation, %. Use with Geography.",
+      "categories": [
+        "Regional"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Employment rate (16-64)",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Regional Unemployment Change on Year": {
+      "description": "Change in a region's unemployment rate on a year earlier, percentage points.",
+      "categories": [
+        "Regional"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Unemployment rate",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Unemployment rate",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.0;-0.0;0.0"
+      }
+    },
+    "Regional Unemployment Change on a Year Earlier": {
+      "description": "Change in a region's unemployment rate on a year earlier, percentage points, counting only rows with a reading a year earlier.",
+      "categories": [
+        "Regional"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2} AND {f3}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Unemployment rate",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f3": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2} AND {f3}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Unemployment rate",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f3": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.0\" pp\";-0.0\" pp\";0.0\" pp\""
+      }
+    },
+    "Regional Unemployment Change vs Pre-Pandemic": {
+      "description": "Change in a region's unemployment rate since Dec-Feb 2020, percentage points.",
+      "categories": [
+        "Regional"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Unemployment rate",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Pre Pandemic"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Unemployment rate",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.0;-0.0;0.0"
+      }
+    },
+    "Regional Unemployment Rate": {
+      "description": "ILO unemployment rate for a region or nation, %. Use with Geography.",
+      "categories": [
+        "Regional"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Theme"
+                }
+              },
+              {
+                "value": "Regional",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Unemployment rate",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Regular Pay Growth": {
+      "description": "Nominal regular pay (excl. bonuses) growth, 3-month average on a year, %. ONS series KAI9.",
+      "categories": [
+        "Pay"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "KAI9",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Regular Pay Growth Change on Year": {
+      "description": "Nominal regular pay growth (KAI9) minus its value 12 months earlier, percentage points. Empty where there is no prior year.",
+      "categories": [
+        "Pay"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "KAI9",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "KAI9",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.0\" pp\";-0.0\" pp\";0.0\" pp\""
+      }
+    },
+    "Sector Vacancies (000s)": {
+      "description": "Vacancies in one industry sector, thousands (indicators \"Vacancies: ...\"). Use with Indicator; 7 sectors only, not the full SIC breakdown.",
+      "categories": [
+        "Vacancies"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "like",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Vacancies: *",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0\"k\""
+      }
+    },
+    "Sector Vacancy Change on Year (000s)": {
+      "description": "Change in a sector's vacancies on a year earlier, thousands. Use with Indicator. Empty where there is no prior year.",
+      "categories": [
+        "Vacancies"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "like",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Vacancies: *",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "like",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Vacancies: *",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+#,##0\"k\";-#,##0\"k\";0\"k\""
+      }
+    },
+    "Share of Sector Vacancies": {
+      "description": "A sector's vacancies as a share of the 7 sectors shown (not of all UK vacancies). Use with Indicator and one period.",
+      "categories": [
+        "Vacancies"
+      ],
+      "resultType": "float",
+      "expression": "{m1} / {m2}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "like",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Vacancies: *",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "scope": "total",
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "like",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Indicator"
+                }
+              },
+              {
+                "value": "Vacancies: *",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "0.0%"
+      }
+    },
+    "Unemployed per Vacancy": {
+      "description": "Unemployed people per job vacancy. ONS series JPC5.",
+      "categories": [
+        "Vacancies"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "JPC5",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Unemployed per Vacancy Change on Year": {
+      "description": "Unemployed people per vacancy (JPC5) minus its value 12 months earlier. Up means a looser market. Empty where there is no prior year.",
+      "categories": [
+        "Vacancies"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "JPC5",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "JPC5",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.00;-0.00;0.00"
+      }
+    },
+    "Unemployed per Vacancy Pre-Pandemic": {
+      "description": "Unemployed people per vacancy (JPC5) in Dec-Feb 2020, before the pandemic. A reference level for the trend.",
+      "categories": [
+        "Vacancies"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Pre Pandemic"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "JPC5",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Unemployment Rate": {
+      "description": "UK ILO unemployment rate, aged 16+, %, rolling 3 months. ONS series MGSX.",
+      "categories": [
+        "Unemployment"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "MGSX",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Unemployment Rate Change on Year": {
+      "description": "UK unemployment rate (MGSX) minus its value 12 months earlier, percentage points. Empty where there is no reading a year earlier (never the value itself).",
+      "categories": [
+        "Unemployment"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "MGSX",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "MGSX",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+0.0\" pp\";-0.0\" pp\";0.0\" pp\""
+      }
+    },
+    "Vacancies (000s)": {
+      "description": "UK job vacancies, thousands, rolling 3 months. ONS series AP2Y.",
+      "categories": [
+        "Vacancies"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "AP2Y",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Vacancies Change on Year (000s)": {
+      "description": "UK vacancies (AP2Y, 000s) minus the value 12 months earlier. Empty where there is no prior year.",
+      "categories": [
+        "Vacancies"
+      ],
+      "resultType": "float",
+      "expression": "{m1} - {m2}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "AP2Y",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "m2": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value Prev Year"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "AP2Y",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "set",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Value Prev Year"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+#,##0\"k\";-#,##0\"k\";0\"k\""
+      }
+    },
+    "Value": {
+      "description": "The reading of one series in one period; only meaningful when a single indicator (Series ID) is in context.",
+      "categories": [
+        "Generic"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Youth Unemployment Rate": {
+      "description": "Unemployment rate, aged 16-24, %. ONS series MGWY.",
+      "categories": [
+        "Unemployment"
+      ],
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "AVG",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Labour Market",
+              "field": "Value"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Labour Market",
+                  "field": "Cdid"
+                }
+              },
+              {
+                "value": "MGWY",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    }
+  },
+  "udfs": {},
+  "businessQuestions": {
+    "Are real wages still growing?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "reference": {
+            "measure": "Regular Pay Growth"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Real Regular Pay Growth"
+          }
+        }
+      ],
+      "question": "Are real wages still growing?",
+      "categories": [
+        "Pay"
+      ],
+      "dimensions": [
+        {
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "Nominal and real (CPIH-adjusted) regular pay growth, 3-month average on a year. The gap is inflation.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "Are vacancies falling as unemployment rises?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "vac",
+          "reference": {
+            "measure": "Vacancies (000s)"
+          }
+        },
+        {
+          "key": "ur",
+          "reference": {
+            "measure": "Unemployment Rate"
+          }
+        }
+      ],
+      "question": "Are vacancies falling as unemployment rises?",
+      "categories": [
+        "Labour Market Pulse",
+        "market"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "UK vacancies (000s, left axis) and the unemployment rate (%, right axis) by month.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How are vacancies changing in each sector?": {
+      "filters": {
+        "expression": "{f1}",
+        "f1": {
+          "operator": "contains",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Indicator"
+              }
+            },
+            {
+              "value": "Vacancies:"
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "v"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "rk",
+          "reference": {
+            "measure": "Latest Value"
+          },
+          "advancedCalculation": {
+            "rank": {
+              "direction": "descending"
+            }
+          }
+        },
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Latest Value"
+          }
+        },
+        {
+          "key": "chg",
+          "reference": {
+            "measure": "Latest Change on a Year Earlier"
+          }
+        },
+        {
+          "key": "sh",
+          "reference": {
+            "measure": "Latest Share of Sector Vacancies"
+          }
+        }
+      ],
+      "question": "How are vacancies changing in each sector?",
+      "categories": [
+        "Labour Market Pulse"
+      ],
+      "dimensions": [
+        {
+          "key": "ind",
+          "reference": {
+            "dimension": "Sector"
+          }
+        }
+      ],
+      "description": "Vacancies by industry sector in the latest release: level (000s), rank, change on a year earlier and share of the seven sectors.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "How does a pay award compare with private sector pay growth?": {
+      "filters": {
+        "expression": "{f1}",
+        "f1": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Pay Award vs Private Sector Pay Growth"
+          }
+        }
+      ],
+      "question": "How does a pay award compare with private sector pay growth?",
+      "categories": [
+        "Labour Market Pulse",
+        "pay"
+      ],
+      "dimensions": [],
+      "description": "Award vs private-sector pay",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How far has the labour market loosened since the 2022 peak?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "uv",
+          "reference": {
+            "measure": "Unemployed per Vacancy"
+          }
+        },
+        {
+          "key": "ma",
+          "reference": {
+            "measure": "Unemployed per Vacancy"
+          },
+          "advancedCalculation": {
+            "movingCalculation": {
+              "aggregate": "AVG",
+              "windowEnd": 0,
+              "windowBegin": -11
+            }
+          }
+        }
+      ],
+      "question": "How far has the labour market loosened since the 2022 peak?",
+      "categories": [
+        "Labour Market Pulse",
+        "market"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "Unemployed people per vacancy each month with its 12-month moving average. The shaded band runs up to the pre-pandemic level (Dec-Feb 2020): below it the market is tighter than before the pandemic.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How fast are real wages growing in the latest release?": {
+      "filters": {
+        "expression": "{f1}",
+        "f1": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Real Regular Pay Growth"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Real Pay Growth Change on Year"
+          }
+        }
+      ],
+      "question": "How fast are real wages growing in the latest release?",
+      "categories": [
+        "Labour Market Pulse",
+        "pay"
+      ],
+      "dimensions": [],
+      "description": "Real pay growth",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How fast is private sector pay growing in the latest release?": {
+      "filters": {
+        "expression": "{f1}",
+        "f1": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Private Sector Pay Growth"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Private Sector Pay Growth Change on Year"
+          }
+        }
+      ],
+      "question": "How fast is private sector pay growing in the latest release?",
+      "categories": [
+        "Labour Market Pulse",
+        "pay"
+      ],
+      "dimensions": [],
+      "description": "Private sector pay growth",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How fast is regular pay growing in the latest release?": {
+      "filters": {
+        "expression": "{f1}",
+        "f1": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Regular Pay Growth"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Regular Pay Growth Change on Year"
+          }
+        }
+      ],
+      "question": "How fast is regular pay growing in the latest release?",
+      "categories": [
+        "Labour Market Pulse",
+        "market"
+      ],
+      "dimensions": [],
+      "description": "Regular pay growth",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How has private sector pay growth moved month by month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Private Sector Pay Growth"
+          }
+        }
+      ],
+      "question": "How has private sector pay growth moved month by month?",
+      "categories": [
+        "Labour Market Pulse",
+        "pay"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "How has private sector pay growth moved month by month?",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How has real pay growth moved month by month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Real Regular Pay Growth"
+          }
+        }
+      ],
+      "question": "How has real pay growth moved month by month?",
+      "categories": [
+        "Labour Market Pulse",
+        "pay"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "How has real pay growth moved month by month?",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How has regional unemployment moved month by month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Regional Unemployment Rate"
+          }
+        }
+      ],
+      "question": "How has regional unemployment moved month by month?",
+      "categories": [
+        "Labour Market Pulse",
+        "regions"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "How has regional unemployment moved month by month?",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How has regular pay growth moved month by month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Regular Pay Growth"
+          }
+        }
+      ],
+      "question": "How has regular pay growth moved month by month?",
+      "categories": [
+        "Labour Market Pulse",
+        "market"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "How has regular pay growth moved month by month?",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How has the UK unemployment rate moved month by month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Unemployment Rate"
+          }
+        }
+      ],
+      "question": "How has the UK unemployment rate moved month by month?",
+      "categories": [
+        "Labour Market Pulse",
+        "market"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "How has the UK unemployment rate moved month by month?",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How has the number of unemployed per vacancy moved month by month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Unemployed per Vacancy"
+          }
+        }
+      ],
+      "question": "How has the number of unemployed per vacancy moved month by month?",
+      "categories": [
+        "Labour Market Pulse",
+        "market"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "How has the number of unemployed per vacancy moved month by month?",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How has the regional employment rate moved month by month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Regional Employment Rate"
+          }
+        }
+      ],
+      "question": "How has the regional employment rate moved month by month?",
+      "categories": [
+        "Labour Market Pulse",
+        "regions"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "How has the regional employment rate moved month by month?",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How has unemployment changed in each region over time?": {
+      "filters": {
+        "expression": "{th}",
+        "th": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Theme"
+              }
+            },
+            {
+              "value": "Regional"
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "Geography"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "reference": {
+            "measure": "Regional Unemployment Rate"
+          }
+        }
+      ],
+      "question": "How has unemployment changed in each region over time?",
+      "categories": [
+        "Regional"
+      ],
+      "dimensions": [
+        {
+          "reference": {
+            "dimension": "Geography"
+          }
+        },
+        {
+          "reference": {
+            "dimension": "Year"
+          }
+        }
+      ],
+      "description": "Average unemployment rate by region or nation and calendar year (2026 covers January to June).",
+      "preferredCharts": [
+        {
+          "type": "heatmap"
+        }
+      ]
+    },
+    "How has unemployment moved since 2015?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "reference": {
+            "measure": "Unemployment Rate"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Youth Unemployment Rate"
+          }
+        }
+      ],
+      "question": "How has unemployment moved since 2015?",
+      "categories": [
+        "Unemployment"
+      ],
+      "dimensions": [
+        {
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "UK unemployment rate (16+) and youth unemployment rate (16-24) by month, rolling 3-month averages.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How have UK job vacancies moved month by month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Vacancies (000s)"
+          }
+        }
+      ],
+      "question": "How have UK job vacancies moved month by month?",
+      "categories": [
+        "Labour Market Pulse",
+        "market"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "How have UK job vacancies moved month by month?",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How have redundancies moved month by month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Redundancies (000s)"
+          }
+        }
+      ],
+      "question": "How have redundancies moved month by month?",
+      "categories": [
+        "Labour Market Pulse",
+        "demand"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "How have redundancies moved month by month?",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How have sector vacancies moved since 2019?": {
+      "filters": {
+        "expression": "{f1} AND {f2}",
+        "f1": {
+          "operator": "contains",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Indicator"
+              }
+            },
+            {
+              "value": "Vacancies:"
+            }
+          ]
+        },
+        "f2": {
+          "operator": "greaterThanOrEqual",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Year"
+              }
+            },
+            {
+              "value": 2019
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "p"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Sector Vacancies (000s)"
+          }
+        }
+      ],
+      "question": "How have sector vacancies moved since 2019?",
+      "categories": [
+        "Labour Market Pulse",
+        "demand"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Period"
+          }
+        },
+        {
+          "key": "ind",
+          "reference": {
+            "dimension": "Sector"
+          }
+        }
+      ],
+      "description": "Vacancies by industry sector (000s), rolling quarters, January 2019 onward.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "How is each region's labour market doing?": {
+      "filters": {
+        "expression": "{lat} AND {th}",
+        "lat": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        },
+        "th": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Theme"
+              }
+            },
+            {
+              "value": "Regional"
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "Regional Unemployment Rate"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "reference": {
+            "measure": "Regional Unemployment Rate"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Regional Unemployment Change on Year"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Regional Unemployment Change vs Pre-Pandemic"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Regional Employment Rate"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Regional Employment Change on Year"
+          }
+        }
+      ],
+      "question": "How is each region's labour market doing?",
+      "categories": [
+        "Regional"
+      ],
+      "dimensions": [
+        {
+          "reference": {
+            "dimension": "Geography"
+          }
+        }
+      ],
+      "description": "Latest unemployment rate with its change on the year and since Dec-Feb 2020, and the 16-64 employment rate with its change on the year, for each region and nation.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "How many job vacancies are there in the latest release?": {
+      "filters": {
+        "expression": "{f1}",
+        "f1": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Vacancies (000s)"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Vacancies Change on Year (000s)"
+          }
+        }
+      ],
+      "question": "How many job vacancies are there in the latest release?",
+      "categories": [
+        "Labour Market Pulse",
+        "market"
+      ],
+      "dimensions": [],
+      "description": "Vacancies",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How many redundancies were there in the latest release?": {
+      "filters": {
+        "expression": "{f1}",
+        "f1": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Redundancies (000s)"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Redundancies Change on Year (000s)"
+          }
+        }
+      ],
+      "question": "How many redundancies were there in the latest release?",
+      "categories": [
+        "Labour Market Pulse",
+        "demand"
+      ],
+      "dimensions": [],
+      "description": "Redundancies",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "How many unemployed people are there per vacancy in the latest release?": {
+      "filters": {
+        "expression": "{f1}",
+        "f1": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Unemployed per Vacancy"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Unemployed per Vacancy Change on Year"
+          }
+        }
+      ],
+      "question": "How many unemployed people are there per vacancy in the latest release?",
+      "categories": [
+        "Labour Market Pulse",
+        "market"
+      ],
+      "dimensions": [],
+      "description": "Unemployed per vacancy",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "Is long-term sickness still rising?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "reference": {
+            "measure": "Long-term Sick (000s)"
+          }
+        }
+      ],
+      "question": "Is long-term sickness still rising?",
+      "categories": [
+        "Inactivity"
+      ],
+      "dimensions": [
+        {
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "People inactive because of long-term sickness (000s, 16-64) by month.",
+      "preferredCharts": [
+        {
+          "type": "area"
+        }
+      ]
+    },
+    "Is public sector pay outpacing the private sector?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "reference": {
+            "measure": "Public Sector Pay Growth"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Private Sector Pay Growth"
+          }
+        }
+      ],
+      "question": "Is public sector pay outpacing the private sector?",
+      "categories": [
+        "Pay"
+      ],
+      "dimensions": [
+        {
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "Regular pay growth by sector, 3-month average on a year.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "Is the jobs market loosening?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "reference": {
+            "measure": "Vacancies (000s)"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Unemployed per Vacancy"
+          }
+        }
+      ],
+      "question": "Is the jobs market loosening?",
+      "categories": [
+        "Vacancies"
+      ],
+      "dimensions": [
+        {
+          "reference": {
+            "dimension": "Period"
+          }
+        }
+      ],
+      "description": "Vacancies (000s) and unemployed people per vacancy by month. Fewer vacancies and more unemployed per vacancy mean a looser market.",
+      "preferredCharts": [
+        {
+          "type": "line"
+        }
+      ]
+    },
+    "What inflation rate is pay being deflated by in the latest release?": {
+      "filters": {
+        "expression": "{f1}",
+        "f1": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Implied CPIH Inflation"
+          }
+        }
+      ],
+      "question": "What inflation rate is pay being deflated by in the latest release?",
+      "categories": [
+        "Labour Market Pulse",
+        "pay"
+      ],
+      "dimensions": [],
+      "description": "Inflation pay is deflated by",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "What is a pay award worth after inflation?": {
+      "filters": {
+        "expression": "{f1}",
+        "f1": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Real Value of Pay Award"
+          }
+        }
+      ],
+      "question": "What is a pay award worth after inflation?",
+      "categories": [
+        "Labour Market Pulse",
+        "pay"
+      ],
+      "dimensions": [],
+      "description": "Award after inflation",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "What is the UK unemployment rate in the latest release?": {
+      "filters": {
+        "expression": "{f1}",
+        "f1": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Unemployment Rate"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Unemployment Rate Change on Year"
+          }
+        }
+      ],
+      "question": "What is the UK unemployment rate in the latest release?",
+      "categories": [
+        "Labour Market Pulse",
+        "market"
+      ],
+      "dimensions": [],
+      "description": "Unemployment rate",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "What is the employment rate across the selected regions in the latest release?": {
+      "filters": {
+        "expression": "{f1}",
+        "f1": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Regional Employment Rate"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Regional Employment Change on a Year Earlier"
+          }
+        }
+      ],
+      "question": "What is the employment rate across the selected regions in the latest release?",
+      "categories": [
+        "Labour Market Pulse",
+        "regions"
+      ],
+      "dimensions": [],
+      "description": "Employment rate, selected regions",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "What is the unemployment rate across the selected regions in the latest release?": {
+      "filters": {
+        "expression": "{f1}",
+        "f1": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Regional Unemployment Rate"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Regional Unemployment Change on a Year Earlier"
+          }
+        }
+      ],
+      "question": "What is the unemployment rate across the selected regions in the latest release?",
+      "categories": [
+        "Labour Market Pulse",
+        "regions"
+      ],
+      "dimensions": [],
+      "description": "Unemployment rate, selected regions",
+      "preferredCharts": [
+        {
+          "type": "kpi"
+        }
+      ]
+    },
+    "What share of sector vacancies does each sector hold?": {
+      "filters": {
+        "expression": "{f1} AND {f2}",
+        "f1": {
+          "operator": "contains",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Indicator"
+              }
+            },
+            {
+              "value": "Vacancies:"
+            }
+          ]
+        },
+        "f2": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "sh"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "sh",
+          "reference": {
+            "measure": "Share of Sector Vacancies"
+          }
+        }
+      ],
+      "question": "What share of sector vacancies does each sector hold?",
+      "categories": [
+        "Labour Market Pulse",
+        "demand"
+      ],
+      "dimensions": [
+        {
+          "key": "ind",
+          "reference": {
+            "dimension": "Sector"
+          }
+        }
+      ],
+      "description": "Each sector's share of the vacancies in the seven sectors shown, latest rolling quarter, ranked.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Where does the UK labour market stand in the latest release?": {
+      "filters": {
+        "expression": "{lat} AND {uk} AND {sx}",
+        "lat": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        },
+        "uk": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Geography"
+              }
+            },
+            {
+              "value": "United Kingdom"
+            }
+          ]
+        },
+        "sx": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Sex"
+              }
+            },
+            {
+              "value": "All"
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "Theme"
+          }
+        },
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "Indicator"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "reference": {
+            "measure": "Value"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Change on Quarter"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Change on Year"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Change vs Pre-Pandemic"
+          }
+        }
+      ],
+      "question": "Where does the UK labour market stand in the latest release?",
+      "categories": [
+        "Headline"
+      ],
+      "dimensions": [
+        {
+          "reference": {
+            "dimension": "Theme"
+          }
+        },
+        {
+          "reference": {
+            "dimension": "Indicator"
+          }
+        },
+        {
+          "reference": {
+            "dimension": "Period Label"
+          }
+        }
+      ],
+      "description": "Every UK headline indicator (employment, unemployment, inactivity, pay, vacancies) in its latest period, with change on the quarter, the year and since Feb 2020 (pre-pandemic).",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "Which pay measures are moving most?": {
+      "filters": {
+        "expression": "{f1}",
+        "f1": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Theme"
+              }
+            },
+            {
+              "value": "Pay"
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "ind"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Latest Value"
+          }
+        },
+        {
+          "key": "chg",
+          "reference": {
+            "measure": "Latest Change on a Year Earlier"
+          }
+        }
+      ],
+      "question": "Which pay measures are moving most?",
+      "categories": [
+        "Labour Market Pulse"
+      ],
+      "dimensions": [
+        {
+          "key": "ind",
+          "reference": {
+            "dimension": "Indicator"
+          }
+        },
+        {
+          "key": "u",
+          "reference": {
+            "dimension": "Unit"
+          }
+        }
+      ],
+      "description": "Every UK pay series in the latest release with its change on a year earlier, in the series' own unit.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "Which regions have seen unemployment rise most over the year?": {
+      "filters": {
+        "expression": "{f1} AND {f2}",
+        "f1": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Theme"
+              }
+            },
+            {
+              "value": "Regional"
+            }
+          ]
+        },
+        "f2": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "chg"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "chg",
+          "reference": {
+            "measure": "Regional Unemployment Change on a Year Earlier"
+          }
+        }
+      ],
+      "question": "Which regions have seen unemployment rise most over the year?",
+      "categories": [
+        "Labour Market Pulse",
+        "regions"
+      ],
+      "dimensions": [
+        {
+          "key": "g",
+          "reference": {
+            "dimension": "Geography"
+          }
+        }
+      ],
+      "description": "Change in each region's unemployment rate on a year earlier (percentage points), latest rolling quarter, ranked.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Which regions have seen unemployment rise most since the pandemic?": {
+      "filters": {
+        "expression": "{lat} AND {th} AND {ind}",
+        "lat": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        },
+        "th": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Theme"
+              }
+            },
+            {
+              "value": "Regional"
+            }
+          ]
+        },
+        "ind": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Indicator"
+              }
+            },
+            {
+              "value": "Unemployment rate"
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "Change vs Pre-Pandemic"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "reference": {
+            "measure": "Change vs Pre-Pandemic"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Change on Year"
+          }
+        }
+      ],
+      "question": "Which regions have seen unemployment rise most since the pandemic?",
+      "categories": [
+        "Regional"
+      ],
+      "dimensions": [
+        {
+          "reference": {
+            "dimension": "Geography"
+          }
+        }
+      ],
+      "description": "Change in each region's unemployment rate since Dec-Feb 2020 and on the year, percentage points, latest period.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Which regions have the highest employment rate?": {
+      "filters": {
+        "expression": "{lat} AND {th} AND {ind}",
+        "lat": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        },
+        "th": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Theme"
+              }
+            },
+            {
+              "value": "Regional"
+            }
+          ]
+        },
+        "ind": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Indicator"
+              }
+            },
+            {
+              "value": "Employment rate (16-64)"
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "Value"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "reference": {
+            "measure": "Value"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Change on Year"
+          }
+        }
+      ],
+      "question": "Which regions have the highest employment rate?",
+      "categories": [
+        "Regional"
+      ],
+      "dimensions": [
+        {
+          "reference": {
+            "dimension": "Geography"
+          }
+        }
+      ],
+      "description": "Latest employment rate (16-64) by region and nation, with change on the year.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Which regions have the highest unemployment?": {
+      "filters": {
+        "expression": "{lat} AND {th} AND {ind}",
+        "lat": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        },
+        "th": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Theme"
+              }
+            },
+            {
+              "value": "Regional"
+            }
+          ]
+        },
+        "ind": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Indicator"
+              }
+            },
+            {
+              "value": "Unemployment rate"
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "Value"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "reference": {
+            "measure": "Value"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Change on Year"
+          }
+        }
+      ],
+      "question": "Which regions have the highest unemployment?",
+      "categories": [
+        "Regional"
+      ],
+      "dimensions": [
+        {
+          "reference": {
+            "dimension": "Geography"
+          }
+        }
+      ],
+      "description": "Latest unemployment rate by region and nation, with change on the year.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Which sectors are cutting vacancies?": {
+      "filters": {
+        "expression": "{lat} AND {ind}",
+        "lat": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        },
+        "ind": {
+          "operator": "contains",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Indicator"
+              }
+            },
+            {
+              "value": "Vacancies:"
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "measure": "Change on Year"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "reference": {
+            "measure": "Value"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Change on Year"
+          }
+        }
+      ],
+      "question": "Which sectors are cutting vacancies?",
+      "categories": [
+        "Vacancies"
+      ],
+      "dimensions": [
+        {
+          "reference": {
+            "dimension": "Indicator"
+          }
+        }
+      ],
+      "description": "Vacancies by industry (000s), latest rolling quarter with change on the year.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Which sectors cut vacancies most over the year?": {
+      "filters": {
+        "expression": "{f1} AND {f2}",
+        "f1": {
+          "operator": "contains",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Indicator"
+              }
+            },
+            {
+              "value": "Vacancies:"
+            }
+          ]
+        },
+        "f2": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "dimension": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "measure": "chg"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "chg",
+          "reference": {
+            "measure": "Sector Vacancy Change on Year (000s)"
+          }
+        }
+      ],
+      "question": "Which sectors cut vacancies most over the year?",
+      "categories": [
+        "Labour Market Pulse",
+        "demand"
+      ],
+      "dimensions": [
+        {
+          "key": "ind",
+          "reference": {
+            "dimension": "Sector"
+          }
+        }
+      ],
+      "description": "Change in vacancies on a year earlier by industry sector (000s), latest rolling quarter. Seven sectors only; together they hold 426k of the 702k UK vacancies.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Why are people economically inactive?": {
+      "filters": {
+        "expression": "{lat} AND {ind}",
+        "lat": {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Period Status"
+              }
+            },
+            {
+              "value": "Latest"
+            }
+          ]
+        },
+        "ind": {
+          "operator": "contains",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Labour Market",
+                "field": "Indicator"
+              }
+            },
+            {
+              "value": "Inactive:"
+            }
+          ]
+        }
+      },
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "Value"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "reference": {
+            "measure": "Value"
+          }
+        },
+        {
+          "reference": {
+            "measure": "Change vs Pre-Pandemic"
+          }
+        }
+      ],
+      "question": "Why are people economically inactive?",
+      "categories": [
+        "Inactivity"
+      ],
+      "dimensions": [
+        {
+          "reference": {
+            "dimension": "Indicator"
+          }
+        }
+      ],
+      "description": "Economically inactive people aged 16-64 by main reason (000s), latest period and change since Feb 2020.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    }
+  },
+  "layout": {}
+}

@@ -1,0 +1,2 @@
+Cannot read properties of undefined (reading 'reduce')
+[astrato-visualizations] visualization reported an error

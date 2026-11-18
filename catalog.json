@@ -1,0 +1,2364 @@
+{
+  "about": "Reference Astrato Apps with their semantic layers. Pick examples by industry, function, archetype, patterns and charts; open README.md and start_here. See AGENTS.md.",
+  "examples": [
+    {
+      "slug": "agency-client-reporting",
+      "title": "Client Reporting, explained",
+      "company": "Tidewater Media (fictional digital-marketing agency)",
+      "layer": "agency-performance",
+      "summary": "Account managers and directors at a digital-marketing agency report monthly to 8 clients from four source systems (Google Ads, Meta, GA4 and Search Console, mock data) joined through shared Clients, Channels and Months tables. They decide which clients need attention, explain why each number moved (driver bridges stored in the layer split every month-on-month change exactly into reach, click-through and conversion-rate effects, read out in plain English), plan where next month's budget goes, and sign off and send each client's report with a multi-sheet Excel pack.",
+      "industry": "marketing-services",
+      "function": "client-services",
+      "persona": "Account Manager / Account Director (digital-marketing agency)",
+      "archetype": "report",
+      "look": "light; aubergine ink (#1E1B3A) on a lilac-white page (#F6F5FB), coral (#FF5A5F), teal (#12B3A8) and violet (#7C6CF2) accents; gradient aubergine header with a lowercase \"tidewater\" wordmark, four source chips and pill buttons; sticky white tab bar with a coral underline; soft rounded white cards, KPI cards with a coral-to-violet left edge; Plus Jakarta Sans and Inter, Roboto inside charts; a dark \"what changed and why\" panel, a chat with a Nash badge, a poster-style infographic one-pager and a spreadsheet-styled Excel view",
+      "tabs": [
+        "Agency portfolio — how did September go across all eight clients against August, which clients moved, and how do spend and ROAS compare between Google Ads and Meta?",
+        "Client performance — for one client, what did every source (paid, web, organic) do this month and over 21 months? The page the client sees.",
+        "Why it changed — what moved this client's conversions, value, spend and organic clicks, split exactly into reach, click-through and conversion-rate effects by channel, campaign, keyword group and device, month on month and year on year?",
+        "Paid media — how does the funnel from impressions to ROAS run by channel, campaign type and campaign?",
+        "SEO & web — how are organic visibility and rankings moving, and what do visitors do on site?",
+        "Ask Nash — mock-up chat that answers in plain English from governed queries and mounts a native chart under each answer",
+        "Budget planner — if we move Q4 budget between channels and change CPC, conversion rate and organic growth, what happens to conversion value, spend and ROAS against the September run-rate?",
+        "Infographic — a one-page September summary for any client (KPIs, growth, revenue mix, insights, next month's strategy)",
+        "Report (Excel view) — the Excel pack's sheets rendered live as a spreadsheet, per client or for the portfolio, with a download",
+        "Client reports — which reports are drafted, in review, approved or sent; explain the flagged anomalies, edit the commentary, sign off and send"
+      ],
+      "patterns": [
+        "kpi-sparkline-comparison",
+        "table-sparklines",
+        "what-if-parameters",
+        "role-switcher",
+        "xlsx-export",
+        "preload-tabs",
+        "query-scheduler"
+      ],
+      "charts": [
+        "kpi",
+        "sparkline",
+        "line",
+        "bar",
+        "stacked-bar",
+        "grouped-bar",
+        "pie",
+        "table",
+        "table-sparklines"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "tabs",
+        "sliders",
+        "role-switcher",
+        "chat",
+        "client-switch",
+        "spreadsheet-view"
+      ],
+      "workflows": [
+        "report-sign-off",
+        "anomaly-explanation",
+        "maker-checker-approval",
+        "client-email"
+      ],
+      "writeback": false,
+      "exports": [
+        "xlsx",
+        "email"
+      ],
+      "objects": 165,
+      "start_here": [
+        "project/src/app.js — shell and tabs, governed query helper, narrative panel, Ask Nash, budget planner, Excel pack, report send, smoke checks",
+        "project/src/dashboard.js — every native object declared as data (KPI cards, driver bridges, tables with sparkline columns, Nash answer charts)",
+        "project/src/explain.js — reads the driver-bridge measures and writes \"what changed and why\", next steps and anomaly flags",
+        "project/src/workflow.js — the report sign-off workflow (maker–checker, audit trail, localStorage)",
+        "project/tools/entities.mjs — the layer's views, joins, dimensions and 208 measures, including the driver bridges"
+      ],
+      "capabilities": [
+        "narrative-headline — project/src/explain.js:37",
+        "assistant — project/src/app.js:282",
+        "what-if — project/src/app.js:338",
+        "excel-export — project/src/app.js:385",
+        "simulated-workflow — project/src/workflow.js:46",
+        "role-switcher — project/src/workflow.js:66"
+      ],
+      "stealable": [
+        "Driver bridges stored in the layer: each month-on-month (and year-on-year) change is split by sequential substitution into effects that add up exactly (conversions = impressions × CTR × CVR; value = conversions × value per conversion; spend = clicks × CPC; organic clicks = impressions × CTR; key events = sessions × rate) — project/tools/entities.mjs:52",
+        "Plain-English explanation from governed numbers: one query per grain for every client, then the biggest effects in the direction of the change become bullets with their share of the change, each mapped to a next step; only the wording is in the app — project/src/explain.js:37",
+        "Bridge chart: a stacked horizontal bar of the effect measures by channel, keyword group or device, with friendly legend names set through updateMeasure customLabel — project/src/dashboard.js:69",
+        "KPI card = native number + line or bar sparkline by month + header-less one-row table with last month and the change, coloured by whether that direction is good — project/src/dashboard.js:89",
+        "One-row delta tables split a fixed pixel width between their columns (fitWidth), so 'Aug £…' never ends in an ellipsis — project/src/theme.js:239",
+        "Sparklines without point markers on visualizations 0.9: setMeasureShape with shape null on each measure — project/src/theme.js:159",
+        "Table column formats on 0.8+ address the column by its exact name; every other column operation still takes the data-item keys — project/src/theme.js:211",
+        "Native tables with a sparkline column over Month and two- or three-band indicator text — project/src/dashboard.js:380",
+        "Ask Nash answers carry a native chart: an ad-hoc tile built, compiled, themed and mounted at run time in its own selection group, pinned to the client by a static filter — project/src/app.js:243",
+        "Report sign-off: anomalies flagged from the same facts must be explained or escalated before an account manager can submit; only a director or head of client services can approve and send — project/src/workflow.js:80",
+        "Send = build the client's Excel pack, download it, and open a mailto with the approved commentary as the body — project/src/app.js:457",
+        "Spreadsheet view of the Excel pack: the same sheet objects the .xlsx is written from, drawn as a grid with lettered columns, frozen rows, number formats and sheet tabs — project/src/sheetview.js:18"
+      ],
+      "caveats": [
+        "Mock data. The four source systems are mimicked, not connected; the \"synced 06:00 today\" source checks in the workflow are fixed strings (src/workflow.js:21).",
+        "No writeback. Report status, explained anomalies, commentary edits and the audit trail live in localStorage (key tidewater-reports-v1) over a seeded state; Reset demo clears it. \"Send\" downloads the Excel pack and opens a mailto: the pack is not attached, and the monthly auto-send checkbox only records the choice.",
+        "The layer has no stored business questions (questions.md lists 0). Every object queries layer measures over raw view columns directly; the layer's 16 governed dimensions are unused by the app.",
+        "Narratives, Nash answers, anomaly flags and the budget planner are browser arithmetic over governed rows. Nash routes by keywords to four canned answer types and hard-codes \"208 governed measures\"; its budget answer always splits £3,000 / £2,000 with a fixed 0.8 marginal-ROAS factor (src/app.js:315). The planner multiplies September by 3 for Q4 with a fixed elasticity of 0.75 (src/app.js:337).",
+        "Dates are fixed: the data's Month Bucket columns make September 2026 \"this month\", and the app hard-codes \"September 2026\", \"Sep\" and \"Aug\" in titles, sheet names and the KPI delta formats (src/dashboard.js:102).",
+        "No selection bar: each tab has its own filter dropdowns and selection group, and pending selections are applied after 250 ms (src/app.js:68), but there are no chips or Clear all. The client tabs open on one fixed client (src/app.js:111).",
+        "Landing: all 165 objects are compiled and themed before anything mounts (src/app.js:83), so landing-ready (~13 s in staging) sits near the 15 s budget; all objects settle in ~32 s with 884 queries.",
+        "Layout: donut slice labels are clipped on the infographic; the header source chips stack at 1024 wide.",
+        "Inert leftovers: an --accent variable block in src/objects.css, LinkedIn button and story-chapter styles in src/styles.css, a stale throttle.js header (timetable, prefetch.js) and an unused prefetchSelections, comments in fields.js and dashboard.js from other apps, and sheetview.js says buildSheets is in main.js.",
+        "tools/layer.mjs is reference only: it needs tools/mcp.mjs and tools/types.txt, neither included in this repo (it reads types.txt on load, so no command runs), creates the layer with a zero datasource id and hard-codes ASTRATO_GALLERY.MOCK_DATA. The script that generated the AGENCY_* mock data is not included in this repo; layers/agency-performance/schema/ddl.sql gives the tables. Recreate the layer from layer.json.",
+        "Web fonts (Plus Jakarta Sans, Inter, Material Icons) load from a public font CDN in index.html.",
+        "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite. Checked in staging with the kit smoke test at 1440, 1280 and 1024 (165 objects rendered, 9 app checks: 5 tab selections, a Nash chart mount, a budget lever, the infographic client switch and the Excel download), compile-check 165/165 and vite build.",
+        "No screenshots are shipped yet.",
+        "astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too."
+      ],
+      "path": "examples/agency-client-reporting/",
+      "readme": "examples/agency-client-reporting/README.md",
+      "screenshots": []
+    },
+    {
+      "slug": "ed-wait-watch",
+      "title": "ED Wait Watch",
+      "company": "None (a fictional emergency department on a public hospital emergency-room sample dataset (see DATA-SOURCES.md); the app is branded ED Wait Watch and names no hospital)",
+      "layer": "hospital-er-operations",
+      "summary": "An emergency department's ED operations lead and duty managers open a morning board for the 30-minute waiting-time target: are we seeing patients in time against the same days of the month before, which weekday and arrival slots and which departments miss it, who waits longest, whether satisfaction falls as waits grow, and a flag on a slot or department handed to a named owner, resolved and signed off maker–checker. Flags are written back in Live mode to two workflow tables (records and audit events); a labelled Practice mode runs the same rules and writes nothing. The first monitor among the examples. Scored 45/52 by an independent judge.",
+      "industry": "healthcare",
+      "function": "operations",
+      "persona": "ED operations lead, with the duty managers",
+      "archetype": "monitor",
+      "look": "light; a deep teal-ink masthead (#0E2A33) with a round \"30\" mark, the data-to date and the comparison window, five underlined tabs and an Excel report button; teal (#0B6E79) = seen within target, coral (#C2410C) = over target and the heat map's bad end, plum (#6D4C7D) = satisfaction, the same on every tab, green (#15803D) / red (#B42318) only on the comparison state; white rounded cards on a pale grey-green page (#F2F6F6); IBM Plex Sans page text, Roboto from npm inside charts; a sticky selection line under the masthead and Month, Dept, Arrival and Day dropdowns beside each tab's question title; a bordered headline with a Target missed verdict badge; card titles are the stored questions; each tab fits one 1440 screen",
+      "tabs": [
+        "Morning board — are we seeing patients within 30 minutes? A headline with the verdict and the worst slot, four KPI cards (seen within 30 min in points, average wait, satisfaction, visits) against the same days of the month before with mini lines, the flag counts, a weekday × arrival-band heat map, the monthly trend with a 3-month average, a departments drivers bridge",
+        "When — when do patients wait longer than 30 minutes? Over-target visits by hour, share seen in time by weekday, an arrival-band table with rank, share of over-target visits and a trend column, a what-if on the target itself (15–45 min)",
+        "Who — which departments and patient groups wait longest? Two KPI cards, departments worst first, a department table with rank, share, wait, satisfaction and trend, age band, race and gender",
+        "Satisfaction — does satisfaction fall as waits grow? Two KPI cards, satisfaction by wait band, within against over target, satisfaction and the target month by month, departments ranked by satisfaction with trend",
+        "Flags — what has been flagged, who owns it, and what is overdue? Practice or Live mode, Acting as, raise a flag on a slot or department with a named owner and due date, act on it (start, resolve, reassign, sign off, reopen), flag counts, owners, the flag list and the audit trail as native tables over the writeback views"
+      ],
+      "patterns": [
+        "governed-business-questions",
+        "kpi-sparkline-comparison",
+        "selection-bar",
+        "preload-tabs",
+        "query-scheduler",
+        "table-sparklines",
+        "what-if-parameters",
+        "writeback-workflow",
+        "role-switcher",
+        "xlsx-export"
+      ],
+      "charts": [
+        "kpi",
+        "sparkline",
+        "bar",
+        "combo",
+        "heatmap",
+        "table",
+        "table-sparklines"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "selection-bar",
+        "tabs",
+        "sliders",
+        "role-switcher",
+        "compare"
+      ],
+      "workflows": [
+        "flag-hand-off",
+        "maker-checker-approval"
+      ],
+      "writeback": true,
+      "exports": [
+        "xlsx"
+      ],
+      "objects": 63,
+      "score": {
+        "total": 45,
+        "max": 52,
+        "judged": "2026-11-18",
+        "by": "independent judge",
+        "file": "SCORE.md"
+      },
+      "start_here": [
+        "project/src/app.js — boot, the comparison window read from the data, the headline and KPI captions with \"Updating…\", the selection mirror and auto-applied pending clicks, the what-if, mount lanes, 15 self-checks",
+        "project/src/catalogue.js — every object as data (a stored question plus presentation) — KPI card factory, heat map, trend with moving average, drivers bridge, flag tables, filters",
+        "project/src/workflow.js — the flag workflow — one rule function for both modes, Live writeback of records and audit events, Practice in the browser tab, Acting as",
+        "project/src/tiles.js — tile to definition to operations (moving average, widths, sparkline columns)"
+      ],
+      "capabilities": [
+        "writeback-workflow — project/src/workflow.js:106",
+        "simulated-workflow — project/src/workflow.js:120",
+        "role-switcher — project/src/workflow.js:28",
+        "what-if — project/src/app.js:451",
+        "narrative-headline — project/src/app.js:347",
+        "excel-export — project/src/export.js:21"
+      ],
+      "stealable": [
+        "One rule function for both modes: decide(action, flag, actor, note) refuses with a reason (lead-only sign-off, four eyes on raiser and resolver, note required); the change then goes to writeback in Live or to the browser tab in Practice (src/workflow.js:125) — project/src/workflow.js:48",
+        "Live writeback as a record update plus an insert into an audit-events view, refusing an update that changed no row, then the query cache cleared and only the flag objects remounted (src/app.js:579) — project/src/workflow.js:106",
+        "The comparison window read from the data, not hard-coded: the latest month with visits and its last day give '1–30 Oct 2020 with 1–30 Sep 2020' for the masthead, captions and Excel — project/src/app.js:286",
+        "Text figures never show one selection's words beside another's numbers: every selection change switches the headline and KPI captions to 'Updating…', and only the read for the current selection may fill them — project/src/app.js:335",
+        "Drivers bridge as a native table: Change, Now and Before from a This Month / Last Month measure family per department, sorted by change, with a trend column; the changes add up to the total — project/src/catalogue.js:78",
+        "Pending clicks applied after 200 ms in every group, and the visible tab's applied state mirrored into one app-wide selection; the trend's own group never takes the month, so it keeps every month — project/src/app.js:430",
+        "What-if on the target itself: a slider sets the layer's Target Minutes parameter on two native numbers with setMeasureDefinedParameter, beside a governed 30-minute baseline that stays put — project/src/app.js:464"
+      ],
+      "caveats": [
+        "Scored 45/52 by an independent judge and admitted (bar 44, no gate at 0); the judge's gaps come first below (SCORE.md).",
+        "The comparison window can be mislabelled under a selection: the Review Month axis ends at the latest day in the filtered rows, but the captions use the unfiltered last day (src/app.js:286). Department = Renal compares 1–9 Oct with 1–9 Sep while the cards say 1–30; Wed 06-09h computes 1–28 Sep.",
+        "The headline's worst slot is picked in the app (lowest share among slots with at least 30 visits, src/app.js:388), not by a stored top-N question; weekdays sort through zero-width spaces in the layer's Arrival Day labels.",
+        "The flag views are not joined to visits: visit filters do not narrow flags, and the Flags tab has only its own Status and Owner filters.",
+        "Legibility at 1440: '+100.0 pts' clips under a mini line (Renal); the Acting as select overflows its card and its label wraps; the empty By status mini chart shows the library's small grey text; 'No comparison for 1–30 Mar' lacks a year; 'unchanged than' and '±0.0 ▼ worse' copy nits from rounding.",
+        "At 1024 table cells end in ellipses, headers wrap mid-word, the Flags table drops its Overdue column and the Acting as select overflows; there is no horizontal page scroll.",
+        "Board selections settle in 3.8–4.8 s (the judge's real clicks), over 3 s; the other tabs 1.9–4.1 s. The five app-text reads run on every selection.",
+        "Live writeback was not exercised by the judge or by the app's checks, which drive Practice mode through DOM clicks and assert that no write was made. Hosted viewers may not be able to write; the panel then offers Practice only. Not published, so no live smoke.",
+        "The app's selection checks put pending selections from code rather than pointer events; the judge's real clicks worked at 1440×860.",
+        "Public sample data: a public hospital emergency-room sample dataset, Apr 2019 – 30 Oct 2020 (31 Oct missing). Satisfaction is recorded for about 27% of visits; small groups swing a lot. Not live.",
+        "Acting as switches between four demo personas (two duty managers, two leads); in production the role would come from the signed-in user's group.",
+        "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.9.0 with Vite.",
+        "astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too."
+      ],
+      "path": "examples/ed-wait-watch/",
+      "readme": "examples/ed-wait-watch/README.md",
+      "screenshots": [
+        "examples/ed-wait-watch/screenshots/board.png",
+        "examples/ed-wait-watch/screenshots/flags.png",
+        "examples/ed-wait-watch/screenshots/sat.png",
+        "examples/ed-wait-watch/screenshots/when.png",
+        "examples/ed-wait-watch/screenshots/who.png"
+      ]
+    },
+    {
+      "slug": "hotel-weather",
+      "title": "Hotel Demand × Weather",
+      "company": "None (Harbourline Hotels, a fictional group of twelve US city hotels on synthetic data; the app names no operator)",
+      "layer": "harbourline-hotels",
+      "summary": "The first data-blending example. Governed hotel demand from the semantic layer, real daily weather read from the public Open-Meteo archive by DuckDB-WASM in the browser, and a blend of the two (one stored question's rows joined to the weather on city and night) are all native Astrato objects on ONE selection: a city click, a table row or a temperature band moves all three sources. A hotel revenue manager uses it to decide whether rain moves demand enough to run a discounted wet-night offer: a governed what-if on layer parameters, baseline beside scenario, then a maker–checker flag for a general manager. Scored 46/52 by an independent judge.",
+      "industry": "leisure",
+      "function": "sales",
+      "persona": "Hotel revenue manager, with a general manager who approves offers",
+      "archetype": "planner",
+      "look": "light; a plain white masthead with the title \"Hotel demand × weather · Aug–Oct 2026\", an Open-Meteo credit and a source key (Governed blue #2F6FED, API amber #C77A00, Blended purple #6B4FD8) that colours every card's tag, top border and series; dry and wet nights get their own pair (stone #9A8F80, rain teal #0E8C9A), green (#1E8E5A) / red (#C7362F) only for good and bad change; a headline sentence in a white band with a purple rule; one bar with three tabs, the City filter, chips, Clear all and an Excel report button; white rounded cards on a cool grey page (#F4F6F9); Roboto from npm, page and charts; card titles are the stored questions (or the question the browser answers); each tab fits one screen at 1440, 1280 and 1024",
+      "tabs": [
+        "Weather & demand — does rain move demand? Five KPIs against Aug–Oct 2025 with mini charts (occupancy and room revenue governed, average high and wet city-days from the API, wet-vs-dry nights blended), revenue by city, nightly occupancy, the city table with a by-month sparkline, the daily high with a 7-night average, occupancy on dry and wet nights by city, occupancy by temperature band",
+        "Wet-night offer — is an offer worth running? Three levers on the layer's parameters (wet share starts at what the weather shows), baseline beside scenario for revenue and occupancy, a bridge of extra nights against the discount, the gain by city, and city-week flags a revenue manager raises and a general manager approves (browser-only)",
+        "Queries — every statement both engines ran, newest first; right-click any card for its SQL"
+      ],
+      "patterns": [
+        "governed-business-questions",
+        "kpi-sparkline-comparison",
+        "selection-bar",
+        "preload-tabs",
+        "what-if-parameters",
+        "query-scheduler",
+        "table-sparklines",
+        "role-switcher",
+        "xlsx-export"
+      ],
+      "charts": [
+        "kpi",
+        "sparkline",
+        "bar",
+        "line",
+        "waterfall",
+        "table",
+        "table-sparklines"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "selection-bar",
+        "tabs",
+        "sliders",
+        "compare",
+        "role-switcher"
+      ],
+      "workflows": [
+        "maker-checker-approval"
+      ],
+      "writeback": false,
+      "exports": [
+        "xlsx"
+      ],
+      "objects": 23,
+      "score": {
+        "total": 46,
+        "max": 52,
+        "judged": "2026-11-18",
+        "by": "independent judge",
+        "file": "SCORE.md"
+      },
+      "start_here": [
+        "project/src/app.js — boot, the governed runtime on a scoped selection service, the extract copied into DuckDB, the second runtime on the DuckDB engine, auto-apply, the headline, the levers, the offer tab's mirrored group, the SQL pop-up, 12 self-checks",
+        {
+          "project/src/duck.js — DuckDB-WASM in the page": "the weather from the API with rain and temperature bands, the governed rows, the blend"
+        },
+        "project/src/duck-engine.js — an engine.getData answered by DuckDB SQL, so native objects run on API and blended data with the app's own selection service",
+        "project/src/selection-scope.js — the governed objects' view of the one selection group, hiding the browser-only weather keys",
+        "project/src/tiles.js — every object as data (source, stored question or browser question, measures, presentation), the levers"
+      ],
+      "capabilities": [
+        "data-blending — project/src/duck.js:71",
+        "what-if — project/src/app.js:420",
+        "narrative-headline — project/src/app.js:395",
+        "simulated-workflow — project/src/offers.js:45",
+        "role-switcher — project/src/app.js:130",
+        "excel-export — project/src/export.js:22"
+      ],
+      "stealable": [
+        "The blend: the rows of ONE stored question (city × night, this autumn and last) are copied into DuckDB beside the weather and joined on city and date, so every demand figure in it is governed — project/src/app.js:297",
+        "A second visualization runtime on a DuckDB engine: native charts on API data, with the app's real selection service, so they click, filter and follow chips like governed ones — project/src/app.js:313",
+        "engine.getData over DuckDB: dimension and measure names map to SQL, dates go back as epoch ms, and the group's applied selections become the WHERE (keys it does not know are ignored) — project/src/duck-engine.js:123",
+        "Scoped selection service for the governed runtime: it hides the browser-only weather keys, emits only when the governed view changes, and adds hidden band selections back on a governed click — project/src/selection-scope.js:46",
+        "Pending selections from chart clicks and range drags are applied after 250 ms of quiet, and an empty range list is dropped before it reaches the engine — project/src/app.js:245",
+        "Levers set the layer's measure parameters on the mounted offer tiles with setMeasureDefinedParameter through applyRuntimeOperations, only while the tab shows — project/src/app.js:420",
+        "Right-click a card for its SQL: governed SQL from an MCP dry run of the stored question (tools/governed-sql.mjs), browser SQL from the last statement that chart ran — project/src/app.js:593",
+        "Independent check of the blend outside the browser: the same stored question over MCP and the same Open-Meteo request, joined in plain JavaScript — project/tools/verify-blend.mjs:1",
+        "Query lanes with 429 retry and a session cache keyed by the exact request — project/src/throttle.js:32"
+      ],
+      "caveats": [
+        "Synthetic hotels, real weather: twelve fictional hotels of the fictional Harbourline Hotels group in twelve US cities, Aug–Oct 2026 against Aug–Oct 2025; the weather is fetched live from the public Open-Meteo archive on every load (weather data by Open-Meteo.com, CC BY 4.0), so the app needs the network.",
+        "The 9 API and blended objects have no stored question: the weather never reaches the warehouse, so the bands, wet/dry flags, 7-night average and weather comparisons are DuckDB SQL (src/duck-engine.js:38). The blended ones sit on one stored question's rows. The judge scored A3 at 1.",
+        "Blended Occupancy is an unweighted average of city-night occupancy (src/duck-engine.js:31) under the governed name; the extract could carry rooms available to weight it. Only the Excel Notes sheet says so. The verdict percentage on the offer tab is app arithmetic.",
+        "A drag along the occupancy chart's date axis selects the labelled tick nights (9 scattered nights for a five-week drag), not the range; a drag in the plot area or a point click selects nothing. The waterfall ignores clicks without a label.",
+        "The city table shows 5 of 12 rows and scrolls inside its card; the waterfall legend wraps; at 1024 the city bar axis drops every other name.",
+        "First real selections settled in 3.6–5.6 s; repeats in 0.9 s. The smoke's own check 7 failed: its repeat sent one governed query.",
+        "Empty and thin selections: Phoenix with under 15 °C empties the weather objects, but the KPIs say 'No comparison: no rows last autumn' and the headline still reports occupancy for the selection, since governed figures ignore weather bands. Wet/dry claims have no minimum sample (Denver: 'Rain helped demand' on one wet city-day).",
+        "The offer flags are not written back: flags and audit trail live in localStorage (key hotel-weather.offer-flags.v1, src/offers.js:16), and the card says so. The layer already has Action Events and Scenarios writeback views.",
+        "The layer is larger than the app: it was built for a wider hotel commercial-planning app (channel mix, acquisition cost, opportunities, scenarios, actions). The app uses 10 of its 28 stored questions.",
+        "Checked by the judge: 23 objects rendered with 0 console errors and 0 failed requests through the kit smoke (1440, 1280, 1024; 11 of 12 app checks) and real mouse input; the KPIs reconciled with MCP unfiltered and with City = Boston, and the Excel figures with City = Austin. Not published, so no live smoke.",
+        "Runs on @astrato-io/visualizations 0.9.0, app-runtime 0.9.0 and @duckdb/duckdb-wasm 1.32 with Vite.",
+        "astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too."
+      ],
+      "path": "examples/hotel-weather/",
+      "readme": "examples/hotel-weather/README.md",
+      "screenshots": [
+        "examples/hotel-weather/screenshots/dash.png",
+        "examples/hotel-weather/screenshots/plan.png",
+        "examples/hotel-weather/screenshots/queries.png"
+      ]
+    },
+    {
+      "slug": "labour-market-pulse",
+      "title": "Labour Market Pulse",
+      "company": "None (public ONS Labour Market Statistics)",
+      "layer": "uk-labour-market",
+      "summary": "The chief economist of a UK recruitment firm reads the monthly ONS labour market release and makes the call account directors take to clients: is the labour market tightening or loosening, and what does it mean for hiring and pay? Market, demand by sector, pay with a pay-award what-if, regions, and the month's call proposed and approved maker–checker. Built by an agent from this repo in a clean environment as a test run, then brought up to standard: it shows what the playbook produces.",
+      "industry": "hr",
+      "function": "strategy",
+      "persona": "Chief economist, UK recruitment firm",
+      "archetype": "report",
+      "look": "light; navy header band (#1F2A44) with underlined tabs and an \"Excel pack\" button; teal (#0F766E) for trends and sparklines, red (#B42318) / green (#067647) only for worse and better, an amber \"Market loosening\" badge; white cards on a warm-grey page (#F4F3EF); Inter / Segoe UI / system-ui (Inter is not bundled), Roboto from npm inside charts; each card titled with its question and subtitled \"Latest release\" or \"Average of the selected months\"; a sticky selection bar with chips, Clear all and the snapshot basis; one screen per tab at 1440",
+      "tabs": [
+        "Market — is the UK labour market tightening or loosening, how far has it loosened since the 2022 peak, and where does every headline indicator stand against a quarter, a year and Feb 2020?",
+        "Demand — where is hiring demand falling, which sectors cut vacancies most over the year, and what share of sector vacancies does each hold?",
+        "Pay — what does a looser market mean for pay, are real wages still growing, is public sector pay outpacing private, and what is a pay award worth after inflation?",
+        "Regions — which regions are loosening fastest, and how has each region's unemployment moved since 2015?",
+        "Our call — what is our market call this month, and has the Head of Research approved it?"
+      ],
+      "patterns": [
+        "governed-business-questions",
+        "kpi-sparkline-comparison",
+        "selection-bar",
+        "preload-tabs",
+        "what-if-parameters",
+        "query-scheduler",
+        "table-sparklines",
+        "role-switcher",
+        "xlsx-export"
+      ],
+      "charts": [
+        "kpi",
+        "sparkline",
+        "line",
+        "bar",
+        "heatmap",
+        "table",
+        "table-sparklines"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "selection-bar",
+        "tabs",
+        "sliders",
+        "compare",
+        "role-switcher",
+        "deep-link"
+      ],
+      "workflows": [
+        "maker-checker-approval"
+      ],
+      "writeback": false,
+      "exports": [
+        "xlsx"
+      ],
+      "objects": 43,
+      "start_here": [
+        "project/src/app.js — boot, the governed query helper, per-tab selection groups, the latest ↔ selected-period swap, mount lanes, table refit, the hero sentence, the what-if, nine self-checks",
+        {
+          "project/src/catalogue.js — every object as data": "its stored question, dimensions, measures, static filters, selected-period alternates and presentation"
+        },
+        "project/src/tiles.js — the one pre-mount path (definition → compile → operations) shared with tools/compile-adapter.mjs; static filter groups and column widths",
+        {
+          "project/src/workflow.js — the monthly call": "draft, submit, approve or return, four-eyes rule, audit trail (browser-only)"
+        }
+      ],
+      "capabilities": [
+        "narrative-headline — project/src/app.js:417",
+        "what-if — project/src/app.js:366",
+        "simulated-workflow — project/src/workflow.js:35",
+        "excel-export — project/src/export.js:30"
+      ],
+      "stealable": [
+        "Two selection groups per tab (charts, and KPIs, which take only the fields their series can answer), mirrored from one app-wide state by difference and only while the tab is visible — project/src/app.js:95",
+        "\"Latest release\" snapshot cards that follow a time selection: with a Year or month selected, setStaticFilterGroup drops Period Status = Latest so the card shows the average of the selected months, and the subtitle says so — project/src/app.js:264",
+        "Latest-release tables swap to a selected-period variant (plain measures instead of the Latest … measures), compiled at load and mounted into the same slot — project/src/app.js:250",
+        "A latest-release table that still draws a full-history sparkline: \"latest\" lives inside the measures (Latest Value, Latest Change on a Year Earlier), so the table carries no period filter — project/src/catalogue.js:59",
+        "Pay-award what-if on a layer parameter: the slider sets `Pay Award %` on the mounted numbers with setMeasureDefinedParameter, no remount — project/src/app.js:377",
+        "KPI comparison coloured by the sign of the stored change measure, read with the card's own selections and latest filter — project/src/app.js:231",
+        "Direct getData dimensions sent as { itemKey, label }, the shape charts send; { fieldKey: '[dimension]…' } is refused with HTTP 400 — project/src/app.js:70",
+        "Static column widths refitted to the slot after mount, on resize and on tab show, through applyRuntimeOperations, never a remount — project/src/app.js:198"
+      ],
+      "caveats": [
+        "Built by an agent from this repo in a clean environment as a test run, then brought up to standard: read it as what the playbook produces, not as a hand-polished demo.",
+        "Public data: ONS Labour Market Statistics, one fixed release (15 Sep 2026), Jan 2015 to Jun/Jul 2026, one row per series per month. Not live. The latest period differs by series, so every \"latest\" figure uses Period Status, never the view's maximum date.",
+        "The market call is not written back. Calls and the audit trail live in localStorage (key labour-market-pulse-calls-v1, src/workflow.js:9), and the screen says so.",
+        "The hero's \"above the pre-pandemic\" figure is a subtraction in the app of two governed values (src/app.js:424), and the LOOSENING / TIGHTENING badge is an app rule on the sign of the U/V change with a ±0.05 dead band (src/app.js:420), not a stored measure.",
+        "Headline measures are averages of the monthly readings in context: with a Year selected a KPI shows the year's average, not its last reading (labelled on the card). Regional KPIs average the selected regions unweighted.",
+        "Sector vacancies cover seven sectors only (426k of the 702k UK vacancies), so the Demand tab is not a full industry breakdown. A Geography selection applies on Regions only; other tabs grey its chip.",
+        "KPIs query twice under a time selection: once for the selection, once for the static-filter swap.",
+        "The sector trend reuses similar purples, so several sector lines are hard to tell apart.",
+        "The questions are written from the app's own catalogue (tools/questions.mjs:45), not synced back from the stored definitions; the five owner-authored questions the app uses are restated in the catalogue, so a tile can drift from its stored question. The header of questions.mjs names a src/questions.js and a tools/sync-questions.mjs that do not exist.",
+        "The Excel Definitions sheet uses notes written in the app (src/export.js:9), not the layer's descriptions; the Pay sheet holds only the three pay KPIs. Export with a Sector selection is untested.",
+        "The pay and regional tables scroll inside their cards at 1440.",
+        "Inert leftovers: throttle.js exports a prefetch helper nothing calls, and its header still mentions a timetable and a prefetch.js.",
+        "A library console error on visualizations 0.9 (TypeError reading 'reduce' in the table's pivotRowDimensionsAsColumns) is allow-listed in tools/smoke-allow.txt; the table still renders. The allow-list's second line matches any \"visualization reported an error\", so it would hide other object errors too.",
+        "Checked in staging: smoke test PASS at 1440, 1280 and 1024, 43 objects, landing-ready in about 4–5 s, 9 app checks (a selection on each data tab, a Year that holds across tabs, the Excel pack with a Year selected, the what-if, the workflow read-only); compile-check 47/47 (43 objects and the 4 table variants); build passes.",
+        "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite.",
+        "astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too."
+      ],
+      "path": "examples/labour-market-pulse/",
+      "readme": "examples/labour-market-pulse/README.md",
+      "screenshots": [
+        "examples/labour-market-pulse/screenshots/call.png",
+        "examples/labour-market-pulse/screenshots/demand.png",
+        "examples/labour-market-pulse/screenshots/market.png",
+        "examples/labour-market-pulse/screenshots/pay.png",
+        "examples/labour-market-pulse/screenshots/regions.png"
+      ]
+    },
+    {
+      "slug": "league-table-planner",
+      "title": "League Table Climb Planner",
+      "company": "None (a published third-party UK university league table; redistribution terms unconfirmed, see DATA-SOURCES.md)",
+      "layer": "uk-university-rankings",
+      "summary": "A Director of Strategy at a mid-ranked UK university (Kent by default, switchable) decides which component measures and which rival universities to focus on to climb the table: where we stand against the universities around us, which measures cost us places, what a higher total score would buy, and a focus plan proposed to the Vice-Chancellor for approval. Built by an agent from this repo in a clean environment as a test run, then brought up to standard: it shows what the playbook produces.",
+      "industry": "education",
+      "function": "strategy",
+      "persona": "Director of Strategy, mid-ranked UK university",
+      "archetype": "planner",
+      "look": "light; deep navy masthead (#0B2545) with the our-university picker and an Excel report button; one teal (#0E9F9A) for \"us\" on every chart, navy-blue (#1F4E79) otherwise, red/green only for falls and climbs; white rounded cards on a pale grey page (#F3F6F9); page text in Inter / Segoe UI / system-ui (Inter is not bundled), Roboto from npm inside charts; a sticky selection bar (Nation, University group and Rank band dropdowns, the library filter bar with chips and Clear all, a \"Rivals: ±10 places\" reset) above four underlined tabs; each tab fits one 1440 screen",
+      "tabs": [
+        "Where we stand — where do we rank, how far have we moved since 2026 and 2025, and how did the rivals within 10 places of us move?",
+        "What costs us places — where does each rival rank within the set on each component measure, and how far above or below the rivals' average is each on prospects, experience, research and entry?",
+        "What it takes — if our total score rose by N points, what rank would it buy, whom would we overtake, and how far ahead is each rival?",
+        "Focus plan — which measures and rivals do we commit to, and has the Vice-Chancellor approved it?"
+      ],
+      "patterns": [
+        "governed-business-questions",
+        "kpi-sparkline-comparison",
+        "selection-bar",
+        "preload-tabs",
+        "what-if-parameters",
+        "query-scheduler",
+        "table-sparklines",
+        "role-switcher",
+        "xlsx-export"
+      ],
+      "charts": [
+        "kpi",
+        "sparkline",
+        "bar",
+        "line",
+        "table",
+        "table-sparklines"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "selection-bar",
+        "tabs",
+        "sliders",
+        "compare",
+        "role-switcher",
+        "deep-link"
+      ],
+      "workflows": [
+        "maker-checker-approval"
+      ],
+      "writeback": false,
+      "exports": [
+        "xlsx"
+      ],
+      "objects": 29,
+      "start_here": [
+        "project/src/app.js — boot, the league query and hero sentence, shell, selection groups mirrored per tab, the what-if slider, mount lanes, resize refit, ten self-checks",
+        "project/src/catalogue.js — every object as data (a stored question plus presentation), the selection groups, the rank and moving-average calculations",
+        "project/src/prepare.js — the one pre-mount path (theme, governed parameters, relabel, widths) shared with tools/compile-adapter.mjs",
+        {
+          "project/src/workflow.js — the focus plan": "propose, approve or return, four-eyes rule, audit trail (browser-only)"
+        }
+      ],
+      "capabilities": [
+        "what-if — project/src/app.js:305",
+        "narrative-headline — project/src/app.js:147",
+        "simulated-workflow — project/src/workflow.js:32",
+        "excel-export — project/src/export.js:22"
+      ],
+      "stealable": [
+        "A selection group per tab, mirrored from main by difference and only while the tab is visible, so a click re-queries only what is on screen; a self-check holds queries per selection to the visible objects — project/src/app.js:253",
+        "Chart clicks arrive as pending selections in the tab's group and are handed to main after 200 ms, so every tab and the chips follow — project/src/app.js:284",
+        "What-if through the layer: the slider sets the governed `score` parameter of Projected Rank at Score on the mounted object, with no remount — project/src/app.js:314",
+        "The same slider writes a governed `between` selection on Total Score (2027) into an `overtake` group, so the overtaken count and table are governed rows — project/src/app.js:247",
+        "One pre-mount path for every tile (theme, governed parameters such as our score as `benchmark`, relabel by position), shared with the offline compile adapter so the check runs what the browser runs — project/src/prepare.js:63",
+        "A stored question's rank-within-set and 2-edition moving average carried onto the tile as advanced-calculation operations — project/src/catalogue.js:84",
+        "Table column widths from header length at the font size, a wrapping name column sized for the longest name, row height from its line count; re-applied on resize without a remount (src/app.js:322) — project/src/prepare.js:18",
+        "Bar charts narrower than 220 px drop their data labels rather than ellipsise them — project/src/prepare.js:89",
+        "Rank-history sparkline column on the league table, from the joined history view's Edition Date — project/src/catalogue.js:167",
+        "Seven-sheet Excel report from each mounted object's own data (handle.getData), following the filters — project/src/export.js:22"
+      ],
+      "caveats": [
+        {
+          "No screenshots in this repo, and no data": "bring your own tables shaped like the layer's schema/ddl.sql."
+        },
+        "Built by an agent from this repo in a clean environment as a test run, then brought up to standard: read it as what the playbook produces, not as a hand-polished demo.",
+        "Third-party published data (licence unconfirmed, see DATA-SOURCES.md): 130 UK universities, 2027 edition, with the two prior overall ranks and a rank-history view (2025–2027). University names are public. The total score's component weights are not in the data, so the app shows gaps per component, not a modelled points bridge.",
+        "The focus plan is not written back. Plan, decisions and audit trail live in localStorage (key climb-planner-plan-v1, src/workflow.js:22), and the screen says so.",
+        "The two what-if KPIs (projected rank, universities overtaken) are bare numbers, with no comparison or mini chart (src/app.js:190, src/app.js:191). Projected rank does not break ties.",
+        "The rank-on-measure table has no sparkline column; only the league table on Where we stand carries one.",
+        "The hero's \"N points of total score separate us from the top 50\" is a subtraction in the app of two governed values (src/app.js:150), not a stored measure.",
+        "Some bars draw no data label (in the test run, one of the largest movers on Who moved most, and most gap bars on What costs us places).",
+        "Indicator columns (Moved, the within-set ranks) draw the same small up caret before every value, falls included; only the colour carries direction.",
+        "Wrapped university names make table rows taller at 1280 and 1024, so fewer rows show without scrolling.",
+        "Clicks on the KPI mini charts and on the moving-average line are untested.",
+        "Changing our university reloads the page with ?uni= (src/app.js:132).",
+        "Inert leftovers: questions.js carries two questions no object uses (climbersBand, fallersBand); throttle.js exports a prefetch helper nothing calls, and its header comment still mentions a timetable.",
+        "Checked in staging: smoke test PASS at 1440, 1280 and 1024, 29 objects, landing-ready in 5.8 s (24 s before compile and theming ran in parallel), 10 app checks (a Nation filter on each of the first three tabs with queries per selection held to the visible objects, a chart click that the next tab follows, the what-if, the focus table, the workflow, an empty selection, the Excel report, no overflow); compile-check 29/29; build passes. Not published, so no live smoke.",
+        "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite.",
+        "astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too."
+      ],
+      "path": "examples/league-table-planner/",
+      "readme": "examples/league-table-planner/README.md",
+      "screenshots": []
+    },
+    {
+      "slug": "lending-affordability",
+      "title": "Affordability & lending decisions",
+      "company": "Keystone Home Finance (fictional UK lender)",
+      "layer": "keystone-lending",
+      "summary": "A retail credit-risk lead checks applicants' income against expenses, moves four affordability thresholds to see how many applications would pass and which rule bites, and works an underwriter-proposes, approver-decides (maker–checker) queue for open applications.",
+      "industry": "lending",
+      "function": "risk",
+      "persona": "Head of Retail Credit Risk",
+      "archetype": "workbench",
+      "look": "light; deep purple brand with a gradient masthead, white cards with a purple top rule, Roboto, sticky filter rail with tabs; kanban lanes whose cards carry green/amber/red Pass/Marginal/Fail edges; modal applicant file",
+      "tabs": [
+        "Overview — how do applicants' income and expenses move month to month, by region and income band, and where does approval land by credit band and product?",
+        "Thresholds — if we change max DTI, min disposable, min credit score and max expense share (with a +3% stress test), how many applications pass and how many breach each rule?",
+        "Decisions — which open applications await a proposal or a sign-off, does each pass the thresholds in view, and how are underwriters performing?"
+      ],
+      "patterns": [
+        "governed-business-questions",
+        "kpi-sparkline-comparison",
+        "selection-bar",
+        "what-if-parameters",
+        "preload-tabs",
+        "role-switcher",
+        "drawer-detail"
+      ],
+      "charts": [
+        "line",
+        "bar",
+        "stacked-bar",
+        "table",
+        "kpi",
+        "sparkline"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "selection-bar",
+        "tabs",
+        "sliders",
+        "compare",
+        "role-switcher",
+        "search",
+        "drawer"
+      ],
+      "workflows": [
+        "maker-checker-approval"
+      ],
+      "writeback": false,
+      "exports": [],
+      "objects": 47,
+      "start_here": [
+        "project/src/app.js — bootstrap, tab shell, sliders written as range selections, filter bar, mount queue, audit-trail query",
+        "project/src/dashboard.js — every object declared from a stored business question; the selection groups (main, policy, one per rule, workflow)",
+        "project/src/workflow.js — decision board, applicant file, maker–checker rules (four-eyes, mandates, escalation)",
+        "project/tools/questions.mjs — the 12 business questions and the sync that copies them into src/questions.js"
+      ],
+      "capabilities": [
+        "what-if — project/src/app.js:208",
+        "simulated-workflow — project/src/workflow.js:175",
+        "record-drawer — project/src/workflow.js:118"
+      ],
+      "stealable": [
+        "Threshold sliders without in-app maths: each slider writes a `between` range selection into a policy group, and each rule has its own selection group holding only its breach range, so governed counts show passers and per-rule breaches — project/src/app.js:227",
+        "Every object built from a stored business question: the question owns dimensions, measures, order and period comparison; the tile adds only type, colours and display names — project/src/dashboard.js:75",
+        "Business questions synced into the app as data, since an Astrato App cannot read them at runtime — project/tools/questions.mjs:111",
+        "KPI change row: a one-row table on the month/quarter question with an inter-record growth or diff calculation (offset 1), LIMIT 1, and a two-segment coloured indicator where 'up' is good or bad per measure — project/src/dashboard.js:158",
+        "Maker–checker in the browser: underwriter proposes, a different approver with a large enough mandate approves, rejects or returns, otherwise escalates; actions layered over seeded state in localStorage — project/src/workflow.js:175",
+        "Table column formats on visualizations 0.8: the two format operations address a column by its exact name, unlike every other column operation — project/src/theme.js:79",
+        "The playbook's selection test as code the smoke test runs: select a value, check the KPI moved, clear, check it returned — project/src/app.js:573"
+      ],
+      "caveats": [
+        {
+          "No screenshots in this repo, and no data": "bring your own tables shaped like the layer's schema/ddl.sql."
+        },
+        "Workflow actions are not written back. Proposals, decisions and escalations live in localStorage (key lending-affordability-workflow-v1) on top of the seeded stage/proposal/audit trail; post them to your own backend to persist.",
+        "KPI values are one-row tables over the \"All Applications\" one-value dimension (headline question), not number objects, so they narrow with selections.",
+        "The decision board, applicant file and Pass/Marginal/Fail badges are page chrome over one getData of every application row (limit 3000; the sample has 2,400). assess() compares stored per-application ratios with the slider values in the browser; it does not scale to a real book.",
+        "The rule-breach ranges use epsilon bounds (e.g. DTI > max + 1e-6, score <= min - 1) to express strict inequalities as `between` ranges.",
+        "The latest month (Sep 2026) is partly open, so MoM approval-rate change compares a partial month with a whole one. Data is fixed to a 30 Sep 2026 snapshot.",
+        "Runs on the public packages (@astrato-io/visualizations and app-runtime 0.8.0, Vite). Ported from 0.6 in 2026-11 and checked in headless Chrome with kit/verify/smoke.mjs; the tile builders still set explicit formats, which the 0.8 docs advise leaving to the layer.",
+        {
+          "One selection re-queries every object on every tab (about 76 queries)": "all tabs share the main selection group. Do not copy that; see patterns/preload-tabs.md."
+        },
+        "The overview tab scrolls sideways by 24px at 1440 wide.",
+        "astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too."
+      ],
+      "path": "examples/lending-affordability/",
+      "readme": "examples/lending-affordability/README.md",
+      "screenshots": []
+    },
+    {
+      "slug": "people-intelligence",
+      "title": "People Intelligence",
+      "company": "Northwind Telecom (fictional telecom group)",
+      "layer": "people-intelligence",
+      "summary": "A telecom group's Group CHRO, and a regional HR director, an HR business partner and a business-unit leader who each see a narrower slice of the same app, decide where attrition, workforce cost and skills risk sit and which retention, reskilling and restructuring interventions to fund and approve. Thirteen tabs on one governed layer of 20 joined HR views: workforce, retention, succession, privacy-safe diversity, skills, two simulators, an approvals register, a self-service custom report builder, an assistant over stored business questions and data operations.",
+      "industry": "telecom",
+      "function": "hr",
+      "persona": "Group CHRO (also regional HR director, HR business partner, business-unit leader)",
+      "archetype": "workbench",
+      "look": "light; white cards on a grey page (#F5F5F6), one blue accent (#2B5CE6 / #1B3FA8), charcoal ink (#25282B), red (#D92D20) only for bad news; Inter for the UI, Roboto inside charts, Material Icons; white left nav with sections and a \"Viewing as\" persona picker at the foot; top bar with \"Illustrative data\" and \"Governed · live query\" badges, Export and an \"Ask People Intelligence\" button; sticky scope-and-selections bar; every card captioned with its stored business question; dense KPI strips; a bottom tab bar and floating ask button on phones",
+      "tabs": [
+        {
+          "My People Home — what needs my attention today in my scope": "headline KPIs, a written briefing, attrition hotspots, cost against budget?"
+        },
+        "Workforce Explorer — how are headcount, movement, cost, absence and engagement moving, and where is the workforce, by any segment?",
+        "Talent & Retention — where is attrition rising, among whom, why, and what does it cost? (with a structured investigation of one segment)",
+        "Talent & Succession Risk — which critical roles have no ready-now successor, and where does key-person risk meet a high impact of loss?",
+        "Diversity & Inclusion — how do representation, pay, promotion and attrition differ by gender and level, with every cell under 10 people blanked?",
+        "Skills & Future Workforce — where are the 2028 capability gaps, who has adjacent skills, and should we build, buy or borrow?",
+        "Workforce Simulator — what would a retention intervention, or an FY28 demand and restructuring plan, do to attrition, headcount and cost?",
+        "People Actions — which interventions are proposed, awaiting my approval or delivering, and what did they return?",
+        "Custom report — any governed dimensions and measures as a table, bar, scatter, heat map or pivot, bookmarked, shared as a link and exported",
+        "Question library — the stored business questions behind the assistant, each runnable as a native table",
+        "Data operations — is every source feed fresh, which pipeline runs failed, and who is fixing which data issue?",
+        "Data & governance — how the data flows from source systems to the semantic layer, and what each role may see and do",
+        "Capability tour — ten capabilities, each with a \"Show me\" that opens the place and persona that shows it"
+      ],
+      "patterns": [
+        "governed-business-questions",
+        "kpi-sparkline-comparison",
+        "selection-bar",
+        "table-sparklines",
+        "role-switcher",
+        "what-if-parameters",
+        "in-app-calc-engine",
+        "writeback-workflow",
+        "xlsx-export",
+        "preload-tabs",
+        "query-scheduler",
+        "report-builder"
+      ],
+      "charts": [
+        "kpi",
+        "sparkline",
+        "bar",
+        "stacked-bar",
+        "line",
+        "combo",
+        "scatter",
+        "pie",
+        "heatmap",
+        "sankey",
+        "table",
+        "table-sparklines",
+        "pivot"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "selection-bar",
+        "drill-down",
+        "tabs",
+        "role-switcher",
+        "sliders",
+        "search",
+        "compare",
+        "deep-link",
+        "chat",
+        "drag-reorder"
+      ],
+      "workflows": [
+        "maker-checker-approval",
+        "data-issue-triage",
+        "scenario-submission",
+        "saved-views"
+      ],
+      "writeback": true,
+      "exports": [
+        "xlsx"
+      ],
+      "objects": 213,
+      "start_here": [
+        "project/src/app.js — personas and scope, governed query helper, lazy per-page compile with a vSpec cache, selection bar, drill-down, mounting, ad-hoc objects, writeback",
+        {
+          "project/src/builder.js — the custom report builder": "state → tile spec, chip bar, field panel, sort/filter popovers, bookmarks, share link, Excel"
+        },
+        "project/src/catalogue.js — every native object declared as data (three-object KPI cards, switchable and drillable charts, tables with sparkline columns)",
+        {
+          "project/src/actions.js — the People Actions register": "maker–checker approval with every step written back as an event"
+        }
+      ],
+      "capabilities": [
+        "report-builder — project/src/builder.js:80",
+        "assistant — project/src/assistant.js:32",
+        "writeback-workflow — project/src/actions.js:51",
+        "what-if — project/src/simulator.js:37",
+        "excel-export — project/src/export.js:9",
+        "saved-views — project/src/builder.js:222",
+        "role-switcher — project/src/app.js:680",
+        "drill-down — project/src/app.js:488",
+        "narrative-headline — project/src/home.js:16",
+        "map — project/src/basemap.js:37"
+      ],
+      "stealable": [
+        "Custom report builder: a pure function turns the report state (visual, ordered fields, sort, filters, row limit) into an ad-hoc tile spec for a table, bar, scatter, heat map or pivot, so the offline compile check runs it too — project/src/builder.js:59",
+        "Ad-hoc native objects at run time: a small spec becomes a tile definition with the persona scope merged into its filters, then is compiled, themed and mounted in its own selection group; the assistant, investigation, question library, simulators and report builder all use it — project/src/adhoc.js:14",
+        "One link, four data scopes: each persona's row scope is a static filter on every native object and every governed query, and objects a role is not cleared for are never mounted, so never queried — project/src/app.js:374",
+        "KPI card = native number + native sparkline in a time-series twin group (a month click never narrows the page) + one-row comparison table — project/src/catalogue.js:98",
+        "Lazy per-page compile against only the fields each object references, with the compiled and themed vSpec cached per device under a hash of its definition — project/src/app.js:178",
+        "Workflow steps written back as audit events through app.writeback, with a labelled browser fallback where the runtime cannot write — project/src/app.js:598",
+        "Query lanes with 429 backoff, a session cache, and no caching for the views the app writes to — project/src/throttle.js:134",
+        "A raster basemap laid under a scatter whose axes are pinned to a lon/lat extent, so the bubbles land on their countries — project/src/basemap.js:37"
+      ],
+      "caveats": [
+        "Mock data: 20 views over MOCK_DATA PEOPLE_* tables, fixed at 30 Sep 2026. The source systems shown on the Data & governance and Data operations tabs are part of the mock architecture. The app names no company on screen; it is branded \"People Intelligence · Group HR\".",
+        "Persona scope is an app-side static filter, not row-level security: anyone who can open the layer can query outside their scope. Enforce access in the semantic layer before copying this for real data.",
+        "Writeback inserts events only: People Actions steps and data-issue triage insert rows into Action Events, saved scenarios into Saved Scenarios. The action records and issue states themselves live in localStorage (people-actions-v2, people-issues-v1) over the governed seed. No smoke check exercises writeback (src/checks.js:9).",
+        "The custom report's table splits its width equally between columns (src/app.js:585), so long values truncate. Its Excel export always asks for at least 2,000 rows whatever the Rows setting, and writes a pivot as a flat table.",
+        "Currency comparison rows in KPI cards clip to a red \"+\".",
+        "On visualizations 0.9 a combo's secondary-axis layer does not move when the card narrows; objects are clipped to their card in CSS (src/pi.css:658) rather than fixed.",
+        "The simulators' elasticities and costs are illustrative constants listed on screen (src/simulator.js:27, src/plan.js:27), not fitted. The assistant matches stored questions by keyword overlap, not a language model.",
+        "Of the layer's 229 stored questions, 61 are copied into src/questions.js for the assistant and the library; the other 168 back the catalogue's objects and are shown as card captions, but the objects are declared against layer measures in catalogue.js rather than generated from the questions.",
+        "All 13 tabs preload, one page at a time after the first: landing-ready 9.4 s in staging, every object settled in about 101 s, so the smoke test needs --settle-ms 180000 --check-ms 120000.",
+        "Inert leftovers: throttle.js's header describes a timetable and a prefetch.js, and its RENAMES comment describes renames the empty list does not do; prefetchSelections (throttle.js) and compileTiles (dashboard.js) are unused; palette names call the blue accent \"red\" (catalogue.js, pi.css); comments cite tools/questions.mjs, chart-questions.mjs and entities.mjs, which are not included in this repo.",
+        "Not shipped: the mock-data generator and the layer-authoring scripts. layers/people-intelligence/schema/ddl.sql gives the tables; recreate the layer from layer.json.",
+        "Web fonts load from a public font CDN and basemap tiles from a public tile service at run time.",
+        "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite. Checked in staging with the kit smoke test at 1440, 1280 and 1024 (213 objects rendered across 13 tabs, 9 app checks), compile-check 217/217 and vite build.",
+        "No screenshots are shipped yet.",
+        "astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too."
+      ],
+      "path": "examples/people-intelligence/",
+      "readme": "examples/people-intelligence/README.md",
+      "screenshots": []
+    },
+    {
+      "slug": "portfolio-os",
+      "title": "Private Markets Portfolio OS",
+      "company": "Northstar Capital Partners (fictional private-equity firm)",
+      "layer": "northstar-portfolio",
+      "summary": "A private-equity deal and portfolio team's quarterly workbench across 36 investments in 4 funds: collect and validate monitoring packs, propose and approve fair values, model scenarios, run value-creation initiatives and take decisions to the Investment Committee. The story in its data is whether to accept a ~$180m downside to the stake in Meridian Cloud Systems.",
+      "industry": "private-markets",
+      "function": "finance",
+      "persona": "Investment Director / deal team (also Valuation Committee, Portfolio Operations)",
+      "archetype": "workbench",
+      "look": "light; institutional fintech: deep-navy left rail, warm-white paper, white cards, muted sea-green accent; Inter body with Libre Baskerville serif headings and wordmark; Material Icons; dense spreadsheet-style HTML sheets next to native charts",
+      "tabs": [
+        "Portfolio — which investments need review, and what are returns and fair value on approved marks?",
+        "Companies — everything about one investment (statements with drill-down, thesis, valuation, debt, KPIs)",
+        "Quarterly Monitoring — which packs are in, do they pass validation rules, who must review or approve?",
+        "Financial Analysis — what drove EBITDA (price/volume/mix/cost bridge), leverage, liquidity, forecast accuracy?",
+        "Valuations — what is each company worth under six methods, and is the Q3 mark approved?",
+        "Scenario Lab — what happens to fair value, MOIC, IRR and the fund if the drivers move?",
+        "Value Creation — which initiatives are approved, and are they delivering planned EBITDA?",
+        "Investment Committee — which decision packages await a decision, and what do decisions change?",
+        "Workflows & Approvals — my queue, all records, role permissions, rules and the audit trail",
+        "Nash AI — keyword-routed governed business questions answered as native tables plus computed narrative"
+      ],
+      "patterns": [
+        "governed-business-questions",
+        "kpi-sparkline-comparison",
+        "selection-bar",
+        "table-sparklines",
+        "writeback-workflow",
+        "what-if-parameters",
+        "xlsx-export",
+        "preload-tabs",
+        "query-scheduler",
+        "role-switcher",
+        "in-app-calc-engine",
+        "drawer-detail"
+      ],
+      "charts": [
+        "bar",
+        "line",
+        "combo",
+        "scatter",
+        "pie",
+        "table",
+        "table-sparklines",
+        "kpi",
+        "sparkline"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "selection-bar",
+        "drawer",
+        "tabs",
+        "role-switcher",
+        "sliders",
+        "search",
+        "compare",
+        "deep-link",
+        "chat"
+      ],
+      "workflows": [
+        "quarterly-monitoring",
+        "valuation-approval",
+        "scenario-approval",
+        "value-creation-initiative",
+        "investment-committee-decision",
+        "action-tracking",
+        "saved-views"
+      ],
+      "writeback": true,
+      "exports": [
+        "xlsx",
+        "pdf"
+      ],
+      "objects": 71,
+      "start_here": [
+        "project/src/app.js — boot, governed query helper, writeback, selection groups, static-filter mirror, mounting",
+        "project/src/core.js — roles/permissions, workflow store written through app.writeback with audit events",
+        "project/src/engine.js — deterministic XIRR, multiple valuation, DCF, 5-year scenario model, validation rules",
+        "project/src/catalogue.js — every native object declared as data (KPI cards, tables with sparklines, filters)"
+      ],
+      "capabilities": [
+        "writeback-workflow — project/src/core.js:176",
+        "what-if — project/src/pages/scenario.js:56",
+        "excel-export — project/src/xlsx.js:207",
+        "pdf-export — project/src/export.js:48",
+        "assistant — project/src/pages/nash.js:18",
+        "role-switcher — project/src/core.js:46",
+        "record-drawer — project/src/core.js:94"
+      ],
+      "stealable": [
+        "Workflow store on two governed views (records + audit events) via app.writeback, falling back to labelled browser persistence — project/src/core.js:176",
+        "KPI card = native number + native sparkline + one-row prior-period table with red/green indicator bands — project/src/catalogue.js:63",
+        "Measure-only objects (KPIs, delta tables) mirror the page's selections as static filters, limited to views they can join — project/src/app.js:218",
+        "One deterministic engine shared by the data build and the app, so the stored $180m downside reproduces live — project/src/engine.js:70",
+        "Query lanes with 429 backoff, timeout retry and a session cache wrapped around engine.getData — project/src/throttle.js:110",
+        "Dependency-free styled .xlsx writer (fills, number formats, frozen panes) — project/src/xlsx.js:207"
+      ],
+      "caveats": [
+        {
+          "No screenshots in this repo, and no data": "bring your own tables shaped like the layer's schema/ddl.sql."
+        },
+        "Runs on @astrato-io/visualizations and app-runtime 0.8.0 with Vite; ported from 0.5 and checked in headless Chrome with the kit smoke test (2026-11)",
+        "The KPI static-filter mirror is not needed for number objects on 0.8 (tested); it is kept for the one-row delta tables, which were not tested without it",
+        "Some KPI comparison labels are cut off, and the table sparkline column shows dots rather than lines, probably because the table is filtered to one quarter (knowledge/tables.md)",
+        "tools/layer.mjs needs ASTRATO_MCP_URL and ASTRATO_PAT for the bundled tools/mcp.mjs, and tools/types.txt (generate with tools/types.mjs); ASTRATO_GALLERY.MOCK_DATA is hard-coded",
+        "Native charts query layer measures directly; only Nash uses the stored business questions, from its own copy in src/questions.js. Nash routes by keyword overlap, not a language model",
+        "Reporting dates are hard-coded (Q3 2026, TODAY 2026-11-09 in core.js:42, 12 quarters in data.js:65); the Q4 2026 period is simulated",
+        "The currency switch changes HTML workbench figures only; native objects stay in USD",
+        "The Reset demo button deletes every non-seed workflow record for all users; the warehouse reset copies the *_SEED tables back (README, Rebuild from nothing)",
+        "prefetchSelections in throttle.js is never called (the prefetch.js its comments mention does not exist)",
+        "Valuation bridge, EBITDA bridge and scenario waterfalls are hand-drawn SVG (src/ui.js:32), not native objects"
+      ],
+      "path": "examples/portfolio-os/",
+      "readme": "examples/portfolio-os/README.md",
+      "screenshots": []
+    },
+    {
+      "slug": "report-builder",
+      "title": "Report builder",
+      "company": "Superstore (the public Superstore sample dataset); the app itself names no brand",
+      "layer": "superstore-sample",
+      "summary": "The small, standalone, copyable flexible custom report: anyone who asks for \"a self-service report\" picks rows, figures, filters and a period, compares with the previous period or the same period last year, switches between a native table, bar and line, saves and reopens the report, shares it as a link and exports exactly what the object shows to Excel. It works on any semantic layer: the field catalogue is read at run time and nothing in the app names a field. The one to start from for a custom report; the people-intelligence tab is the larger, branded version.",
+      "industry": "retail",
+      "function": "sales",
+      "persona": "Analyst or business user building their own report",
+      "archetype": "explorer",
+      "look": "light and plain: a grey page (#F8FAFC), white cards, one blue accent (#2563EB), amber note text; Roboto throughout, bundled from npm; a top bar with the editable report name, New, Saved reports, Save, Share link and Export .xlsx; a 250px field panel on the left (search, Rows and Figures, each field tagged abc, date or 123); a chip bar of rows and figures with move and remove buttons and a grain picker on date rows; one control row (Table / Bar / Line, period, compare, sort, row limit); a filter bar with chips; the one native object fills the rest; one screen, no page scroll",
+      "tabs": [
+        "Report builder — what do these figures look like by these rows, for this period and these filters, and how did each period change against the one before or the same one last year?"
+      ],
+      "patterns": [
+        "report-builder",
+        "selection-bar",
+        "query-scheduler",
+        "xlsx-export"
+      ],
+      "charts": [
+        "table",
+        "bar",
+        "stacked-bar",
+        "line"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "selection-bar",
+        "search",
+        "compare",
+        "period-picker",
+        "deep-link"
+      ],
+      "workflows": [],
+      "writeback": false,
+      "exports": [
+        "xlsx"
+      ],
+      "objects": 1,
+      "start_here": [
+        {
+          "project/src/builder.js — the whole UI": "field panel, chip bar, period and filters as selections, chart clicks, save / reopen / share link, Excel export of the object's own rows"
+        },
+        "project/src/report.js — report state → spec → compiled vSpec (pure, so the compile check runs it), the comparison rule, formats, column widths, chart colours, starter reports",
+        "project/src/catalogue.js — the field catalogue built at run time from whatever layer the app is bound to",
+        "project/src/app.js — boot, the getData wrapper (operator fix, 4 lanes, retry, cache), mounting the one object and refitting its columns on resize"
+      ],
+      "capabilities": [
+        "report-builder — project/src/builder.js:33",
+        "saved-views — project/src/builder.js:252",
+        "excel-export — project/src/builder.js:281"
+      ],
+      "stealable": [
+        "A field catalogue read at run time: rows are the layer's string, date and boolean view columns (named by a stored dimension where one points at them), figures are its governed measures with their own format and description; starter reports name fields and drop any the layer lacks — project/src/catalogue.js:12",
+        "Report state → spec → vSpec as pure functions: the same code the app mounts is what the offline compile check runs over every view and starter — project/src/report.js:50",
+        "Period comparison with no comparison measures: a native inter-record growth (diff for ratio measures) along a date row moved to the first column, sorted ascending, at offset −1 (previous) or −12 / −4 / −1 (same month, quarter or year last year), with a note when it cannot apply — project/src/report.js:37",
+        "Two columns on one measure: rename the change column with setColumnLabel, then format it by that name, because format operations match the label the figure and its copy share — project/src/report.js:134",
+        "Filters and the period are applied selections in one group (inList filters, a between period counting back from the last date in the data), so the object follows them and a chart click becomes a filter chip — project/src/builder.js:60",
+        "Excel from runtime.getData(tileId): the workbook holds the object's own rows, comparison columns included, with the layer's formats and a Definitions sheet; the .xlsx writer has no dependencies — project/src/builder.js:281",
+        "The address always carries the report as #r=<base64url JSON>, so reload, bookmark and Share link all reopen it with its filters and period — project/src/builder.js:268",
+        "Table columns as pixel widths from the header and the layer's format pattern, refitted in place on resize with no remount — project/src/report.js:107"
+      ],
+      "caveats": [
+        "Public sample data: the classic Superstore orders table, one view and no joins, January 2016 to 30 Dec 2019. Periods count back from the last date in the data (src/builder.js:44), so Year to date and Last 12 months are the same range on this sample.",
+        "The comparison is row to row, not calendar-based: the layer has no time axis, so a missing month shifts the offset, and the first period (or first year) of the range is blank. It needs a date row at month, quarter or year and shows only in the table (src/report.js:37).",
+        "While comparing, sort is disabled and the table is sorted by date ascending (src/builder.js:170, src/report.js:61).",
+        "A ratio's change is a difference in points (diff), but it is formatted with a % sign; the header says (pts) (src/report.js:56). In the second screenshot Profit Ratio vs LY reads \"-48.8%\" for Jan 2017, meaning −48.8 points.",
+        "Charts use the first two rows, and with two rows only the first figure; they never show the comparison (src/report.js:57). The note under the controls says so.",
+        "A 7-column comparison report (the second starter) scrolls sideways inside the table at 1024 px: text columns never go below 120 px (src/report.js:113).",
+        "Saved reports live in one browser's localStorage, per layer (src/builder.js:35); Share link is the only way to move a report between people or devices.",
+        "No stored business question behind the object: reports are ad hoc by design, over the layer's calculations and raw view columns. There is no KPI band, no narrative and no what-if; it is one report, not a dashboard. Offering raw view columns as rows counts as an unmatched object under the rubric's A3 note; patterns/report-builder.md says to offer stored dimensions only.",
+        "A bar with one row and several figures would stack on 0.9, so it sends setBarChartLayout 'groups' (src/report.js:150); compile-checked, not yet re-checked in a browser. A Line view does not select on click on 0.9.",
+        "The filter picker offers non-date rows only, reads the first 500 values and lists 300 at a time, with a search (src/builder.js:182, src/builder.js:191). A chart click on a date is dropped, since it would replace the period (src/builder.js:319).",
+        "The app runs on any layer, but its smoke checks (src/checks.js:30) and tools/compile-adapter.mjs name Superstore fields (Region, Category, Sales, West); rewrite them for another layer.",
+        "Checked in staging: smoke test PASS at 1440, 1280 and 1024 with no page scroll, landing in about 1.7 s, 7/7 app checks (build from the panel, Region filter and Clear all, Year to date period, Bar / Line / Table switch, save + reopen + share link, Excel export, and the comparison value checked by hand: Dec 2019 Sales vs LY −23.55% = (96,410.63 − 126,106.54) / 126,106.54); compile-check 32/32; build passes; figures cross-checked against an MCP query.",
+        "Library quirks behind the comparison (a descending sort with a positive offset returned nulls on 0.9) are in knowledge/engine-and-queries.md, Window calculations.",
+        "tools/available-fields.json is the field catalogue a smoke run saved; the compile check reads it.",
+        "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite.",
+        "astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too."
+      ],
+      "path": "examples/report-builder/",
+      "readme": "examples/report-builder/README.md",
+      "screenshots": [
+        "examples/report-builder/screenshots/starter-1-table.png",
+        "examples/report-builder/screenshots/starter-2-table.png",
+        "examples/report-builder/screenshots/starter-3-bar.png",
+        "examples/report-builder/screenshots/starter-4-line.png"
+      ]
+    },
+    {
+      "slug": "revenue-war-room",
+      "title": "Pipeline War Room",
+      "company": "Velmora (fictional SaaS)",
+      "layer": "live-gallery",
+      "summary": "A CRO's Q4 forecast room: is the quarter going to land, which open deals close the $1.29m gap to target, which reps need coaching, and what managers commit on the Monday forecast call.",
+      "industry": "saas",
+      "function": "sales",
+      "persona": "CRO",
+      "archetype": "command-centre",
+      "look": "light, Salesforce-like white cards on a #F3F3F3 page, #0176D3 blue accent, green/red good/bad ink, one screen per tab with no page scroll above 1100px, sentence headline on every tab",
+      "tabs": [
+        "Command — will we hit Q4? gap bridge vs target, four forecast categories with week-over-week change, region cards, weekly trajectory",
+        "Deals — which open deals close the gap? top 15 by recovery score stacked against the gap, recovery list, deal drawer with actions",
+        "Coaching — how does one rep compare with their team? five rep-vs-team-average cards, forecast vs quota for every rep, activity mix, pipeline by stage",
+        "Forecast call — what do managers commit per rep against the system forecast and target? editable commit/best case, roll-up, submit",
+        "Trends — how do bookings, win rate and deal size trend by closed quarter, by deal size band and by product?"
+      ],
+      "patterns": [
+        "kpi-sparkline-comparison",
+        "selection-bar",
+        "reference-lines",
+        "preload-tabs",
+        "query-scheduler",
+        "drawer-detail",
+        "offset-bar-waterfall"
+      ],
+      "charts": [
+        "waterfall",
+        "bar",
+        "stacked-bar",
+        "line",
+        "combo",
+        "table",
+        "sparkline"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "selection-bar",
+        "drawer",
+        "tabs",
+        "deep-link"
+      ],
+      "workflows": [
+        "deal-actions",
+        "forecast-call-submission",
+        "decision-log"
+      ],
+      "writeback": false,
+      "exports": [],
+      "objects": 21,
+      "start_here": [
+        "project/src/app.js — object list, governed queries, reference lines, selection hand-offs, mock writeback",
+        "project/src/charts.js — tile builders (bar, line, combo, spark, table) and compilation to vSpecs",
+        "project/src/objects.js — the tile list and the compile, theme and reference-line path, importable by the offline compile check",
+        "project/src/lib/theme.js — appearance operations applied to each vSpec before mount"
+      ],
+      "capabilities": [
+        "narrative-headline — project/src/app.js:197",
+        "record-drawer — project/src/app.js:523",
+        "simulated-workflow — project/src/app.js:55"
+      ],
+      "stealable": [
+        "Forecast bridge as a waterfall from an offset-layout bar, sorted by a hidden supporting measure — project/src/objects.js:39",
+        "Reference lines whose values come from governed queries, injected into vSpec.refLines and re-pushed with updateInstance on selection change — project/src/objects.js:119",
+        "Engine query gate (max 4 in flight) plus memo of identical getData bodies — project/src/app.js:102",
+        "Chart click hand-off — a pending selection on Opp Name is removed and opens the deal drawer instead of filtering — project/src/app.js:523",
+        "Separate selection groups (all-reps hero, rep focus) with the region mirrored in from the main group — project/src/app.js:531",
+        "Visible tab mounts first, then the rest in three lanes on hidden (visibility) pages — project/src/app.js:561"
+      ],
+      "caveats": [
+        {
+          "No screenshots in this repo, and no data": "bring your own tables shaped like the layer's schema/ddl.sql."
+        },
+        "Writeback is mocked in localStorage (key nb-war-room-v1); no app.writeback call, no warehouse table",
+        "Charts are declared against measure and column names, not stored business questions, although the layer holds matching ones (e.g. \"Which deals can close the Q4 gap?\")",
+        "KPI values, region numbers and coaching cards are HTML text from engine.getData queries, not native number objects; only their sparklines are native",
+        "The forecast-call grid and deal drawer are hand-built HTML, not native tables",
+        "Dates are hard-coded (as-of Mon 5 Oct 2026, Close Quarter 2026-Q4, closed quarters 2024-Q1..2026-Q3)",
+        "getData memo assumes data is static for the session; do not copy it for live data",
+        "Below 1100px wide inactive pages switch to display:none, unlike the visibility-hidden preload on desktop",
+        "project/README.md over-claims (activity sparklines in the recovery list, mean ± σ on the trajectory); stale comments call the design dark",
+        "Runs on @astrato-io/visualizations and app-runtime 0.8.0 with Vite; ported from 0.5 and checked in headless Chrome with the kit smoke test (2026-11)",
+        {
+          "One selection re-queries objects on every tab": "all tabs share one selection group"
+        }
+      ],
+      "path": "examples/revenue-war-room/",
+      "readme": "examples/revenue-war-room/README.md",
+      "screenshots": []
+    },
+    {
+      "slug": "royalty-close",
+      "title": "Royalty Close & Exception Review",
+      "company": "Larkspur Music (fictional music publisher)",
+      "layer": "royalty-engine",
+      "summary": "Finance controllers and royalty operations close a monthly royalty statement run (current run against the prior one): find the statements that need attention, open and assign an exception case, submit evidence, and have a controller approve the disposition, return it or approve a carry-forward. Cases and their audit trail are written back to the warehouse.",
+      "industry": "media",
+      "function": "finance",
+      "persona": "Finance Controller / Royalty Analyst (royalty operations)",
+      "archetype": "workbench",
+      "look": "light; black top tab bar with a green (#1DB584) active tab, a navy-to-teal gradient band (#1B3A5C → #13706F) holding white header dropdowns, a green banner sentence overlapping the band, white cards on a pale canvas, Roboto; coloured status pills, coloured indicator text in tables; English/Spanish switch; a phone-first Summary tab",
+      "tabs": [
+        "Summary — on a phone, what needs me, where is the exposure, and which five statements are largest?",
+        "Close overview — which statements need attention before close, by branch and exception category, and how does this run compare with the prior one?",
+        "Statement investigation — what are one statement's amounts, suspense, calculation errors and income lines, and what case is open on it?",
+        "Controller review — who owns each exception, what evidence supports sign-off, and which carry-forwards are still exposed?",
+        "Close simulator — with these analysts, clearance rate and days left, will the run close on time and how much exposure is left?",
+        "Business questions — the layer's stored close questions, each run as a native table"
+      ],
+      "patterns": [
+        "kpi-sparkline-comparison",
+        "selection-bar",
+        "table-sparklines",
+        "writeback-workflow",
+        "role-switcher",
+        "xlsx-export",
+        "preload-tabs",
+        "query-scheduler"
+      ],
+      "charts": [
+        "bar",
+        "stacked-bar",
+        "combo",
+        "pie",
+        "table",
+        "table-sparklines",
+        "kpi",
+        "sparkline"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "selection-bar",
+        "drill-down",
+        "tabs",
+        "role-switcher",
+        "sliders"
+      ],
+      "workflows": [
+        "exception-case-management",
+        "maker-checker-approval",
+        "carry-forward-approval"
+      ],
+      "writeback": true,
+      "exports": [
+        "xlsx"
+      ],
+      "objects": 79,
+      "start_here": [
+        "project/src/app.js — shell, header filters, governed query helper, writeback with guards, statement investigation, controller review, simulator, pivot, Excel close pack, smoke checks",
+        "project/src/catalogue.js — every native object declared as data (KPI cards, queue, scorecard, charts, detail tables)",
+        "project/src/questions.js — the 21 stored questions and the tile that runs one as a native table",
+        "project/tools/layer.mjs — views, measures, questions and the Data Actions with role and branch guards in SQL"
+      ],
+      "capabilities": [
+        "writeback-workflow — project/src/app.js:342",
+        "role-switcher — project/src/app.js:285",
+        "what-if — project/src/app.js:481",
+        "excel-export — project/src/app.js:639",
+        "narrative-headline — project/src/app.js:300",
+        "drill-down — project/src/app.js:370"
+      ],
+      "stealable": [
+        "Case workflow on two governed views (cases + action history) through app.writeback, with a role, branch-scope and maker–checker guard before every write and a labelled browser-storage fallback — project/src/app.js:342",
+        "Copy-to-clipboard for a native table: re-runs the table's own governed query (its columns, static filters and the group's applied selections) and writes every row as tab-separated text — project/src/app.js:108",
+        "Banner sentence built from two governed queries of stored measures, following the header filters — project/src/app.js:300",
+        "KPI card = number + bar or line sparkline by processing run + header-less one-row comparison table coloured by whether it moved the right way — project/src/catalogue.js:28",
+        "Pivot with branch subtotals from three governed queries (leaf rows, branch totals, grand total), so totals stay right for non-additive measures — project/src/app.js:567",
+        "English/Spanish switch with a MutationObserver that translates page text, including native objects' rendered labels, while selections and writes keep the English values — project/src/i18n.js:302",
+        "Data Actions whose SQL repeats the app's guards (role, branch scope, maker–checker) and appends the audit row — project/tools/layer.mjs:193"
+      ],
+      "caveats": [
+        "The app writes ROYALTY_CLOSE_CASES and ROYALTY_CLOSE_EVENTS with app.writeback inserts and updates; it does not call the layer's Data Actions. The role, branch-scope and maker–checker guard therefore runs only in the browser (src/app.js:341). The Data Actions enforce the same rules in SQL, but nothing in the app calls them.",
+        "If a write fails or writeback is unavailable, the change is kept in localStorage (key royalty-close-local-v1) and the toast says so. Reset demo clears only that copy; the warehouse reset copies the *_SEED tables back (README, Rebuild from nothing).",
+        "The smoke checks are read-only; no write was exercised by the smoke test.",
+        "Visualizations 0.9: the Unreconciled statements comparison row shows the change as \"-13.1 pts\" with a decimal pts format, while the measure is +13.125 through MCP.",
+        "At 1440 wide with six KPI cards per row, the calc-error comparison is truncated (\"impact $33,…\"). \"Acting as\" is clipped at 1280, and the header stacks below 1100px. Summary stays a narrow column even at 1440.",
+        "The Exception pivot is an HTML table drawn from governed queries (the native table here has a grand total only); the close simulator's bars are hand-drawn SVG and its projection is browser arithmetic, including a fixed 0.6 factor on residual exposure (src/app.js:498).",
+        "Native tiles query layer measures directly, not stored questions; the \"BQ · …\" caption on each card is generated from the tile title (src/catalogue.js:172). Only the Business questions tab runs stored questions, and it hides the 7 that belong to the layer's sibling recovery app.",
+        "The header Branch, Run and Currency dropdowns write the same selection into all four groups (src/app.js:292), so one change re-queries about 150 objects on every tab.",
+        "No analyst in ROYALTY_USERS covers DE, ES or JP: nobody can open or submit a case on those branches, and seeded cases there are owned by an analyst scoped to US only.",
+        {
+          "Dates are fixed": "demo date 2026-11-11, current run R-2026-10, close deadline 14 Nov. The banner hard-codes \"across 8 branches\" (src/app.js:308)."
+        },
+        "tools/layer.mjs imports tools/mcp.mjs and reads tools/types.txt, and neither is shipped; it creates the layer with a zero datasource id. ASTRATO_GALLERY.MOCK_DATA is hard-coded in layer.mjs and the Data Action SQL.",
+        "The layer is shared with a recovery app that is not in this repo. Its Paid vs Collectable and Recovery views, 7 of the 21 questions and 5 of the 8 Data Actions are unused here.",
+        "Some code comments and dictionary strings still name the original source tables; the dashboard.js header comment describes another app's selection groups.",
+        "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite. Checked with the kit smoke test at 1440, 1280 and 1024 (79 objects, 6 checks including the Excel download), compile-check 92/92 and vite build.",
+        "No screenshots are shipped yet.",
+        "astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too."
+      ],
+      "path": "examples/royalty-close/",
+      "readme": "examples/royalty-close/README.md",
+      "screenshots": []
+    },
+    {
+      "slug": "snowline",
+      "title": "Snowline",
+      "company": "None (fictional Alpine resorts on synthetic data; the app is branded Snowline and names no operator)",
+      "layer": "ski-resort-operations",
+      "summary": "The head of resort operations, with the marketing lead, reviews the season every Monday and decides which resorts and weeks to push next season and where the marketing budget goes: did a snowier season bring more guests, which resorts and weeks perform best, how snow and holidays drive crowds, where good snow went unsold, and a budget plan on governed levers proposed and approved maker–checker. A test agent was given raw Snowflake tables and no semantic layer; it built and published the layer itself, then the app. The reference example for building the layer from raw tables (playbook/build-the-layer.md). Scored 47/52 by an independent judge.",
+      "industry": "leisure",
+      "function": "operations",
+      "persona": "Head of resort operations, with the marketing lead",
+      "archetype": "planner",
+      "look": "light; a slate-to-ice-blue masthead (#0F2A3D to #1F6FB2) with the brand mark, a \"Synthetic data · ends 30 Mar 2026\" badge and an Excel report button; snow is ice blue (#1F6FB2, light #9CC3E6) and crowds lift-pass amber (#C9731E) on almost every chart, green (#2E7D4F) / red (#B83B3B) only for good and bad change, grey for the default plan; white rounded cards on a glacier page (#EEF3F7); a Georgia serif headline sentence over Segoe UI / system-ui page text, Roboto from npm inside charts; a sticky selection bar (Resort, Country, Season Stage and Week Type dropdowns beside the library filter bar with chips and Clear all) above five underlined tabs; card titles are the stored questions; each tab fits one 1440 screen",
+      "tabs": [
+        "Season review — did a snowier season bring more guests? Five KPIs against 2024/25, snow and crowd by week of the season, each resort's season with a crowd-by-week sparkline",
+        "Best resorts & weeks — which resorts and weeks perform best? Ranked resorts, a resort × week heat map, the ten best resort-weeks of 2025/26, each resort's score profile",
+        "Snow & crowds — how do snow conditions drive visits? Crowd by fresh-snow band and week type, the holiday uplift, base depth against crowds by stage, 3-week moving averages, crowd level by snowfall band",
+        "Where to market — where is good snow going unsold? Demand headroom by resort, quiet powder weeks by resort with share, gateway airports",
+        "Plan next season — how do we split next season's marketing budget? Three levers on governed measure parameters, target weeks against 2024/25, the scenario beside the default plan by resort and by stage, a maker–checker marketing plan with audit trail (browser-only)"
+      ],
+      "patterns": [
+        "governed-business-questions",
+        "kpi-sparkline-comparison",
+        "selection-bar",
+        "preload-tabs",
+        "what-if-parameters",
+        "query-scheduler",
+        "table-sparklines",
+        "role-switcher",
+        "xlsx-export"
+      ],
+      "charts": [
+        "kpi",
+        "sparkline",
+        "bar",
+        "combo",
+        "heatmap",
+        "table",
+        "table-sparklines"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "selection-bar",
+        "tabs",
+        "sliders",
+        "compare",
+        "role-switcher"
+      ],
+      "workflows": [
+        "maker-checker-approval"
+      ],
+      "writeback": false,
+      "exports": [
+        "xlsx"
+      ],
+      "objects": 40,
+      "score": {
+        "total": 47,
+        "max": 52,
+        "judged": "2026-11-18",
+        "by": "independent judge",
+        "file": "SCORE.md"
+      },
+      "start_here": [
+        "project/src/app.js — boot, the governed headline query, shell and tabs, per-tab selection groups mirrored from main, chart clicks into main, the levers, mount lanes, idle prefetch, resize refit, 17 self-checks",
+        "project/src/catalogue.js — every object as data (a stored question plus presentation), change rows, sparkline columns, scenario beside the default plan, the static Season filter, compile",
+        "project/src/questions.js — the app's copy of the layer's stored questions, read back from the published layer",
+        {
+          "project/src/workflow.js — the 2026/27 marketing plan": "propose, approve or return, four-eyes rule, audit trail (browser-only)"
+        }
+      ],
+      "capabilities": [
+        "what-if — project/src/app.js:359",
+        "narrative-headline — project/src/app.js:274",
+        "simulated-workflow — project/src/workflow.js:25",
+        "role-switcher — project/src/workflow.js:75",
+        "excel-export — project/src/export.js:22"
+      ],
+      "stealable": [
+        "Three levers set the layer's measure parameters (budget, minSnow, maxCrowd) on every mounted tile marked params with setMeasureDefinedParameter through applyRuntimeOperations, no remount — project/src/app.js:364",
+        "Scenario beside a governed baseline: one stored question carries Suggested Budget at Default Rule (no parameters) and the parameterised Suggested Budget, relabelled Default plan and Scenario, so the levers move one series and the other stays put — project/src/catalogue.js:257",
+        "This-season questions carry Season = 2025/26 as a static filter group on the raw Season column, not as an app selection — project/src/catalogue.js:289",
+        "KPI change row: a one-row table with a three-segment indicator, red / grey inside ±flat (what the format rounds to zero) / green, with up or down good per measure — project/src/catalogue.js:114",
+        "Idle prefetch: once no real query has run for a second, re-run the active tab's queries with each Country, Stage and Week type value added, so the next pick is answered from the session cache — project/src/app.js:111",
+        "A selection group per tab, mirrored from main by difference and only while the tab shows; chart clicks arrive pending in the tab's group and are handed to main after 200 ms (src/app.js:331) — project/src/app.js:311",
+        "Query lane with 429 and 502/503/504 backoff, timeouts, a session cache keyed by the exact request and a query log — project/src/throttle.js:120",
+        "Table column widths from header length at the font size, the resort column taking the rest; re-applied on resize through a ResizeObserver without a remount (src/app.js:376) — project/src/prepare.js:34"
+      ],
+      "caveats": [
+        "Built by a test agent from raw Snowflake tables with no semantic layer: it built and published the layer (5 views, 47 measures, 32 stored questions), then the app; a staging pass brought it up to standard and an independent judge admitted it at 47/52 (SCORE.md). Read it as what the playbook produces, not as a hand-polished demo.",
+        "Synthetic data: ten fictional Alpine resorts, 18 weeks in each of two seasons (2024/25 and 2025/26), ending 30 Mar 2026. Not live. The data holds no visits, revenue or marketing spend: the Crowd Index (0–100) stands in for visits, and the budget split is a governed planning rule, not a spend history.",
+        "Filter dropdowns need Apply: a pick there makes a pending chip with Cancel / Apply and nothing changes until Apply, while chart and table clicks apply at once. The app's own selection checks set applied selections through the API (src/app.js:487), so they never meet this step.",
+        "The marketing plan is not written back, because the brief forbade creating warehouse tables. Plan, decisions and audit trail live in localStorage (key snowline-plan-2026-27-v1, src/workflow.js:20), and the screen says so.",
+        "The plan's resort-split chart labels only every other resort (5 of 10) at 1440 and 1280.",
+        "The three Best resorts & weeks tables cut a partial row at 1440, so ten rows need a scroll inside the card; at 1280 the By week and Headroom headers ellipsise.",
+        "Filter chips show raw field names (Season_Stage, Resort Name, Snowfall_Band): selections are written on the raw columns (src/app.js:303). Filter controls truncate their value while a selection is held.",
+        "Scenario is blue in the resort split and amber, the crowd colour, in the stage split (src/catalogue.js:257, src/catalogue.js:258).",
+        "The landing tab reuses league-table-planner's skeleton (masthead with Excel button, dropdowns and filter bar, tabs, headline sentence, KPI row, chart left and table right); the judge marked design down for it.",
+        "Cold first load took about 59 s to landing-ready and failed the kit smoke's 15 s landing budget; warm loads took 6–7 s. At 1024 the layout stacks and the page scrolls vertically.",
+        "Objects re-express their stored questions in src/questions.js rather than run them by id (runQuestion needs a published App); three of the 32 stored questions are unused (targets, split, splitStage).",
+        "The 3-week moving-average chart has no clickable points (combo lines on 0.9); its card says so. Top 10 is a sort plus a 10-row limit, since tables take no topN on 0.9 (src/catalogue.js:217).",
+        "Excel report: change values are raw decimals, and the Definitions sheet says the comparison uses the Season Axis over 1 Dec 2025 – 5 Apr 2026 (src/export.js:68); the measures filter Season explicitly and the data ends 30 Mar 2026.",
+        "Checked by the judge: all 40 objects rendered with 0 console errors and 0 failed requests through the kit smoke (17 app checks, all tabs, 1440, 1280 and 1024) and two runs with real mouse input; the KPIs reconciled with MCP queries unfiltered and with Country = Italy. Not published, so no live smoke.",
+        "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.9.0 with Vite.",
+        "astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too."
+      ],
+      "path": "examples/snowline/",
+      "readme": "examples/snowline/README.md",
+      "screenshots": [
+        "examples/snowline/screenshots/best.png",
+        "examples/snowline/screenshots/market.png",
+        "examples/snowline/screenshots/plan.png",
+        "examples/snowline/screenshots/review.png",
+        "examples/snowline/screenshots/snow.png"
+      ]
+    },
+    {
+      "slug": "stock-rotation",
+      "title": "Stock Rotation",
+      "company": "Corvo (fictional retailer)",
+      "layer": "inventory-rotation",
+      "summary": "A stock planner and the warehouse, quality and operations people around them keep short-dated stock rotating across two fulfilment hubs: see what is held and what expires unsold, book goods in, ship oldest-expiry-first, transfer, count, trace and recall batches, propose purchase orders and write-offs for approval, and test options for at-risk stock. Stock moves are written back to the warehouse.",
+      "industry": "retail",
+      "function": "supply-chain",
+      "persona": "Stock Planner (also Operations Manager, Quality Lead, Warehouse Operator)",
+      "archetype": "workbench",
+      "look": "light; white page, green header band (#3BB273) with the wordmark, uppercase Antonio headline and Inter body, ink (#2D3246) tab strip, pill-shaped role picker and export button; native tables with traffic-light indicator text; plain HTML queue tables with status pills on the workflow tabs",
+      "tabs": [
+        "Stock — what do we hold, where, what is at risk of expiring unsold, and how have receipts and shipments moved against the prior 30 days?",
+        "Goods in — which purchase orders are due, and booking a counted delivery in as a batch",
+        "Goods out — which batch must ship next (oldest eligible expiry first, enforced) and dispatching it",
+        "Transfers — which at-risk stock should move to the other warehouse?",
+        "Stock count — does the counted quantity match the system, and does the variance need approval?",
+        "Trace & recall — where did a batch come from, where did it go, and quarantining what is left",
+        "Reorder — which products need ordering now, and proposing purchase orders",
+        "Expiry — which batches expire within 30 days, are at risk or in quarantine, and what to do with them",
+        "Ledger — every stock movement behind the figures",
+        "Approvals — requests waiting for a second person, and the audit trail",
+        "Plan — what do a promotion, a discount, a transfer, a demand change or a supplier delay do to value at risk and reorders?"
+      ],
+      "patterns": [
+        "kpi-sparkline-comparison",
+        "selection-bar",
+        "table-sparklines",
+        "writeback-workflow",
+        "role-switcher",
+        "xlsx-export",
+        "query-scheduler"
+      ],
+      "charts": [
+        "table",
+        "table-sparklines",
+        "kpi",
+        "sparkline"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "selection-bar",
+        "tabs",
+        "role-switcher",
+        "sliders",
+        "search"
+      ],
+      "workflows": [
+        "goods-in",
+        "fefo-dispatch",
+        "stock-transfer",
+        "stock-count",
+        "batch-recall",
+        "reorder-approval",
+        "write-off-approval"
+      ],
+      "writeback": true,
+      "exports": [
+        "xlsx"
+      ],
+      "objects": 21,
+      "start_here": [
+        "project/src/workflow.js — the operational screens, the writes behind each step, FEFO and shelf-life blocks, requests and approvals",
+        "project/src/app.js — shell, governed query helper, writeback, queue loading, trace, Plan levers, Excel report, smoke checks",
+        "project/src/dashboard.js — the 21 native objects (KPI cards, stock and batch tables, ledger)"
+      ],
+      "capabilities": [
+        "writeback-workflow — project/src/workflow.js:48",
+        "role-switcher — project/src/app.js:92",
+        "what-if — project/src/app.js:187",
+        "excel-export — project/src/app.js:274"
+      ],
+      "stealable": [
+        "Each stock step as a sequence of app.writeback inserts and updates on governed tables (batch, movement, purchase order), then a cache clear and a re-query of every mounted object — project/src/workflow.js:48",
+        "First-expired-first-out enforced at the pick list: a batch is blocked if quarantined, below the product's minimum shelf life, or not the oldest eligible batch for that product and warehouse — project/src/workflow.js:35",
+        "Two-person rules: count variances over 5%, write-offs and purchase orders become requests that only the named approver role can approve — project/src/workflow.js:96",
+        "Batch trace from governed movements: the root batch and its transfer children, received, shipped, distinct shipment references and stock still held — project/src/app.js:257",
+        "Value at risk modelled in the layer: a SQL view projects each batch's units expiring unsold from the 28-day run rate and the stock ahead of it in expiry order, so the app only reads a measure — layers/inventory-rotation/layer.json:134",
+        "KPI card = number + monthly mini-chart + one-row prior-period table with red/green bands — project/src/dashboard.js:64"
+      ],
+      "caveats": [
+        "The app writes the tables directly. The layer's nine Data Actions describe the same steps (the code notes the App runtime cannot call a named Data Action), but the guards here run in the browser, and FEFO and minimum shelf life are checked only by the app.",
+        "Steps are several separate writes (a transfer is four), so a failure part-way leaves partial state. A failed write is logged as FAILED in the audit trail; there is no browser-storage fallback.",
+        "Requests, approvals and the audit trail live in localStorage only (key corvo-ops-v1). An approval is marked Approved before its write runs and stays Approved if the write fails (src/workflow.js:151). Roles come from the picker, so one person can request and approve by switching role.",
+        "Inactive tabs use display:none (src/app.js:134); the ledger table is mounted hidden and refits when first shown. Prefer off-screen panes (patterns/preload-tabs.md).",
+        "None of the layer's 10 stored business questions is used; native objects query layer measures directly.",
+        "Figures are relative to CURRENT_DATE (expiry, 28-day run rate, 30-day windows), so they drift as the sample data ages.",
+        "No data generator or reset script is shipped; the layer's tables were loaded from CSV files that are not included. layers/inventory-rotation/schema/ddl.sql gives the shapes, but lists the Month and Period custom fields of Movements and Sales Orders as columns. The SQL views hard-code ASTRATO_GALLERY.ASTRATO.",
+        "Transfers assume exactly two warehouses (WH-UK and WH-US). The Plan tab is browser arithmetic over a governed baseline. The Value at risk card's mini-chart plots units expired by month, not value at risk.",
+        "styles.css, objects.css and ops.css carry rules for screens this app does not have.",
+        "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite. Verified with compile-check (21/21) and vite build; the app registers six smoke checks, but no smoke-test run is recorded for this export.",
+        "No screenshots are shipped yet.",
+        "astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too."
+      ],
+      "path": "examples/stock-rotation/",
+      "readme": "examples/stock-rotation/README.md",
+      "screenshots": []
+    },
+    {
+      "slug": "superstore-explorer",
+      "title": "Superstore explorer",
+      "company": "Superstore (the public Superstore sample dataset)",
+      "layer": "superstore-sample",
+      "summary": "The plain, minimal explorer, on the public Superstore sample: a sales or category manager picks a period and a comparison (previous period or same period last year) and asks who and what drives sales and profit in it, then drills through to one customer or product to see how it compares with its own previous period. The one to start from for a clean explore app, not a branded command centre.",
+      "industry": "retail",
+      "function": "sales",
+      "persona": "Sales / category manager",
+      "archetype": "explorer",
+      "look": "light and minimal, \"storytelling with data\": white page, greys, one blue accent (#1F5FB8) and orange-red (#C2410C) only for losses; Source Sans 3, Roboto inside charts; a narrow icon rail (Overview, Detail), a masthead with the period button, a filter bar with a Filters drawer, ship-mode quick buttons and chips; ruled KPI cards with a mini chart; master list on the left, detail pane on the right; both pages fit one screen with no page scroll",
+      "tabs": [
+        "Overview — in the chosen period, how do sales, profit, orders and profit ratio compare with the comparison period, which customers or products drive them, and where in Category › Sub-Category › Product does the picked one sell?",
+        "Detail — for the picked customer or product, what are its KPIs against its own comparison period, its monthly trend and its order lines, and how does the next one compare?"
+      ],
+      "patterns": [
+        "selection-bar",
+        "kpi-sparkline-comparison",
+        "query-scheduler"
+      ],
+      "charts": [
+        "kpi",
+        "sparkline",
+        "bar",
+        "line",
+        "table"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "selection-bar",
+        "drill-down",
+        "search",
+        "compare",
+        "period-picker",
+        "filter-drawer",
+        "quick-filters",
+        "drill-through",
+        "previous-next"
+      ],
+      "workflows": [],
+      "writeback": false,
+      "exports": [
+        "xlsx",
+        "csv"
+      ],
+      "objects": 13,
+      "start_here": [
+        "project/src/app.js — boot, the getData wrapper (lanes, cache, operator fix), period picker and selections, KPI comparisons, master list, narrative, detail page, object menu, smoke checks",
+        "project/src/charts.js — the four native object builders (drill bar, trend with moving average, KPI mini chart, order-lines table) and the visualizations 0.9 operation fixes",
+        "project/src/exports.js — CSV and a dependency-free single-sheet .xlsx writer",
+        "project/tools/compile-adapter.mjs — every object the app can mount, for the offline compile check"
+      ],
+      "capabilities": [
+        "drill-down — project/src/app.js:562",
+        "narrative-headline — project/src/app.js:743",
+        "excel-export — project/src/exports.js:96"
+      ],
+      "stealable": [
+        "Every control is an applied selection in one group: the period (a `between` selection on Order Date), the drawer filters, the ship-mode buttons, the drill path and the picked item; native objects follow by themselves, and the app's own queries turn the same selections into filters — project/src/app.js:236",
+        "Period picker: presets anchored on the last order date and a comparison choice (previous period, same period last year, none), turned into a second date range — project/src/app.js:222",
+        "KPI change against the comparison period: the layer's calculations queried twice with the same filters, once per range; ratios change in points — project/src/app.js:605",
+        "Mirror group: the overview's KPI mini charts sit in a second group that copies every selection except the picked item, so they describe all items while the drill bar, trend and order lines follow the pick — project/src/app.js:596",
+        "Operator-less selections sent as inList: a filter without an operator is refused with HTTP 400 \"Astrato rejected the runtime request\" — project/src/app.js:142",
+        "One getData wrapper for charts and app queries: 4 lanes, one retry, a session cache keyed by the exact request — project/src/app.js:147",
+        "Dashed 3-month moving average: a second copy of the measure with a native movingCalculation (AVG, window −2 to 0) — project/src/charts.js:172",
+        "Table columns as pixel widths of their slot, dropping Ship mode then Order ID when narrow, refitted on resize with updateInstance and no remount — project/src/app.js:726",
+        "Visualizations 0.9 operation shapes: updateMeasure customLabel is {enabled, value}, setAnimationEnabled takes {enabled}, and the Order Date column needs setColumnFormatType yyyymmdd (addressed by column name) or it prints epoch numbers — project/src/charts.js:276",
+        "Object menu on every object (Show as table, CSV, Excel), each from a query the app re-runs for that object — project/src/app.js:980"
+      ],
+      "caveats": [
+        "Public sample data: the classic Superstore orders table, one view and no joins. The data ends on 30 Dec 2019, and every period counts back from the last order date (src/app.js:187).",
+        "No stored business question behind any object. The layer's 8 questions do not match the objects' shapes; every object and app query reads the layer's calculations (Sales, Profit, Orders, Profit Ratio) over raw Orders columns. The governed dimensions, including the Category > Sub-Category > Product hierarchy, are unused: the drill is the app's own, one raw column per level.",
+        "KPI values are text from governed queries, not native number objects; their mini charts are native lines.",
+        "No period comparison on the drill bar or the trend. The layer has no time axis or comparison measures; the trend carries a 3-month moving average instead, and that average skips months with no orders.",
+        "The master list is an HTML list with value bars, the one A2 exception: it is navigation (search, pick, Previous/Next), not a data visual. It renders the first 300 rows of a query limited to 2,500 (src/app.js:642, src/app.js:672). The Show as table dialog also draws an HTML table (src/app.js:958).",
+        "Detail KPI changes run to figures like \"9901.7%\" when the item's previous period was tiny.",
+        "Money axes label zero as \"0.00\"; product names are cut to an ellipsis in narrow slots.",
+        "When a filter change drops the picked customer from the list, the top one is picked instead and the original is not restored (src/app.js:648); the smoke checks pick it back by hand.",
+        "With the Customers list open, a product bar click at the drill's third level filters the drill bar, trend and order lines but not the KPIs, mini charts, list or narrative, which leave both item fields out (src/app.js:596, src/app.js:814). A click on the trend is dropped (src/app.js:844).",
+        "Pages are not preloaded. Switching page releases every object and mounts the other page's (src/app.js:884).",
+        "Excel is one unformatted sheet per object, written in the browser (src/exports.js:96); there is no multi-sheet management report, no what-if and no workflow, since it is an explorer. The order-lines export stops at 5,000 rows (src/app.js:932).",
+        "Inert leftovers: src/theme.js reads a saved dark-mode choice, but styles.css defines no dark theme; a smoke check names the quarter-to-date start `ytdStart` (src/app.js:1074).",
+        "Checked in staging: smoke test PASS at 1440, 1280 and 1024 with no page scroll, landing in about 3 s, 5/5 app checks (region filter, drill click, quarter-to-date range reaching the trend query, detail Next/Previous, Excel export of the order lines); compile-check 30/30; build passes.",
+        "The script that loaded the sample into the warehouse is not included in this repo; layers/superstore-sample/schema/ddl.sql gives the table. tools/available-fields.json is the field catalogue a smoke run saved; the compile check falls back to layer.json without it.",
+        "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite.",
+        "astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too."
+      ],
+      "path": "examples/superstore-explorer/",
+      "readme": "examples/superstore-explorer/README.md",
+      "screenshots": [
+        "examples/superstore-explorer/screenshots/detail.png",
+        "examples/superstore-explorer/screenshots/overview.png"
+      ]
+    },
+    {
+      "slug": "thessaloniki-on-the-move",
+      "title": "Thessaloniki on the Move",
+      "company": "Thessaloniki bus network (real public open data, the OSETH GTFS timetable)",
+      "layer": "thessaloniki-transit",
+      "summary": "A scrolling data story on the real public bus timetable of the Regional Unit of Thessaloniki (GTFS, 14 Jul – 3 Aug 2026; scheduled service, not ridership) for city and transport planners and curious residents: how well does the bus network serve the city, and where does improvement pay back fastest, frequency at the edge or bus priority in the core? Nine chapters follow one filter bar, a day of 8,015 scheduled trips plays over the map, and a what-if prices bus priority on governed baselines.",
+      "industry": "transport",
+      "function": "planning",
+      "persona": "City / transport planner (also curious residents)",
+      "archetype": "story",
+      "look": "light; Aegean palette on warm paper: sand page, #FFFDF8 cards, deep-sea navy (#10263F) ink, terracotta (#E0583A) and gold (#F2B33D) accents; Fraunces serif headlines with Inter body and Roboto inside charts; sticky top bar and filter bar, a dotted chapter rail on the left, large outlined chapter numbers; a drawn White Tower skyline with moving bus lines in the hero; dark navy panels for the live-day clock and the what-if; a small feature badge on each card (\"Ratio of aggregates\", \"Coordinates as measures\")",
+      "tabs": [
+        "The network (hero) — what does the network do on an average day, in six numbers, three findings and the hourly pulse?",
+        "Scale — which line categories carry the trips, the bus-kilometres and the Sunday service?",
+        "Geography — where are the stops, and how often does a bus call at each, from the centre to 20 km out?",
+        "Access — how many stops have a frequent bus, how many are underserved, and how long is the worst daytime wait?",
+        "Rhythm — when does the city move, by hour, service day, day of week and time band?",
+        "Live day — how does a whole weekday of scheduled trips play out on the map, minute by minute?",
+        "Boarding — where can the city board and change buses (scheduled departures as a demand proxy)?",
+        "Operations — how hard does the fleet work, and which lines run often yet crawl?",
+        "Routes — for any line, what are its stops, timetable through the day and weekend service, against every other line?",
+        "Opportunities — where would more frequency at the edge or bus priority in the core pay back fastest?"
+      ],
+      "patterns": [
+        "selection-bar",
+        "preload-tabs",
+        "query-scheduler",
+        "reference-lines",
+        "what-if-parameters",
+        "xlsx-export"
+      ],
+      "charts": [
+        "kpi",
+        "sparkline",
+        "line",
+        "area",
+        "bar",
+        "stacked-bar",
+        "grouped-bar",
+        "pie",
+        "heatmap",
+        "scatter",
+        "map",
+        "table"
+      ],
+      "interactions": [
+        "click-to-filter",
+        "selection-bar",
+        "chapter-rail",
+        "scroll-stepping",
+        "map-extent-switch",
+        "playback",
+        "compare",
+        "sliders",
+        "share"
+      ],
+      "workflows": [],
+      "writeback": false,
+      "exports": [
+        "xlsx",
+        "png"
+      ],
+      "objects": 54,
+      "start_here": [
+        "project/src/app.js — story shell, chapter rail and one-chapter-per-gesture scrolling, governed narratives, per-chapter selection mirroring, map extents, the live day, route explorer, what-if, share card, Excel report, smoke checks",
+        "project/src/dashboard.js — every native object declared as data, chapter by chapter; stop maps as scatters; the per-chapter selection groups",
+        "project/src/throttle.js — query lanes, 429 and 502/503/504 retry, session cache and idle prefetch",
+        "project/src/sim.js — the animated day, buses interpolated stop to stop on a canvas over the map"
+      ],
+      "capabilities": [
+        "story-mode — project/src/app.js:183",
+        "narrative-headline — project/src/app.js:607",
+        "map — project/src/dashboard.js:130",
+        "what-if — project/src/app.js:671",
+        "excel-export — project/src/report.js:23",
+        "drill-down — project/src/app.js:712"
+      ],
+      "stealable": [
+        "Instant selections: every answer is cached for the session by its exact request, and when idle the app re-runs the visible chapter's query shapes with each filter value added, two at a time, yielding to real queries, so a click is usually a cache hit — project/src/throttle.js:66",
+        "Prefetch waits until every object has mounted: started during boot it held two of the four lanes and slowed the last mounts — project/src/app.js:742",
+        "One selection group per chapter, mirrored from the filter bar only for the chapter on screen and, 1.8 s later, the chapters either side; a chart click inside a chapter is forwarded to the filter bar as a pending selection — project/src/app.js:769",
+        "Stop map with no map object: a scatter of Stop Lon / Stop Lat measures whose axes are pinned to a lon/lat window, widened to the plot's own aspect so 1 km across equals 1 km down — project/src/app.js:487",
+        "Raster street tiles laid behind the scatter's plot canvas, each placed by its own lon/lat bounds and re-measured on resize — project/src/basemap.js:37",
+        "Scatter coloured by a raw field with fixed limits: on visualizations 0.9 the stored min/max apply only after setColoringGradientAuto false — project/src/theme.js:298",
+        "A day of 8,015 scheduled trips from a compacted timetable file (a trips extract, not shipped; the panel says so when it is absent), each bus interpolated between its stops and drawn on a canvas aligned to the scatter's plot canvas — project/src/sim.js:33",
+        "Playhead on a governed chart: the clock moves a native reference line on the fleet chart's time axis, at most four times a second — project/src/app.js:952",
+        "Average and median reference lines on both axes of a scatter, recomputed from a governed query for the lines in scope — project/src/app.js:650",
+        "Route explorer in its own selection group: a click on a line anywhere opens it there instead of filtering, and the pick is written on the dropdown's own field so other labels stay selectable — project/src/app.js:702",
+        "Reset that clears: the main group's selections are removed outside the mirroring flag, so chips, chapters and narratives all refresh — project/src/app.js:261",
+        "502/503/504 retried at most twice beside the 429 backoff — project/src/throttle.js:117",
+        "Seven-sheet management report from governed queries scoped to the filters on screen, with in-cell bars standing in for charts — project/src/report.js:23",
+        "Share card: a 1200×627 image drawn on a canvas from the governed figures on screen, with an editable suggested post — project/src/share.js:41"
+      ],
+      "caveats": [
+        "Real public data, scheduled service only. The Boarding chapter uses scheduled departures as a stand-in for demand; no ridership is published.",
+        "Landing: the hero is ready in 4–6.5 s and all 54 objects settle in 14–23 s on a shared backend. The staging smoke run failed its 15 s landing budget because the app then marked only hero-ready, so the kit timed all-settled; it now also marks landing-ready there (src/app.js:1226), not yet re-run. Otherwise 13/13 smoke checks pass at 1440, 1280 and 1024, 54/54 objects render, compile-check passes 54/54 and the build passes.",
+        "The layer has no stored business questions (questions.md lists 0). Every object queries layer measures over raw view columns directly; the layer's 26 governed dimensions are unused by the app.",
+        "Hero KPIs are one-row tables with a mini chart and no period comparison.",
+        "Narratives, the three findings, the what-if, the share card and the report are browser arithmetic over governed query rows (for example, bus-hours on lines under 18 km/h are summed in the app, src/app.js:615).",
+        "Hard-coded figures that do not follow the filters: the chapter titles \"nearly 8,000 bus trips a day\" and \"Watch 8,015 trips\", the live map note \"3,673 stops\", and the live category bars' fixed scale of 260 (src/app.js:939).",
+        "The live day needs a trips extract that is not in this repo (public/sim-day.json, Tue 21 Jul 2026); without it the play button is disabled, the panel says \"needs a trips extract\" and the route map draws no coloured paths. When present it is a static file, not a governed query; it follows only the line-category filter (src/app.js:924), and the route map's coloured paths come from the same file (src/sim.js:108). The narrative's fleet peak is queried without the filter bar (src/app.js:585).",
+        "The live narrative says the governed chart is \"averaged per ten minutes\" (src/app.js:640), but its bars are 2, 5 or 15 minutes (5 by default).",
+        "Basemap tiles come at run time from a public tile server with no key (src/basemap.js:15); use a licensed tile provider in production. Some tiles are missing in the whole-region view (screenshots/geo.png). The \"Coordinates as measures\" badge still says there is no basemap service (src/app.js:167).",
+        "Layout: op-vh has a short plot under rotated labels; op-fleet line labels are ellipsed; the opportunity and route tables are cramped at 1024; the route dropdown shows a \"Line Label\" prefix and the filter dropdowns show column names (Category, Dist Band) as placeholders; band labels keep their sort prefix (\"1. Centre (<2 km)\"); the stop-map legend title is truncated.",
+        "On desktop (901px and wider) the wheel and arrow keys move one whole chapter per gesture; a table that can still scroll keeps the wheel.",
+        "tools/layer.mjs is reference only: it needs an MCP client at tools/mcp.mjs taking `<tool> @argsfile` and printing {ok,data}, which is not included in this repo; it creates the layer with a zero datasource id; and tools/entities.mjs declares 5 views and 2 joins, while layer.json has 7 views (two Custom SQL views, Categories and Hours) and 7 joins. Recreate the layer from layer.json.",
+        "The source line in the hero and the report names the warehouse tables (ASTRATO_GALLERY.MOCK_DATA.TH_*, src/app.js:369, src/report.js:15); point it, the two SQL views and layer.mjs at your own database and schema. The step that turned the GTFS feed into the TH_* tables and sim-day.json is not included in this repo, and no data rows are.",
+        "Web fonts (Fraunces, Inter, Material Icons) load from a public font CDN in index.html.",
+        "Stale comments: the dashboard.js header names only the main and route groups, and its Live section says the live chapter has its own group (the LIVE group is unused); the share.js header says the card is copied to the clipboard, which the app does not do.",
+        "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite.",
+        "astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too."
+      ],
+      "path": "examples/thessaloniki-on-the-move/",
+      "readme": "examples/thessaloniki-on-the-move/README.md",
+      "screenshots": [
+        "examples/thessaloniki-on-the-move/screenshots/geo.png",
+        "examples/thessaloniki-on-the-move/screenshots/hero.png",
+        "examples/thessaloniki-on-the-move/screenshots/live.png",
+        "examples/thessaloniki-on-the-move/screenshots/opps.png"
+      ]
+    }
+  ],
+  "patterns": [
+    {
+      "slug": "drawer-detail",
+      "title": "Record drawer",
+      "summary": "Clicking a record (a deal, an applicant, a company) opens a drawer or dialog with its facts, timeline and actions, instead of filtering the page.",
+      "path": "patterns/drawer-detail.md",
+      "examples": [
+        "lending-affordability",
+        "portfolio-os",
+        "revenue-war-room"
+      ]
+    },
+    {
+      "slug": "governed-business-questions",
+      "title": "Governed business questions",
+      "summary": "Every chart, KPI and table is a stored business question in the semantic layer; the app only adds presentation.",
+      "path": "patterns/governed-business-questions.md",
+      "examples": [
+        "ed-wait-watch",
+        "hotel-weather",
+        "labour-market-pulse",
+        "league-table-planner",
+        "lending-affordability",
+        "people-intelligence",
+        "portfolio-os",
+        "snowline"
+      ]
+    },
+    {
+      "slug": "in-app-calc-engine",
+      "title": "In-app calculation engine",
+      "summary": "Pure, deterministic functions for maths the semantic layer cannot express (XIRR, DCF, scenario projections, validation rules), run over governed inputs.",
+      "path": "patterns/in-app-calc-engine.md",
+      "examples": [
+        "people-intelligence",
+        "portfolio-os"
+      ]
+    },
+    {
+      "slug": "kpi-sparkline-comparison",
+      "title": "KPI with comparison and mini chart",
+      "summary": "A KPI card is never a bare number: it carries a period comparison (vs previous, vs target) and a native mini chart of its trend or mix.",
+      "path": "patterns/kpi-sparkline-comparison.md",
+      "examples": [
+        "agency-client-reporting",
+        "ed-wait-watch",
+        "hotel-weather",
+        "labour-market-pulse",
+        "league-table-planner",
+        "lending-affordability",
+        "people-intelligence",
+        "portfolio-os",
+        "revenue-war-room",
+        "royalty-close",
+        "snowline",
+        "stock-rotation",
+        "superstore-explorer"
+      ]
+    },
+    {
+      "slug": "offset-bar-waterfall",
+      "title": "Waterfall from an offset bar",
+      "summary": "A native waterfall (forecast bridge, EBITDA bridge, valuation bridge) built from a bar chart in offset layout.",
+      "path": "patterns/offset-bar-waterfall.md",
+      "examples": [
+        "revenue-war-room"
+      ]
+    },
+    {
+      "slug": "preload-tabs",
+      "title": "Preloaded tabs",
+      "summary": "Mount every tab up front: the visible tab first, then the others in the background, so switching tabs is instant.",
+      "path": "patterns/preload-tabs.md",
+      "examples": [
+        "agency-client-reporting",
+        "ed-wait-watch",
+        "hotel-weather",
+        "labour-market-pulse",
+        "league-table-planner",
+        "lending-affordability",
+        "people-intelligence",
+        "portfolio-os",
+        "revenue-war-room",
+        "royalty-close",
+        "snowline",
+        "thessaloniki-on-the-move"
+      ]
+    },
+    {
+      "slug": "query-scheduler",
+      "title": "Query scheduler",
+      "summary": "A wrapper around `engine.getData` that limits concurrency, retries, and caches, so a page of 40 objects and every click stay fast.",
+      "path": "patterns/query-scheduler.md",
+      "examples": [
+        "agency-client-reporting",
+        "ed-wait-watch",
+        "hotel-weather",
+        "labour-market-pulse",
+        "league-table-planner",
+        "people-intelligence",
+        "portfolio-os",
+        "report-builder",
+        "revenue-war-room",
+        "royalty-close",
+        "snowline",
+        "stock-rotation",
+        "superstore-explorer",
+        "thessaloniki-on-the-move"
+      ]
+    },
+    {
+      "slug": "reference-lines",
+      "title": "Governed reference lines",
+      "summary": "Trend charts carry reference lines (mean, mean ± σ, target) whose values come from governed queries, so they move with the selection.",
+      "path": "patterns/reference-lines.md",
+      "examples": [
+        "revenue-war-room",
+        "thessaloniki-on-the-move"
+      ]
+    },
+    {
+      "slug": "report-builder",
+      "title": "Self-service report builder",
+      "summary": "A flexible custom report: the user picks rows, figures, filters and a period, compares with the previous period or the same period last year, sees one native table or chart, and saves, shares and exports it.",
+      "path": "patterns/report-builder.md",
+      "examples": [
+        "people-intelligence",
+        "report-builder"
+      ]
+    },
+    {
+      "slug": "role-switcher",
+      "title": "Role switcher",
+      "summary": "An \"Acting as\" picker that changes who the user is in the demo: permissions, default views and who signs the audit trail.",
+      "path": "patterns/role-switcher.md",
+      "examples": [
+        "agency-client-reporting",
+        "ed-wait-watch",
+        "hotel-weather",
+        "labour-market-pulse",
+        "league-table-planner",
+        "lending-affordability",
+        "people-intelligence",
+        "portfolio-os",
+        "royalty-close",
+        "snowline",
+        "stock-rotation"
+      ]
+    },
+    {
+      "slug": "selection-bar",
+      "title": "Selection bar",
+      "summary": "A sticky strip under the top bar that lists the active selections as removable chips, with \"Clear all\", plus filters on every page. Every filter, chart click and map click filters every object, KPIs included.",
+      "path": "patterns/selection-bar.md",
+      "examples": [
+        "ed-wait-watch",
+        "hotel-weather",
+        "labour-market-pulse",
+        "league-table-planner",
+        "lending-affordability",
+        "people-intelligence",
+        "portfolio-os",
+        "report-builder",
+        "revenue-war-room",
+        "royalty-close",
+        "snowline",
+        "stock-rotation",
+        "superstore-explorer",
+        "thessaloniki-on-the-move"
+      ]
+    },
+    {
+      "slug": "table-sparklines",
+      "title": "Table sparklines",
+      "summary": "Native tables with a mini-chart column (trend per row), so a ranked list also shows each row's direction.",
+      "path": "patterns/table-sparklines.md",
+      "examples": [
+        "agency-client-reporting",
+        "ed-wait-watch",
+        "hotel-weather",
+        "labour-market-pulse",
+        "league-table-planner",
+        "people-intelligence",
+        "portfolio-os",
+        "royalty-close",
+        "snowline",
+        "stock-rotation"
+      ]
+    },
+    {
+      "slug": "what-if-parameters",
+      "title": "What-if controls",
+      "summary": "Sliders and inputs that change the numbers through the semantic layer: layer parameters re-priced in the engine, or range selections on stored per-row values.",
+      "path": "patterns/what-if-parameters.md",
+      "examples": [
+        "agency-client-reporting",
+        "ed-wait-watch",
+        "hotel-weather",
+        "labour-market-pulse",
+        "league-table-planner",
+        "lending-affordability",
+        "people-intelligence",
+        "portfolio-os",
+        "snowline",
+        "thessaloniki-on-the-move"
+      ]
+    },
+    {
+      "slug": "writeback-workflow",
+      "title": "Writeback workflow",
+      "summary": "Workflow state (proposals, approvals, decisions) and its audit trail are written to governed views through `app.writeback`, then read back like any other data.",
+      "path": "patterns/writeback-workflow.md",
+      "examples": [
+        "ed-wait-watch",
+        "people-intelligence",
+        "portfolio-os",
+        "royalty-close",
+        "stock-rotation"
+      ]
+    },
+    {
+      "slug": "xlsx-export",
+      "title": "Formatted Excel report",
+      "summary": "An \"Excel report\" button that writes a formatted, multi-tab management report from the same governed queries as the screen, following the filters on screen.",
+      "path": "patterns/xlsx-export.md",
+      "examples": [
+        "agency-client-reporting",
+        "ed-wait-watch",
+        "hotel-weather",
+        "labour-market-pulse",
+        "league-table-planner",
+        "people-intelligence",
+        "portfolio-os",
+        "report-builder",
+        "royalty-close",
+        "snowline",
+        "stock-rotation",
+        "thessaloniki-on-the-move"
+      ]
+    }
+  ],
+  "layers": [
+    {
+      "slug": "agency-performance",
+      "name": "Tidewater Media – Client Performance",
+      "views": 6,
+      "joins": 9,
+      "dimensions": 16,
+      "measures": 208,
+      "questions": 0,
+      "path": "layers/agency-performance/",
+      "examples": [
+        "agency-client-reporting"
+      ]
+    },
+    {
+      "slug": "harbourline-hotels",
+      "name": "Harbourline Hotels",
+      "views": 9,
+      "joins": 10,
+      "dimensions": 44,
+      "measures": 209,
+      "questions": 28,
+      "path": "layers/harbourline-hotels/",
+      "examples": [
+        "hotel-weather"
+      ]
+    },
+    {
+      "slug": "hospital-er-operations",
+      "name": "Hospital ER Operations",
+      "views": 3,
+      "joins": 0,
+      "dimensions": 40,
+      "measures": 38,
+      "questions": 37,
+      "path": "layers/hospital-er-operations/",
+      "examples": [
+        "ed-wait-watch"
+      ]
+    },
+    {
+      "slug": "inventory-rotation",
+      "name": "Corvo – Inventory Rotation (illustrative synthetic data)",
+      "views": 9,
+      "joins": 14,
+      "dimensions": 17,
+      "measures": 37,
+      "questions": 10,
+      "path": "layers/inventory-rotation/",
+      "examples": [
+        "stock-rotation"
+      ]
+    },
+    {
+      "slug": "keystone-lending",
+      "name": "Keystone Affordability & Decisions",
+      "views": 2,
+      "joins": 1,
+      "dimensions": 18,
+      "measures": 25,
+      "questions": 12,
+      "path": "layers/keystone-lending/",
+      "examples": [
+        "lending-affordability"
+      ]
+    },
+    {
+      "slug": "live-gallery",
+      "name": "Four Businesses (demo)",
+      "views": 31,
+      "joins": 23,
+      "dimensions": 4,
+      "measures": 153,
+      "questions": 29,
+      "path": "layers/live-gallery/",
+      "examples": [
+        "revenue-war-room"
+      ]
+    },
+    {
+      "slug": "northstar-portfolio",
+      "name": "Northstar – Private Markets Portfolio OS",
+      "views": 19,
+      "joins": 14,
+      "dimensions": 40,
+      "measures": 137,
+      "questions": 24,
+      "path": "layers/northstar-portfolio/",
+      "examples": [
+        "portfolio-os"
+      ]
+    },
+    {
+      "slug": "people-intelligence",
+      "name": "People Intelligence (illustrative HR data)",
+      "views": 20,
+      "joins": 36,
+      "dimensions": 80,
+      "measures": 635,
+      "questions": 229,
+      "path": "layers/people-intelligence/",
+      "examples": [
+        "people-intelligence"
+      ]
+    },
+    {
+      "slug": "royalty-engine",
+      "name": "Larkspur Music – Royalty Engine (demo)",
+      "views": 16,
+      "joins": 14,
+      "dimensions": 63,
+      "measures": 110,
+      "questions": 21,
+      "path": "layers/royalty-engine/",
+      "examples": [
+        "royalty-close"
+      ]
+    },
+    {
+      "slug": "ski-resort-operations",
+      "name": "Ski Resort Operations",
+      "views": 5,
+      "joins": 2,
+      "dimensions": 13,
+      "measures": 47,
+      "questions": 32,
+      "path": "layers/ski-resort-operations/",
+      "examples": [
+        "snowline"
+      ]
+    },
+    {
+      "slug": "superstore-sample",
+      "name": "Superstore Sample",
+      "views": 1,
+      "joins": 0,
+      "dimensions": 6,
+      "measures": 5,
+      "questions": 8,
+      "path": "layers/superstore-sample/",
+      "examples": [
+        "report-builder",
+        "superstore-explorer"
+      ]
+    },
+    {
+      "slug": "thessaloniki-transit",
+      "name": "Thessaloniki on the Move",
+      "views": 7,
+      "joins": 7,
+      "dimensions": 26,
+      "measures": 63,
+      "questions": 0,
+      "path": "layers/thessaloniki-transit/",
+      "examples": [
+        "thessaloniki-on-the-move"
+      ]
+    },
+    {
+      "slug": "uk-labour-market",
+      "name": "UK Labour Market (ONS LMS)",
+      "views": 1,
+      "joins": 0,
+      "dimensions": 11,
+      "measures": 50,
+      "questions": 42,
+      "path": "layers/uk-labour-market/",
+      "examples": [
+        "labour-market-pulse"
+      ]
+    },
+    {
+      "slug": "uk-university-rankings",
+      "name": "UK University Rankings 2027",
+      "views": 3,
+      "joins": 2,
+      "dimensions": 21,
+      "measures": 43,
+      "questions": 40,
+      "path": "layers/uk-university-rankings/",
+      "examples": [
+        "league-table-planner"
+      ]
+    }
+  ],
+  "capabilities": {
+    "report-builder": [
+      {
+        "example": "people-intelligence",
+        "where": "project/src/builder.js:80"
+      },
+      {
+        "example": "report-builder",
+        "where": "project/src/builder.js:33"
+      }
+    ],
+    "assistant": [
+      {
+        "example": "agency-client-reporting",
+        "where": "project/src/app.js:282"
+      },
+      {
+        "example": "people-intelligence",
+        "where": "project/src/assistant.js:32"
+      },
+      {
+        "example": "portfolio-os",
+        "where": "project/src/pages/nash.js:18"
+      }
+    ],
+    "writeback-workflow": [
+      {
+        "example": "ed-wait-watch",
+        "where": "project/src/workflow.js:106"
+      },
+      {
+        "example": "people-intelligence",
+        "where": "project/src/actions.js:51"
+      },
+      {
+        "example": "portfolio-os",
+        "where": "project/src/core.js:176"
+      },
+      {
+        "example": "royalty-close",
+        "where": "project/src/app.js:342"
+      },
+      {
+        "example": "stock-rotation",
+        "where": "project/src/workflow.js:48"
+      }
+    ],
+    "simulated-workflow": [
+      {
+        "example": "agency-client-reporting",
+        "where": "project/src/workflow.js:46"
+      },
+      {
+        "example": "ed-wait-watch",
+        "where": "project/src/workflow.js:120"
+      },
+      {
+        "example": "hotel-weather",
+        "where": "project/src/offers.js:45"
+      },
+      {
+        "example": "labour-market-pulse",
+        "where": "project/src/workflow.js:35"
+      },
+      {
+        "example": "league-table-planner",
+        "where": "project/src/workflow.js:32"
+      },
+      {
+        "example": "lending-affordability",
+        "where": "project/src/workflow.js:175"
+      },
+      {
+        "example": "revenue-war-room",
+        "where": "project/src/app.js:55"
+      },
+      {
+        "example": "snowline",
+        "where": "project/src/workflow.js:25"
+      }
+    ],
+    "what-if": [
+      {
+        "example": "agency-client-reporting",
+        "where": "project/src/app.js:338"
+      },
+      {
+        "example": "ed-wait-watch",
+        "where": "project/src/app.js:451"
+      },
+      {
+        "example": "hotel-weather",
+        "where": "project/src/app.js:420"
+      },
+      {
+        "example": "labour-market-pulse",
+        "where": "project/src/app.js:366"
+      },
+      {
+        "example": "league-table-planner",
+        "where": "project/src/app.js:305"
+      },
+      {
+        "example": "lending-affordability",
+        "where": "project/src/app.js:208"
+      },
+      {
+        "example": "people-intelligence",
+        "where": "project/src/simulator.js:37"
+      },
+      {
+        "example": "portfolio-os",
+        "where": "project/src/pages/scenario.js:56"
+      },
+      {
+        "example": "royalty-close",
+        "where": "project/src/app.js:481"
+      },
+      {
+        "example": "snowline",
+        "where": "project/src/app.js:359"
+      },
+      {
+        "example": "stock-rotation",
+        "where": "project/src/app.js:187"
+      },
+      {
+        "example": "thessaloniki-on-the-move",
+        "where": "project/src/app.js:671"
+      }
+    ],
+    "excel-export": [
+      {
+        "example": "agency-client-reporting",
+        "where": "project/src/app.js:385"
+      },
+      {
+        "example": "ed-wait-watch",
+        "where": "project/src/export.js:21"
+      },
+      {
+        "example": "hotel-weather",
+        "where": "project/src/export.js:22"
+      },
+      {
+        "example": "labour-market-pulse",
+        "where": "project/src/export.js:30"
+      },
+      {
+        "example": "league-table-planner",
+        "where": "project/src/export.js:22"
+      },
+      {
+        "example": "people-intelligence",
+        "where": "project/src/export.js:9"
+      },
+      {
+        "example": "portfolio-os",
+        "where": "project/src/xlsx.js:207"
+      },
+      {
+        "example": "report-builder",
+        "where": "project/src/builder.js:281"
+      },
+      {
+        "example": "royalty-close",
+        "where": "project/src/app.js:639"
+      },
+      {
+        "example": "snowline",
+        "where": "project/src/export.js:22"
+      },
+      {
+        "example": "stock-rotation",
+        "where": "project/src/app.js:274"
+      },
+      {
+        "example": "superstore-explorer",
+        "where": "project/src/exports.js:96"
+      },
+      {
+        "example": "thessaloniki-on-the-move",
+        "where": "project/src/report.js:23"
+      }
+    ],
+    "pdf-export": [
+      {
+        "example": "portfolio-os",
+        "where": "project/src/export.js:48"
+      }
+    ],
+    "data-blending": [
+      {
+        "example": "hotel-weather",
+        "where": "project/src/duck.js:71"
+      }
+    ],
+    "story-mode": [
+      {
+        "example": "thessaloniki-on-the-move",
+        "where": "project/src/app.js:183"
+      }
+    ],
+    "drill-down": [
+      {
+        "example": "people-intelligence",
+        "where": "project/src/app.js:488"
+      },
+      {
+        "example": "royalty-close",
+        "where": "project/src/app.js:370"
+      },
+      {
+        "example": "superstore-explorer",
+        "where": "project/src/app.js:562"
+      },
+      {
+        "example": "thessaloniki-on-the-move",
+        "where": "project/src/app.js:712"
+      }
+    ],
+    "narrative-headline": [
+      {
+        "example": "agency-client-reporting",
+        "where": "project/src/explain.js:37"
+      },
+      {
+        "example": "ed-wait-watch",
+        "where": "project/src/app.js:347"
+      },
+      {
+        "example": "hotel-weather",
+        "where": "project/src/app.js:395"
+      },
+      {
+        "example": "labour-market-pulse",
+        "where": "project/src/app.js:417"
+      },
+      {
+        "example": "league-table-planner",
+        "where": "project/src/app.js:147"
+      },
+      {
+        "example": "people-intelligence",
+        "where": "project/src/home.js:16"
+      },
+      {
+        "example": "revenue-war-room",
+        "where": "project/src/app.js:197"
+      },
+      {
+        "example": "royalty-close",
+        "where": "project/src/app.js:300"
+      },
+      {
+        "example": "snowline",
+        "where": "project/src/app.js:274"
+      },
+      {
+        "example": "superstore-explorer",
+        "where": "project/src/app.js:743"
+      },
+      {
+        "example": "thessaloniki-on-the-move",
+        "where": "project/src/app.js:607"
+      }
+    ],
+    "record-drawer": [
+      {
+        "example": "lending-affordability",
+        "where": "project/src/workflow.js:118"
+      },
+      {
+        "example": "portfolio-os",
+        "where": "project/src/core.js:94"
+      },
+      {
+        "example": "revenue-war-room",
+        "where": "project/src/app.js:523"
+      }
+    ],
+    "saved-views": [
+      {
+        "example": "people-intelligence",
+        "where": "project/src/builder.js:222"
+      },
+      {
+        "example": "report-builder",
+        "where": "project/src/builder.js:252"
+      }
+    ],
+    "role-switcher": [
+      {
+        "example": "agency-client-reporting",
+        "where": "project/src/workflow.js:66"
+      },
+      {
+        "example": "ed-wait-watch",
+        "where": "project/src/workflow.js:28"
+      },
+      {
+        "example": "hotel-weather",
+        "where": "project/src/app.js:130"
+      },
+      {
+        "example": "people-intelligence",
+        "where": "project/src/app.js:680"
+      },
+      {
+        "example": "portfolio-os",
+        "where": "project/src/core.js:46"
+      },
+      {
+        "example": "royalty-close",
+        "where": "project/src/app.js:285"
+      },
+      {
+        "example": "snowline",
+        "where": "project/src/workflow.js:75"
+      },
+      {
+        "example": "stock-rotation",
+        "where": "project/src/app.js:92"
+      }
+    ],
+    "map": [
+      {
+        "example": "people-intelligence",
+        "where": "project/src/basemap.js:37"
+      },
+      {
+        "example": "thessaloniki-on-the-move",
+        "where": "project/src/dashboard.js:130"
+      }
+    ]
+  }
+}

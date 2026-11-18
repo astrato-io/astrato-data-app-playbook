@@ -1,0 +1,3071 @@
+{
+  "fileVersion": 3,
+  "name": "Corvo – Inventory Rotation (illustrative synthetic data)",
+  "datasource": "00000000-0000-0000-0000-000000000000",
+  "locale": {
+    "number": {
+      "decimalSep": ".",
+      "thousandSep": ","
+    },
+    "formats": {
+      "date": "yyyy-mm-dd",
+      "time": "hh:mm:ss",
+      "money": "$#,###.00",
+      "number": "#,##0.00",
+      "datetime": "yyyy-mm-dd hh:mm:ss",
+      "numberInt": "#,##0"
+    },
+    "calendar": {
+      "dayNames": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "monthNames": [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+      ],
+      "dayNamesAbbr": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ],
+      "monthNamesAbbr": [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec"
+      ]
+    },
+    "timezone": "Europe/London"
+  },
+  "views": {
+    "Batch Rotation": {
+      "fields": {
+        "SKU": {
+          "source": "SKU",
+          "dataType": "string"
+        },
+        "STATUS": {
+          "source": "STATUS",
+          "dataType": "string"
+        },
+        "BATCH_ID": {
+          "source": "BATCH_ID",
+          "dataType": "string"
+        },
+        "CATEGORY": {
+          "source": "CATEGORY",
+          "dataType": "string"
+        },
+        "EXPIRY_BAND": {
+          "source": "EXPIRY_BAND",
+          "dataType": "string"
+        },
+        "EXPIRY_DATE": {
+          "source": "EXPIRY_DATE",
+          "dataType": "date"
+        },
+        "QTY_AT_RISK": {
+          "source": "QTY_AT_RISK",
+          "dataType": "int"
+        },
+        "QTY_ON_HAND": {
+          "source": "QTY_ON_HAND",
+          "dataType": "int"
+        },
+        "PRODUCT_NAME": {
+          "source": "PRODUCT_NAME",
+          "dataType": "string"
+        },
+        "WAREHOUSE_ID": {
+          "source": "WAREHOUSE_ID",
+          "dataType": "string"
+        },
+        "RECEIVED_DATE": {
+          "source": "RECEIVED_DATE",
+          "dataType": "date"
+        },
+        "DAILY_RUN_RATE": {
+          "source": "DAILY_RUN_RATE",
+          "dataType": "float"
+        },
+        "DAYS_TO_EXPIRY": {
+          "source": "DAYS_TO_EXPIRY",
+          "dataType": "int"
+        },
+        "STOCK_VALUE_GBP": {
+          "source": "STOCK_VALUE_GBP",
+          "dataType": "float"
+        },
+        "VALUE_AT_RISK_GBP": {
+          "source": "VALUE_AT_RISK_GBP",
+          "dataType": "float"
+        }
+      },
+      "source": {
+        "type": "sql",
+        "statement": "WITH d AS (SELECT \"sku\", \"warehouse_id\", SUM(\"qty_shipped\")/28.0 AS daily FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_SALES_ORDERS WHERE \"order_date\" >= DATEADD(day,-28,CURRENT_DATE) GROUP BY 1,2), b AS (SELECT x.*, DATEDIFF(day,CURRENT_DATE,x.\"expiry_date\") AS dte, COALESCE(d.daily,0) AS daily, COALESCE(SUM(x.\"qty_on_hand\") OVER (PARTITION BY x.\"sku\",x.\"warehouse_id\" ORDER BY x.\"expiry_date\",x.\"batch_id\" ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),0) AS ahead FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES x LEFT JOIN d ON d.\"sku\"=x.\"sku\" AND d.\"warehouse_id\"=x.\"warehouse_id\" WHERE x.\"qty_on_hand\">0) SELECT b.\"batch_id\" AS batch_id, b.\"sku\" AS sku, p.\"product_name\" AS product_name, p.\"category\" AS category, b.\"warehouse_id\" AS warehouse_id, b.\"status\" AS status, b.\"received_date\" AS received_date, b.\"expiry_date\" AS expiry_date, b.dte AS days_to_expiry, CASE WHEN b.dte<=30 THEN '0-30 days' WHEN b.dte<=60 THEN '31-60 days' WHEN b.dte<=90 THEN '61-90 days' WHEN b.dte<=180 THEN '91-180 days' ELSE '180+ days' END AS expiry_band, b.\"qty_on_hand\" AS qty_on_hand, b.\"qty_on_hand\"*b.\"unit_cost_gbp\" AS stock_value_gbp, ROUND(b.daily,1) AS daily_run_rate, ROUND(b.\"qty_on_hand\"-GREATEST(0,LEAST(b.\"qty_on_hand\",b.daily*b.dte-b.ahead))) AS qty_at_risk, ROUND((b.\"qty_on_hand\"-GREATEST(0,LEAST(b.\"qty_on_hand\",b.daily*b.dte-b.ahead)))*b.\"unit_cost_gbp\",2) AS value_at_risk_gbp FROM b JOIN ASTRATO_GALLERY.ASTRATO.CORVO_INV_PRODUCTS p ON p.\"sku\"=b.\"sku\""
+      },
+      "description": "One row per live batch, with days to expiry and FEFO-projected quantity at risk of expiring unsold, using the last 28 days of shipments as the run rate."
+    },
+    "Stock Position": {
+      "fields": {
+        "SKU": {
+          "source": "SKU",
+          "dataType": "string"
+        },
+        "CATEGORY": {
+          "source": "CATEGORY",
+          "dataType": "string"
+        },
+        "NEXT_PO_DUE": {
+          "source": "NEXT_PO_DUE",
+          "dataType": "date"
+        },
+        "QTY_INBOUND": {
+          "source": "QTY_INBOUND",
+          "dataType": "int"
+        },
+        "SUPPLIER_ID": {
+          "source": "SUPPLIER_ID",
+          "dataType": "string"
+        },
+        "PRODUCT_NAME": {
+          "source": "PRODUCT_NAME",
+          "dataType": "string"
+        },
+        "STOCK_STATUS": {
+          "source": "STOCK_STATUS",
+          "dataType": "string"
+        },
+        "WAREHOUSE_ID": {
+          "source": "WAREHOUSE_ID",
+          "dataType": "string"
+        },
+        "DAYS_OF_COVER": {
+          "source": "DAYS_OF_COVER",
+          "dataType": "float"
+        },
+        "QTY_AVAILABLE": {
+          "source": "QTY_AVAILABLE",
+          "dataType": "int"
+        },
+        "DAILY_RUN_RATE": {
+          "source": "DAILY_RUN_RATE",
+          "dataType": "float"
+        },
+        "QTY_QUARANTINE": {
+          "source": "QTY_QUARANTINE",
+          "dataType": "int"
+        },
+        "REORDER_COVER_DAYS": {
+          "source": "REORDER_COVER_DAYS",
+          "dataType": "int"
+        },
+        "SUGGESTED_ORDER_QTY": {
+          "source": "SUGGESTED_ORDER_QTY",
+          "dataType": "int"
+        }
+      },
+      "source": {
+        "type": "sql",
+        "statement": "WITH k AS (SELECT p.\"sku\", p.\"product_name\", p.\"category\", p.\"supplier_id\", p.\"reorder_cover_days\", w.\"warehouse_id\" FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_PRODUCTS p CROSS JOIN ASTRATO_GALLERY.ASTRATO.CORVO_INV_WAREHOUSES w), s AS (SELECT \"sku\",\"warehouse_id\",SUM(IFF(\"status\"='Available',\"qty_on_hand\",0)) AS avail, SUM(IFF(\"status\"='Quarantine',\"qty_on_hand\",0)) AS quar FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES GROUP BY 1,2), d AS (SELECT \"sku\",\"warehouse_id\",SUM(\"qty_shipped\")/28.0 AS daily FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_SALES_ORDERS WHERE \"order_date\">=DATEADD(day,-28,CURRENT_DATE) GROUP BY 1,2), o AS (SELECT \"sku\",\"warehouse_id\",SUM(\"qty_ordered\") AS inbound, MIN(\"expected_date\") AS next_due FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_PURCHASE_ORDERS WHERE \"status\" IN ('Open','Delayed') GROUP BY 1,2), c AS (SELECT k.*, COALESCE(s.avail,0) avail, COALESCE(s.quar,0) quar, COALESCE(d.daily,0) daily, COALESCE(o.inbound,0) inbound, o.next_due FROM k LEFT JOIN s ON s.\"sku\"=k.\"sku\" AND s.\"warehouse_id\"=k.\"warehouse_id\" LEFT JOIN d ON d.\"sku\"=k.\"sku\" AND d.\"warehouse_id\"=k.\"warehouse_id\" LEFT JOIN o ON o.\"sku\"=k.\"sku\" AND o.\"warehouse_id\"=k.\"warehouse_id\") SELECT \"sku\" AS sku, \"product_name\" AS product_name, \"category\" AS category, \"supplier_id\" AS supplier_id, \"warehouse_id\" AS warehouse_id, avail AS qty_available, quar AS qty_quarantine, ROUND(daily,1) AS daily_run_rate, ROUND(avail/NULLIF(daily,0),1) AS days_of_cover, \"reorder_cover_days\" AS reorder_cover_days, inbound AS qty_inbound, next_due AS next_po_due, CASE WHEN avail<daily*7 THEN 'Stockout risk' WHEN avail+inbound<daily*\"reorder_cover_days\" THEN 'Reorder now' WHEN avail>daily*120 THEN 'Overstocked' ELSE 'Healthy' END AS stock_status, GREATEST(0,CEIL(daily*(\"reorder_cover_days\"+30)-avail-inbound)) AS suggested_order_qty FROM c"
+      },
+      "description": "One row per SKU and warehouse: available stock, run rate, days of cover, inbound purchase orders, reorder status and suggested order quantity."
+    },
+    "Corvo Inv Batches": {
+      "fields": {
+        "Sku": {
+          "source": "sku",
+          "dataType": "string"
+        },
+        "Status": {
+          "source": "status",
+          "dataType": "string"
+        },
+        "Batch ID": {
+          "source": "batch_id",
+          "dataType": "string"
+        },
+        "Expiry Date": {
+          "source": "expiry_date",
+          "dataType": "date"
+        },
+        "Qty On Hand": {
+          "source": "qty_on_hand",
+          "dataType": "int"
+        },
+        "Supplier ID": {
+          "source": "supplier_id",
+          "dataType": "string"
+        },
+        "Qty Received": {
+          "source": "qty_received",
+          "dataType": "int"
+        },
+        "Warehouse ID": {
+          "source": "warehouse_id",
+          "dataType": "string"
+        },
+        "Received Date": {
+          "source": "received_date",
+          "dataType": "date"
+        },
+        "Unit Cost Gbp": {
+          "source": "unit_cost_gbp",
+          "dataType": "float"
+        }
+      },
+      "source": {
+        "type": "table",
+        "table": "CORVO_INV_BATCHES",
+        "schema": "ASTRATO",
+        "database": "ASTRATO_GALLERY",
+        "objectType": "BASE TABLE"
+      }
+    },
+    "Corvo Inv Movements": {
+      "fields": {
+        "Qty": {
+          "source": "qty",
+          "dataType": "int"
+        },
+        "Sku": {
+          "source": "sku",
+          "dataType": "string"
+        },
+        "Month": {
+          "source": "TO_CHAR(\"movement_date\",'YYYY-MM')",
+          "dataType": "string",
+          "sourceType": "expression"
+        },
+        "Period": {
+          "source": "CASE WHEN \"movement_date\" > DATEADD(day,-30,CURRENT_DATE) THEN 'Last 30d' WHEN \"movement_date\" > DATEADD(day,-60,CURRENT_DATE) THEN 'Prior 30d' ELSE 'Older' END",
+          "dataType": "string",
+          "sourceType": "expression"
+        },
+        "Batch ID": {
+          "source": "batch_id",
+          "dataType": "string"
+        },
+        "Reference": {
+          "source": "reference",
+          "dataType": "string"
+        },
+        "Created By": {
+          "source": "created_by",
+          "dataType": "string"
+        },
+        "Movement ID": {
+          "source": "movement_id",
+          "dataType": "string"
+        },
+        "Warehouse ID": {
+          "source": "warehouse_id",
+          "dataType": "string"
+        },
+        "Movement Date": {
+          "source": "movement_date",
+          "dataType": "date"
+        },
+        "Movement Type": {
+          "source": "movement_type",
+          "dataType": "string"
+        }
+      },
+      "source": {
+        "type": "table",
+        "table": "CORVO_INV_MOVEMENTS",
+        "schema": "ASTRATO",
+        "database": "ASTRATO_GALLERY",
+        "objectType": "BASE TABLE"
+      }
+    },
+    "Corvo Inv Products": {
+      "fields": {
+        "Sku": {
+          "source": "sku",
+          "dataType": "string"
+        },
+        "Storage": {
+          "source": "storage",
+          "dataType": "string"
+        },
+        "Category": {
+          "source": "category",
+          "dataType": "string"
+        },
+        "Supplier ID": {
+          "source": "supplier_id",
+          "dataType": "string"
+        },
+        "Product Name": {
+          "source": "product_name",
+          "dataType": "string"
+        },
+        "Unit Cost Gbp": {
+          "source": "unit_cost_gbp",
+          "dataType": "float"
+        },
+        "Unit Price Gbp": {
+          "source": "unit_price_gbp",
+          "dataType": "int"
+        },
+        "Shelf Life Days": {
+          "source": "shelf_life_days",
+          "dataType": "int"
+        },
+        "Reorder Cover Days": {
+          "source": "reorder_cover_days",
+          "dataType": "int"
+        },
+        "Min Remaining Shelf Days": {
+          "source": "min_remaining_shelf_days",
+          "dataType": "int"
+        }
+      },
+      "source": {
+        "type": "table",
+        "table": "CORVO_INV_PRODUCTS",
+        "schema": "ASTRATO",
+        "database": "ASTRATO_GALLERY",
+        "objectType": "BASE TABLE"
+      }
+    },
+    "Corvo Inv Purchase Orders": {
+      "fields": {
+        "Sku": {
+          "source": "sku",
+          "dataType": "string"
+        },
+        "Month": {
+          "source": "TO_CHAR(\"order_date\",'YYYY-MM')",
+          "dataType": "string",
+          "sourceType": "expression"
+        },
+        "Po ID": {
+          "source": "po_id",
+          "dataType": "string"
+        },
+        "Period": {
+          "source": "CASE WHEN \"order_date\" > DATEADD(day,-30,CURRENT_DATE) THEN 'Last 30d' WHEN \"order_date\" > DATEADD(day,-60,CURRENT_DATE) THEN 'Prior 30d' ELSE 'Older' END",
+          "dataType": "string",
+          "sourceType": "expression"
+        },
+        "Status": {
+          "source": "status",
+          "dataType": "string"
+        },
+        "Order Date": {
+          "source": "order_date",
+          "dataType": "date"
+        },
+        "Qty Ordered": {
+          "source": "qty_ordered",
+          "dataType": "int"
+        },
+        "Supplier ID": {
+          "source": "supplier_id",
+          "dataType": "string"
+        },
+        "Qty Received": {
+          "source": "qty_received",
+          "dataType": "int"
+        },
+        "Warehouse ID": {
+          "source": "warehouse_id",
+          "dataType": "string"
+        },
+        "Expected Date": {
+          "source": "expected_date",
+          "dataType": "date"
+        },
+        "Received Date": {
+          "source": "received_date",
+          "dataType": "date"
+        }
+      },
+      "source": {
+        "type": "table",
+        "table": "CORVO_INV_PURCHASE_ORDERS",
+        "schema": "ASTRATO",
+        "database": "ASTRATO_GALLERY",
+        "objectType": "BASE TABLE"
+      }
+    },
+    "Corvo Inv Sales Orders": {
+      "fields": {
+        "Sku": {
+          "source": "sku",
+          "dataType": "string"
+        },
+        "Month": {
+          "source": "TO_CHAR(\"order_date\",'YYYY-MM')",
+          "dataType": "string",
+          "sourceType": "expression"
+        },
+        "Period": {
+          "source": "CASE WHEN \"order_date\" > DATEADD(day,-30,CURRENT_DATE) THEN 'Last 30d' WHEN \"order_date\" > DATEADD(day,-60,CURRENT_DATE) THEN 'Prior 30d' ELSE 'Older' END",
+          "dataType": "string",
+          "sourceType": "expression"
+        },
+        "Status": {
+          "source": "status",
+          "dataType": "string"
+        },
+        "Channel": {
+          "source": "channel",
+          "dataType": "string"
+        },
+        "Order ID": {
+          "source": "order_id",
+          "dataType": "string"
+        },
+        "Order Date": {
+          "source": "order_date",
+          "dataType": "date"
+        },
+        "Qty Ordered": {
+          "source": "qty_ordered",
+          "dataType": "int"
+        },
+        "Qty Shipped": {
+          "source": "qty_shipped",
+          "dataType": "int"
+        },
+        "Revenue Gbp": {
+          "source": "revenue_gbp",
+          "dataType": "int"
+        },
+        "Warehouse ID": {
+          "source": "warehouse_id",
+          "dataType": "string"
+        }
+      },
+      "source": {
+        "type": "table",
+        "table": "CORVO_INV_SALES_ORDERS",
+        "schema": "ASTRATO",
+        "database": "ASTRATO_GALLERY",
+        "objectType": "BASE TABLE"
+      }
+    },
+    "Corvo Inv Suppliers": {
+      "fields": {
+        "Country": {
+          "source": "country",
+          "dataType": "string"
+        },
+        "Supplier ID": {
+          "source": "supplier_id",
+          "dataType": "string"
+        },
+        "On Time Rate": {
+          "source": "on_time_rate",
+          "dataType": "float"
+        },
+        "Supplier Name": {
+          "source": "supplier_name",
+          "dataType": "string"
+        },
+        "Lead Time Days": {
+          "source": "lead_time_days",
+          "dataType": "int"
+        }
+      },
+      "source": {
+        "type": "table",
+        "table": "CORVO_INV_SUPPLIERS",
+        "schema": "ASTRATO",
+        "database": "ASTRATO_GALLERY",
+        "objectType": "BASE TABLE"
+      }
+    },
+    "Corvo Inv Warehouses": {
+      "fields": {
+        "Country": {
+          "source": "country",
+          "dataType": "string"
+        },
+        "Warehouse ID": {
+          "source": "warehouse_id",
+          "dataType": "string"
+        },
+        "Warehouse Name": {
+          "source": "warehouse_name",
+          "dataType": "string"
+        },
+        "Pick Cutoff Hour": {
+          "source": "pick_cutoff_hour",
+          "dataType": "int"
+        }
+      },
+      "source": {
+        "type": "table",
+        "table": "CORVO_INV_WAREHOUSES",
+        "schema": "ASTRATO",
+        "database": "ASTRATO_GALLERY",
+        "objectType": "BASE TABLE"
+      }
+    }
+  },
+  "joins": [
+    {
+      "views": [
+        "Batch Rotation",
+        "Corvo Inv Products"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Batch Rotation",
+                "field": "SKU"
+              }
+            },
+            {
+              "reference": {
+                "view": "Corvo Inv Products",
+                "field": "Sku"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    },
+    {
+      "views": [
+        "Batch Rotation",
+        "Corvo Inv Warehouses"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Batch Rotation",
+                "field": "WAREHOUSE_ID"
+              }
+            },
+            {
+              "reference": {
+                "view": "Corvo Inv Warehouses",
+                "field": "Warehouse ID"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    },
+    {
+      "views": [
+        "Stock Position",
+        "Corvo Inv Products"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Stock Position",
+                "field": "SKU"
+              }
+            },
+            {
+              "reference": {
+                "view": "Corvo Inv Products",
+                "field": "Sku"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    },
+    {
+      "views": [
+        "Stock Position",
+        "Corvo Inv Suppliers"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Stock Position",
+                "field": "SUPPLIER_ID"
+              }
+            },
+            {
+              "reference": {
+                "view": "Corvo Inv Suppliers",
+                "field": "Supplier ID"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    },
+    {
+      "views": [
+        "Stock Position",
+        "Corvo Inv Warehouses"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Stock Position",
+                "field": "WAREHOUSE_ID"
+              }
+            },
+            {
+              "reference": {
+                "view": "Corvo Inv Warehouses",
+                "field": "Warehouse ID"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    },
+    {
+      "views": [
+        "Corvo Inv Movements",
+        "Corvo Inv Batches"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Corvo Inv Movements",
+                "field": "Batch ID"
+              }
+            },
+            {
+              "reference": {
+                "view": "Corvo Inv Batches",
+                "field": "Batch ID"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    },
+    {
+      "views": [
+        "Corvo Inv Batches",
+        "Corvo Inv Products"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Corvo Inv Batches",
+                "field": "Sku"
+              }
+            },
+            {
+              "reference": {
+                "view": "Corvo Inv Products",
+                "field": "Sku"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    },
+    {
+      "views": [
+        "Corvo Inv Batches",
+        "Corvo Inv Suppliers"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Corvo Inv Batches",
+                "field": "Supplier ID"
+              }
+            },
+            {
+              "reference": {
+                "view": "Corvo Inv Suppliers",
+                "field": "Supplier ID"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    },
+    {
+      "views": [
+        "Corvo Inv Batches",
+        "Corvo Inv Warehouses"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Corvo Inv Batches",
+                "field": "Warehouse ID"
+              }
+            },
+            {
+              "reference": {
+                "view": "Corvo Inv Warehouses",
+                "field": "Warehouse ID"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    },
+    {
+      "views": [
+        "Corvo Inv Purchase Orders",
+        "Corvo Inv Products"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Corvo Inv Purchase Orders",
+                "field": "Sku"
+              }
+            },
+            {
+              "reference": {
+                "view": "Corvo Inv Products",
+                "field": "Sku"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    },
+    {
+      "views": [
+        "Corvo Inv Sales Orders",
+        "Corvo Inv Products"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Corvo Inv Sales Orders",
+                "field": "Sku"
+              }
+            },
+            {
+              "reference": {
+                "view": "Corvo Inv Products",
+                "field": "Sku"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    },
+    {
+      "views": [
+        "Corvo Inv Purchase Orders",
+        "Corvo Inv Suppliers"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Corvo Inv Purchase Orders",
+                "field": "Supplier ID"
+              }
+            },
+            {
+              "reference": {
+                "view": "Corvo Inv Suppliers",
+                "field": "Supplier ID"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    },
+    {
+      "views": [
+        "Corvo Inv Purchase Orders",
+        "Corvo Inv Warehouses"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Corvo Inv Purchase Orders",
+                "field": "Warehouse ID"
+              }
+            },
+            {
+              "reference": {
+                "view": "Corvo Inv Warehouses",
+                "field": "Warehouse ID"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    },
+    {
+      "views": [
+        "Corvo Inv Sales Orders",
+        "Corvo Inv Warehouses"
+      ],
+      "conditions": [
+        {
+          "operator": "equals",
+          "arguments": [
+            {
+              "reference": {
+                "view": "Corvo Inv Sales Orders",
+                "field": "Warehouse ID"
+              }
+            },
+            {
+              "reference": {
+                "view": "Corvo Inv Warehouses",
+                "field": "Warehouse ID"
+              }
+            }
+          ]
+        }
+      ],
+      "cardinality": "many-to-one"
+    }
+  ],
+  "dimensions": {
+    "Batch": {
+      "kind": "field",
+      "reference": {
+        "view": "Batch Rotation",
+        "field": "BATCH_ID"
+      },
+      "resultType": "string",
+      "description": "Live batch."
+    },
+    "Batch Status": {
+      "kind": "field",
+      "reference": {
+        "view": "Batch Rotation",
+        "field": "STATUS"
+      },
+      "resultType": "string",
+      "description": "Available or Quarantine."
+    },
+    "Category": {
+      "kind": "field",
+      "reference": {
+        "view": "Corvo Inv Products",
+        "field": "Category"
+      },
+      "resultType": "string",
+      "description": "Product category: Diagnostics, Snacks, Vitamins."
+    },
+    "Channel": {
+      "kind": "field",
+      "reference": {
+        "view": "Corvo Inv Sales Orders",
+        "field": "Channel"
+      },
+      "resultType": "string",
+      "description": "Sales channel."
+    },
+    "Expiry Band": {
+      "kind": "field",
+      "reference": {
+        "view": "Batch Rotation",
+        "field": "EXPIRY_BAND"
+      },
+      "resultType": "string",
+      "description": "Days-to-expiry band."
+    },
+    "Expiry Date": {
+      "kind": "field",
+      "reference": {
+        "view": "Batch Rotation",
+        "field": "EXPIRY_DATE"
+      },
+      "resultType": "date",
+      "description": "Batch expiry date."
+    },
+    "Movement Month": {
+      "kind": "field",
+      "reference": {
+        "view": "Corvo Inv Movements",
+        "field": "Month"
+      },
+      "resultType": "string",
+      "description": "Month of the movement."
+    },
+    "Movement Type": {
+      "kind": "field",
+      "reference": {
+        "view": "Corvo Inv Movements",
+        "field": "Movement Type"
+      },
+      "resultType": "string",
+      "description": "Receipt, Customer Shipment, Write-off."
+    },
+    "Order Month": {
+      "kind": "field",
+      "reference": {
+        "view": "Corvo Inv Sales Orders",
+        "field": "Month"
+      },
+      "resultType": "string",
+      "description": "Month of the customer order."
+    },
+    "PO": {
+      "kind": "field",
+      "reference": {
+        "view": "Corvo Inv Purchase Orders",
+        "field": "Po ID"
+      },
+      "resultType": "string",
+      "description": "Purchase order."
+    },
+    "PO Expected Date": {
+      "kind": "field",
+      "reference": {
+        "view": "Corvo Inv Purchase Orders",
+        "field": "Expected Date"
+      },
+      "resultType": "date",
+      "description": "Expected delivery date."
+    },
+    "PO Status": {
+      "kind": "field",
+      "reference": {
+        "view": "Corvo Inv Purchase Orders",
+        "field": "Status"
+      },
+      "resultType": "string",
+      "description": "Open, Delayed, Received."
+    },
+    "Product": {
+      "kind": "field",
+      "reference": {
+        "view": "Corvo Inv Products",
+        "field": "Product Name"
+      },
+      "resultType": "string",
+      "description": "Product name."
+    },
+    "Stock Status": {
+      "kind": "field",
+      "reference": {
+        "view": "Stock Position",
+        "field": "STOCK_STATUS"
+      },
+      "resultType": "string",
+      "description": "Stockout risk, Reorder now, Healthy, Overstocked."
+    },
+    "Storage": {
+      "kind": "field",
+      "reference": {
+        "view": "Corvo Inv Products",
+        "field": "Storage"
+      },
+      "resultType": "string",
+      "description": "Storage requirement."
+    },
+    "Supplier": {
+      "kind": "field",
+      "reference": {
+        "view": "Corvo Inv Suppliers",
+        "field": "Supplier Name"
+      },
+      "resultType": "string",
+      "description": "Supplier."
+    },
+    "Warehouse": {
+      "kind": "field",
+      "reference": {
+        "view": "Corvo Inv Warehouses",
+        "field": "Warehouse Name"
+      },
+      "resultType": "string",
+      "description": "Fulfilment warehouse."
+    }
+  },
+  "measures": {
+    "Daily Run Rate": {
+      "description": "Units per day over the last 28 days.",
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Stock Position",
+              "field": "DAILY_RUN_RATE"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0.0"
+      }
+    },
+    "Days Of Cover": {
+      "description": "Available units over the daily run rate.",
+      "resultType": "float",
+      "expression": "{m1}/{m2}",
+      "m1": {
+        "reference": {
+          "measure": "Units Available"
+        }
+      },
+      "m2": {
+        "reference": {
+          "measure": "Daily Run Rate"
+        }
+      },
+      "format": {
+        "pattern": "0.0"
+      }
+    },
+    "Delayed PO Units": {
+      "description": "Units on POs past their expected date.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Purchase Orders",
+              "field": "Qty Ordered"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Purchase Orders",
+                  "field": "Status"
+                }
+              },
+              {
+                "value": "Delayed",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Delayed Share": {
+      "description": "Delayed PO units as a share of inbound units.",
+      "resultType": "float",
+      "expression": "{m1}/{m2}",
+      "m1": {
+        "reference": {
+          "measure": "Delayed PO Units"
+        }
+      },
+      "m2": {
+        "reference": {
+          "measure": "Units Inbound"
+        }
+      },
+      "format": {
+        "pattern": "0.0%"
+      }
+    },
+    "Net Movement": {
+      "description": "Net units in less out.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Movements",
+              "field": "Qty"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "+#,##0;-#,##0;0"
+      }
+    },
+    "Net Movement 30d": {
+      "description": "Net change in stock over the last 30 days.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Movements",
+              "field": "Qty"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Movements",
+                  "field": "Period"
+                }
+              },
+              {
+                "value": "Last 30d",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "+#,##0;-#,##0;0"
+      }
+    },
+    "PO Units Ordered": {
+      "description": "Units on purchase orders by order date.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Purchase Orders",
+              "field": "Qty Ordered"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Received 30d": {
+      "description": "Units received. Last 30 days.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Movements",
+              "field": "Qty"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Movements",
+                  "field": "Period"
+                }
+              },
+              {
+                "value": "Last 30d",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "inList",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Movements",
+                  "field": "Movement Type"
+                }
+              },
+              {
+                "value": "Receipt",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Received Change": {
+      "description": "Received, last 30 days against the prior 30.",
+      "resultType": "float",
+      "expression": "({m1}-{m2})/{m2}",
+      "m1": {
+        "reference": {
+          "measure": "Received 30d"
+        }
+      },
+      "m2": {
+        "reference": {
+          "measure": "Received Prior 30d"
+        }
+      },
+      "format": {
+        "pattern": "+0.0%;-0.0%;0.0%"
+      }
+    },
+    "Received Prior 30d": {
+      "description": "Units received. The 30 days before that.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Movements",
+              "field": "Qty"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Movements",
+                  "field": "Period"
+                }
+              },
+              {
+                "value": "Prior 30d",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "inList",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Movements",
+                  "field": "Movement Type"
+                }
+              },
+              {
+                "value": "Receipt",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Revenue": {
+      "description": "Order revenue, GBP.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Sales Orders",
+              "field": "Revenue Gbp"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "£#,##0"
+      }
+    },
+    "Revenue 30d": {
+      "description": "Order revenue, GBP. Last 30 days.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Sales Orders",
+              "field": "Revenue Gbp"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Sales Orders",
+                  "field": "Period"
+                }
+              },
+              {
+                "value": "Last 30d",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "£#,##0"
+      }
+    },
+    "Revenue Change": {
+      "description": "Revenue, last 30 days against the prior 30.",
+      "resultType": "float",
+      "expression": "({m1}-{m2})/{m2}",
+      "m1": {
+        "reference": {
+          "measure": "Revenue 30d"
+        }
+      },
+      "m2": {
+        "reference": {
+          "measure": "Revenue Prior 30d"
+        }
+      },
+      "format": {
+        "pattern": "+0.0%;-0.0%;0.0%"
+      }
+    },
+    "Revenue Prior 30d": {
+      "description": "Order revenue, GBP. The 30 days before that.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Sales Orders",
+              "field": "Revenue Gbp"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Sales Orders",
+                  "field": "Period"
+                }
+              },
+              {
+                "value": "Prior 30d",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "£#,##0"
+      }
+    },
+    "Shipped 30d": {
+      "description": "Units shipped to customers. Last 30 days.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Sales Orders",
+              "field": "Qty Shipped"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Sales Orders",
+                  "field": "Period"
+                }
+              },
+              {
+                "value": "Last 30d",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Shipped Change": {
+      "description": "Shipped, last 30 days against the prior 30.",
+      "resultType": "float",
+      "expression": "({m1}-{m2})/{m2}",
+      "m1": {
+        "reference": {
+          "measure": "Shipped 30d"
+        }
+      },
+      "m2": {
+        "reference": {
+          "measure": "Shipped Prior 30d"
+        }
+      },
+      "format": {
+        "pattern": "+0.0%;-0.0%;0.0%"
+      }
+    },
+    "Shipped Prior 30d": {
+      "description": "Units shipped to customers. The 30 days before that.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Sales Orders",
+              "field": "Qty Shipped"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Sales Orders",
+                  "field": "Period"
+                }
+              },
+              {
+                "value": "Prior 30d",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Stock Value": {
+      "description": "Live stock at cost, GBP.",
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Batch Rotation",
+              "field": "STOCK_VALUE_GBP"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "£#,##0"
+      }
+    },
+    "Suggested Order Units": {
+      "description": "Units to order to restore cover.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Stock Position",
+              "field": "SUGGESTED_ORDER_QTY"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Units At Risk": {
+      "description": "Units projected to expire unsold, FEFO at the 28-day run rate.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Batch Rotation",
+              "field": "QTY_AT_RISK"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Units Available": {
+      "description": "Units available to ship, excluding quarantine.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Stock Position",
+              "field": "QTY_AVAILABLE"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Units Expired": {
+      "description": "Units lost to expiry or write-off, as a negative total.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Movements",
+              "field": "Qty"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "inList",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Movements",
+                  "field": "Movement Type"
+                }
+              },
+              {
+                "value": "Expiry Write-off",
+                "dataType": "string"
+              },
+              {
+                "value": "Manual Write-off",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Units Expiring 30d": {
+      "description": "Units on hand expiring within 30 days.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Batch Rotation",
+              "field": "QTY_ON_HAND"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Batch Rotation",
+                  "field": "EXPIRY_BAND"
+                }
+              },
+              {
+                "value": "0-30 days",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Units In": {
+      "description": "Units received into stock.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Movements",
+              "field": "Qty"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Movements",
+                  "field": "Movement Type"
+                }
+              },
+              {
+                "value": "Receipt",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Units Inbound": {
+      "description": "Units on open or delayed purchase orders.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Stock Position",
+              "field": "QTY_INBOUND"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Units On Hand": {
+      "description": "Units in live batches, including quarantine.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Batch Rotation",
+              "field": "QTY_ON_HAND"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Units On Hand 30d Ago": {
+      "description": "Units on hand 30 days ago: today less the net movement since.",
+      "resultType": "int",
+      "expression": "{m1}-{m2}",
+      "m1": {
+        "reference": {
+          "measure": "Units On Hand"
+        }
+      },
+      "m2": {
+        "reference": {
+          "measure": "Net Movement 30d"
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Units On Hand Change": {
+      "description": "Net movement as a share of stock 30 days ago.",
+      "resultType": "float",
+      "expression": "{m2}/({m1}-{m2})",
+      "m1": {
+        "reference": {
+          "measure": "Units On Hand"
+        }
+      },
+      "m2": {
+        "reference": {
+          "measure": "Net Movement 30d"
+        }
+      },
+      "format": {
+        "pattern": "+0.0%;-0.0%;0.0%"
+      }
+    },
+    "Units Ordered": {
+      "description": "Units ordered by customers.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Sales Orders",
+              "field": "Qty Ordered"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Units Out": {
+      "description": "Units shipped, as a negative movement total.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Movements",
+              "field": "Qty"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Movements",
+                  "field": "Movement Type"
+                }
+              },
+              {
+                "value": "Customer Shipment",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Units Quarantined": {
+      "description": "Units held in quarantine.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Stock Position",
+              "field": "QTY_QUARANTINE"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Units Shipped": {
+      "description": "Units shipped to customers.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Sales Orders",
+              "field": "Qty Shipped"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Value At Risk": {
+      "description": "Cost of units projected to expire unsold, GBP.",
+      "resultType": "float",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Batch Rotation",
+              "field": "VALUE_AT_RISK_GBP"
+            }
+          }
+        ]
+      },
+      "format": {
+        "pattern": "£#,##0"
+      }
+    },
+    "Value At Risk Share": {
+      "description": "Value at risk as a share of stock value.",
+      "resultType": "float",
+      "expression": "{m1}/{m2}",
+      "m1": {
+        "reference": {
+          "measure": "Value At Risk"
+        }
+      },
+      "m2": {
+        "reference": {
+          "measure": "Stock Value"
+        }
+      },
+      "format": {
+        "pattern": "0.0%"
+      }
+    },
+    "Written Off 30d": {
+      "description": "Units written off, negative. Last 30 days.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Movements",
+              "field": "Qty"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Movements",
+                  "field": "Period"
+                }
+              },
+              {
+                "value": "Last 30d",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "inList",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Movements",
+                  "field": "Movement Type"
+                }
+              },
+              {
+                "value": "Expiry Write-off",
+                "dataType": "string"
+              },
+              {
+                "value": "Manual Write-off",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    },
+    "Written Off Change": {
+      "description": "Written Off, last 30 days against the prior 30.",
+      "resultType": "float",
+      "expression": "({m1}-{m2})/{m2}",
+      "m1": {
+        "reference": {
+          "measure": "Written Off 30d"
+        }
+      },
+      "m2": {
+        "reference": {
+          "measure": "Written Off Prior 30d"
+        }
+      },
+      "format": {
+        "pattern": "+0.0%;-0.0%;0.0%"
+      }
+    },
+    "Written Off Prior 30d": {
+      "description": "Units written off, negative. The 30 days before that.",
+      "resultType": "int",
+      "expression": "{m1}",
+      "m1": {
+        "aggregate": "SUM",
+        "arguments": [
+          {
+            "reference": {
+              "view": "Corvo Inv Movements",
+              "field": "Qty"
+            }
+          }
+        ],
+        "filter": {
+          "expression": "{f1} AND {f2}",
+          "f1": {
+            "operator": "equals",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Movements",
+                  "field": "Period"
+                }
+              },
+              {
+                "value": "Prior 30d",
+                "dataType": "string"
+              }
+            ]
+          },
+          "f2": {
+            "operator": "inList",
+            "arguments": [
+              {
+                "reference": {
+                  "view": "Corvo Inv Movements",
+                  "field": "Movement Type"
+                }
+              },
+              {
+                "value": "Expiry Write-off",
+                "dataType": "string"
+              },
+              {
+                "value": "Manual Write-off",
+                "dataType": "string"
+              }
+            ]
+          }
+        }
+      },
+      "format": {
+        "pattern": "#,##0"
+      }
+    }
+  },
+  "udfs": {},
+  "businessQuestions": {
+    "How do stock, demand and supply line up by category?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "v"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Stock Value"
+          }
+        },
+        {
+          "key": "r",
+          "reference": {
+            "measure": "Value At Risk"
+          }
+        },
+        {
+          "key": "s",
+          "reference": {
+            "measure": "Shipped 30d"
+          }
+        },
+        {
+          "key": "i",
+          "reference": {
+            "measure": "Received 30d"
+          }
+        },
+        {
+          "key": "b",
+          "reference": {
+            "measure": "Units Inbound"
+          }
+        }
+      ],
+      "question": "How do stock, demand and supply line up by category?",
+      "categories": [
+        "Corvo Inventory",
+        "Executive summary"
+      ],
+      "dimensions": [
+        {
+          "key": "c",
+          "reference": {
+            "dimension": "Category"
+          }
+        }
+      ],
+      "description": "Cross-source: batches, sales orders, purchase orders and movements joined through Products.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "How do the warehouses compare?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "v"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Stock Value"
+          }
+        },
+        {
+          "key": "r",
+          "reference": {
+            "measure": "Value At Risk"
+          }
+        },
+        {
+          "key": "a",
+          "reference": {
+            "measure": "Units Available"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Days Of Cover"
+          }
+        },
+        {
+          "key": "s",
+          "reference": {
+            "measure": "Shipped 30d"
+          }
+        }
+      ],
+      "question": "How do the warehouses compare?",
+      "categories": [
+        "Corvo Inventory",
+        "Executive summary"
+      ],
+      "dimensions": [
+        {
+          "key": "w",
+          "reference": {
+            "dimension": "Warehouse"
+          }
+        }
+      ],
+      "description": "Stock, risk, cover and flow by warehouse.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "How does stock flow in and out each month?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "m"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "i",
+          "reference": {
+            "measure": "Units In"
+          }
+        },
+        {
+          "key": "o",
+          "reference": {
+            "measure": "Units Out"
+          }
+        },
+        {
+          "key": "x",
+          "reference": {
+            "measure": "Units Expired"
+          }
+        },
+        {
+          "key": "n",
+          "reference": {
+            "measure": "Net Movement"
+          }
+        }
+      ],
+      "question": "How does stock flow in and out each month?",
+      "categories": [
+        "Corvo Inventory",
+        "Flow"
+      ],
+      "dimensions": [
+        {
+          "key": "m",
+          "reference": {
+            "dimension": "Movement Month"
+          }
+        }
+      ],
+      "description": "Receipts, shipments and write-offs by month.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "How is demand moving by channel?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "s"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "s",
+          "reference": {
+            "measure": "Shipped 30d"
+          }
+        },
+        {
+          "key": "g",
+          "reference": {
+            "measure": "Shipped Change"
+          }
+        },
+        {
+          "key": "r",
+          "reference": {
+            "measure": "Revenue 30d"
+          }
+        },
+        {
+          "key": "rg",
+          "reference": {
+            "measure": "Revenue Change"
+          }
+        }
+      ],
+      "question": "How is demand moving by channel?",
+      "categories": [
+        "Corvo Inventory",
+        "Demand"
+      ],
+      "dimensions": [
+        {
+          "key": "c",
+          "reference": {
+            "dimension": "Channel"
+          }
+        }
+      ],
+      "description": "Units shipped and revenue by sales channel, last 30 days against the prior 30.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "How much stock sits in each expiry band?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "dimension": "b"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "u",
+          "reference": {
+            "measure": "Units On Hand"
+          }
+        },
+        {
+          "key": "s",
+          "reference": {
+            "measure": "Stock Value"
+          }
+        },
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Value At Risk"
+          }
+        }
+      ],
+      "question": "How much stock sits in each expiry band?",
+      "categories": [
+        "Corvo Inventory",
+        "Expiry"
+      ],
+      "dimensions": [
+        {
+          "key": "b",
+          "reference": {
+            "dimension": "Expiry Band"
+          }
+        }
+      ],
+      "description": "Units, stock value and value at risk by days-to-expiry band.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "What purchase orders are late?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "d"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Delayed PO Units"
+          }
+        },
+        {
+          "key": "i",
+          "reference": {
+            "measure": "Units Inbound"
+          }
+        },
+        {
+          "key": "r",
+          "reference": {
+            "measure": "Delayed Share"
+          }
+        }
+      ],
+      "question": "What purchase orders are late?",
+      "categories": [
+        "Corvo Inventory",
+        "Inbound"
+      ],
+      "dimensions": [
+        {
+          "key": "s",
+          "reference": {
+            "dimension": "Supplier"
+          }
+        }
+      ],
+      "description": "Delayed PO units by supplier against all inbound units.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "What stock is at risk of expiring unsold?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "v"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "v",
+          "reference": {
+            "measure": "Value At Risk"
+          }
+        },
+        {
+          "key": "u",
+          "reference": {
+            "measure": "Units At Risk"
+          }
+        },
+        {
+          "key": "h",
+          "reference": {
+            "measure": "Units On Hand"
+          }
+        }
+      ],
+      "question": "What stock is at risk of expiring unsold?",
+      "categories": [
+        "Corvo Inventory",
+        "Expiry"
+      ],
+      "dimensions": [
+        {
+          "key": "b",
+          "reference": {
+            "dimension": "Batch"
+          }
+        },
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Product"
+          }
+        },
+        {
+          "key": "w",
+          "reference": {
+            "dimension": "Warehouse"
+          }
+        },
+        {
+          "key": "e",
+          "reference": {
+            "dimension": "Expiry Date"
+          }
+        }
+      ],
+      "description": "Live batches ranked by value projected to expire unsold (FEFO at the 28-day run rate).",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    },
+    "Where are we overstocked or short?": {
+      "measures": [
+        {
+          "key": "a",
+          "reference": {
+            "measure": "Units Available"
+          }
+        },
+        {
+          "key": "i",
+          "reference": {
+            "measure": "Units Inbound"
+          }
+        },
+        {
+          "key": "q",
+          "reference": {
+            "measure": "Suggested Order Units"
+          }
+        }
+      ],
+      "question": "Where are we overstocked or short?",
+      "categories": [
+        "Corvo Inventory",
+        "Replenishment"
+      ],
+      "dimensions": [
+        {
+          "key": "s",
+          "reference": {
+            "dimension": "Stock Status"
+          }
+        },
+        {
+          "key": "w",
+          "reference": {
+            "dimension": "Warehouse"
+          }
+        }
+      ],
+      "description": "Available and inbound units by stock status and warehouse.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Which categories lose the most to write-offs?": {
+      "orderBy": [
+        {
+          "direction": "ascending",
+          "reference": {
+            "measure": "x"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "x",
+          "reference": {
+            "measure": "Units Expired"
+          }
+        },
+        {
+          "key": "w",
+          "reference": {
+            "measure": "Written Off 30d"
+          }
+        },
+        {
+          "key": "p",
+          "reference": {
+            "measure": "Written Off Prior 30d"
+          }
+        }
+      ],
+      "question": "Which categories lose the most to write-offs?",
+      "categories": [
+        "Corvo Inventory",
+        "Flow"
+      ],
+      "dimensions": [
+        {
+          "key": "c",
+          "reference": {
+            "dimension": "Category"
+          }
+        }
+      ],
+      "description": "Units written off by category, last 30 days against the prior 30.",
+      "preferredCharts": [
+        {
+          "type": "bar"
+        }
+      ]
+    },
+    "Which products need reordering now?": {
+      "orderBy": [
+        {
+          "direction": "descending",
+          "reference": {
+            "measure": "q"
+          }
+        }
+      ],
+      "measures": [
+        {
+          "key": "q",
+          "reference": {
+            "measure": "Suggested Order Units"
+          }
+        },
+        {
+          "key": "a",
+          "reference": {
+            "measure": "Units Available"
+          }
+        },
+        {
+          "key": "i",
+          "reference": {
+            "measure": "Units Inbound"
+          }
+        },
+        {
+          "key": "d",
+          "reference": {
+            "measure": "Days Of Cover"
+          }
+        }
+      ],
+      "question": "Which products need reordering now?",
+      "categories": [
+        "Corvo Inventory",
+        "Replenishment"
+      ],
+      "dimensions": [
+        {
+          "key": "p",
+          "reference": {
+            "dimension": "Product"
+          }
+        },
+        {
+          "key": "w",
+          "reference": {
+            "dimension": "Warehouse"
+          }
+        },
+        {
+          "key": "s",
+          "reference": {
+            "dimension": "Stock Status"
+          }
+        }
+      ],
+      "description": "Suggested order quantity by product and warehouse, with cover and inbound.",
+      "preferredCharts": [
+        {
+          "type": "table"
+        }
+      ]
+    }
+  },
+  "dataActions": {
+    "Cancel Purchase Order": {
+      "kind": "virtualProcedure",
+      "returns": {
+        "fields": {
+          "rows_affected": {
+            "dataType": "int"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "po_id",
+          "dataType": "string",
+          "description": "Purchase order to cancel"
+        }
+      ],
+      "description": "Cancels an Open or Delayed purchase order that has not been received.",
+      "implementation": {
+        "dialects": {
+          "snowflake": {
+            "result": {
+              "mode": "affectedRows",
+              "field": "rows_affected",
+              "statement": "cancel"
+            },
+            "statements": [
+              {
+                "sql": "UPDATE ASTRATO_GALLERY.ASTRATO.CORVO_INV_PURCHASE_ORDERS SET \"status\"='Cancelled' WHERE \"po_id\"={po_id:string} AND \"status\" IN ('Open','Delayed') AND COALESCE(\"qty_received\",0)=0",
+                "name": "cancel"
+              }
+            ]
+          }
+        },
+        "transaction": true
+      }
+    },
+    "Post Stock Count": {
+      "kind": "virtualProcedure",
+      "returns": {
+        "fields": {
+          "rows_affected": {
+            "dataType": "int"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "batch_id",
+          "dataType": "string",
+          "description": "Batch counted"
+        },
+        {
+          "name": "counted",
+          "dataType": "int",
+          "description": "Units counted"
+        }
+      ],
+      "description": "Sets a batch to its counted quantity and logs the variance as a Count Adjustment.",
+      "implementation": {
+        "dialects": {
+          "snowflake": {
+            "result": {
+              "mode": "affectedRows",
+              "field": "rows_affected",
+              "statement": "set_qty"
+            },
+            "statements": [
+              {
+                "sql": "INSERT INTO ASTRATO_GALLERY.ASTRATO.CORVO_INV_MOVEMENTS (\"movement_id\",\"movement_date\",\"batch_id\",\"sku\",\"warehouse_id\",\"movement_type\",\"qty\",\"reference\",\"created_by\") SELECT 'MV-'||UUID_STRING(),CURRENT_DATE,\"batch_id\",\"sku\",\"warehouse_id\",'Count Adjustment',{counted:int}-\"qty_on_hand\",'Stock count','workflow' FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES WHERE \"batch_id\"={batch_id:string}",
+                "name": "log_variance"
+              },
+              {
+                "sql": "UPDATE ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES SET \"qty_on_hand\"={counted:int} WHERE \"batch_id\"={batch_id:string}",
+                "name": "set_qty"
+              }
+            ]
+          }
+        },
+        "transaction": true
+      }
+    },
+    "Raise Purchase Order": {
+      "kind": "virtualProcedure",
+      "returns": {
+        "fields": {
+          "rows_affected": {
+            "dataType": "int"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "sku",
+          "dataType": "string",
+          "description": "Product to reorder"
+        },
+        {
+          "name": "warehouse_id",
+          "dataType": "string",
+          "description": "Destination warehouse"
+        },
+        {
+          "name": "qty",
+          "dataType": "int",
+          "description": "Units to order"
+        }
+      ],
+      "description": "Raises a replenishment PO for a SKU and warehouse, using the product supplier and its lead time for the expected date.",
+      "implementation": {
+        "dialects": {
+          "snowflake": {
+            "result": {
+              "mode": "affectedRows",
+              "field": "rows_affected",
+              "statement": "create_po"
+            },
+            "statements": [
+              {
+                "sql": "INSERT INTO ASTRATO_GALLERY.ASTRATO.CORVO_INV_PURCHASE_ORDERS (\"po_id\",\"sku\",\"supplier_id\",\"warehouse_id\",\"order_date\",\"expected_date\",\"received_date\",\"qty_ordered\",\"qty_received\",\"status\") SELECT 'PO-'||LEFT(UUID_STRING(),8),p.\"sku\",p.\"supplier_id\",{warehouse_id:string},CURRENT_DATE,DATEADD(day,s.\"lead_time_days\",CURRENT_DATE),NULL,{qty:int},0,'Open' FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_PRODUCTS p JOIN ASTRATO_GALLERY.ASTRATO.CORVO_INV_SUPPLIERS s ON s.\"supplier_id\"=p.\"supplier_id\" WHERE p.\"sku\"={sku:string}",
+                "name": "create_po"
+              }
+            ]
+          }
+        },
+        "transaction": true
+      }
+    },
+    "Recall Batch": {
+      "kind": "virtualProcedure",
+      "returns": {
+        "fields": {
+          "rows_affected": {
+            "dataType": "int"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "batch_id",
+          "dataType": "string",
+          "description": "Parent batch"
+        }
+      ],
+      "description": "Quarantines all remaining Available stock of a batch and its transferred child batches.",
+      "implementation": {
+        "dialects": {
+          "snowflake": {
+            "result": {
+              "mode": "affectedRows",
+              "field": "rows_affected",
+              "statement": "quarantine"
+            },
+            "statements": [
+              {
+                "sql": "UPDATE ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES SET \"status\"='Quarantine' WHERE (\"batch_id\"={batch_id:string} OR STARTSWITH(\"batch_id\",{batch_id:string}||'-T')) AND \"status\"='Available'",
+                "name": "quarantine"
+              }
+            ]
+          }
+        },
+        "transaction": true
+      }
+    },
+    "Receive Purchase Order": {
+      "kind": "virtualProcedure",
+      "returns": {
+        "fields": {
+          "rows_affected": {
+            "dataType": "int"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "po_id",
+          "dataType": "string",
+          "description": "Purchase order received"
+        },
+        {
+          "name": "qty_received",
+          "dataType": "int",
+          "description": "Units counted in"
+        },
+        {
+          "name": "expiry_date",
+          "dataType": "date",
+          "description": "Expiry date printed on the batch"
+        }
+      ],
+      "description": "Goods in: creates a new batch from an open or delayed PO, logs the Receipt movement and closes the PO.",
+      "implementation": {
+        "dialects": {
+          "snowflake": {
+            "result": {
+              "mode": "affectedRows",
+              "field": "rows_affected",
+              "statement": "close_po"
+            },
+            "statements": [
+              {
+                "sql": "INSERT INTO ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES (\"batch_id\",\"sku\",\"warehouse_id\",\"supplier_id\",\"received_date\",\"expiry_date\",\"qty_received\",\"qty_on_hand\",\"unit_cost_gbp\",\"status\") SELECT 'B-'||o.\"po_id\",o.\"sku\",o.\"warehouse_id\",o.\"supplier_id\",CURRENT_DATE,{expiry_date:date},{qty_received:int},{qty_received:int},p.\"unit_cost_gbp\",'Available' FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_PURCHASE_ORDERS o JOIN ASTRATO_GALLERY.ASTRATO.CORVO_INV_PRODUCTS p ON p.\"sku\"=o.\"sku\" WHERE o.\"po_id\"={po_id:string} AND o.\"status\" IN ('Open','Delayed')",
+                "name": "create_batch"
+              },
+              {
+                "sql": "INSERT INTO ASTRATO_GALLERY.ASTRATO.CORVO_INV_MOVEMENTS (\"movement_id\",\"movement_date\",\"batch_id\",\"sku\",\"warehouse_id\",\"movement_type\",\"qty\",\"reference\",\"created_by\") SELECT 'MV-'||UUID_STRING(),CURRENT_DATE,'B-'||\"po_id\",\"sku\",\"warehouse_id\",'Receipt',{qty_received:int},\"po_id\",'workflow' FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_PURCHASE_ORDERS WHERE \"po_id\"={po_id:string} AND \"status\" IN ('Open','Delayed')",
+                "name": "log_movement"
+              },
+              {
+                "sql": "UPDATE ASTRATO_GALLERY.ASTRATO.CORVO_INV_PURCHASE_ORDERS SET \"status\"='Received',\"received_date\"=CURRENT_DATE,\"qty_received\"={qty_received:int} WHERE \"po_id\"={po_id:string} AND \"status\" IN ('Open','Delayed')",
+                "name": "close_po"
+              }
+            ]
+          }
+        },
+        "transaction": true
+      }
+    },
+    "Record Dispatch": {
+      "kind": "virtualProcedure",
+      "returns": {
+        "fields": {
+          "rows_affected": {
+            "dataType": "int"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "batch_id",
+          "dataType": "string",
+          "description": "Batch picked (oldest expiry first)"
+        },
+        {
+          "name": "qty",
+          "dataType": "int",
+          "description": "Units dispatched"
+        },
+        {
+          "name": "reference",
+          "dataType": "string",
+          "description": "Order or transfer reference"
+        }
+      ],
+      "description": "Goods out: ships units from a named batch. Refused unless the batch is Available and holds enough stock.",
+      "implementation": {
+        "dialects": {
+          "snowflake": {
+            "result": {
+              "mode": "affectedRows",
+              "field": "rows_affected",
+              "statement": "decrement"
+            },
+            "statements": [
+              {
+                "sql": "INSERT INTO ASTRATO_GALLERY.ASTRATO.CORVO_INV_MOVEMENTS (\"movement_id\",\"movement_date\",\"batch_id\",\"sku\",\"warehouse_id\",\"movement_type\",\"qty\",\"reference\",\"created_by\") SELECT 'MV-'||UUID_STRING(),CURRENT_DATE,\"batch_id\",\"sku\",\"warehouse_id\",'Customer Shipment',-{qty:int},{reference:string},'workflow' FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES WHERE \"batch_id\"={batch_id:string} AND \"status\"='Available' AND \"qty_on_hand\">={qty:int}",
+                "name": "log_movement"
+              },
+              {
+                "sql": "UPDATE ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES SET \"qty_on_hand\"=\"qty_on_hand\"-{qty:int} WHERE \"batch_id\"={batch_id:string} AND \"status\"='Available' AND \"qty_on_hand\">={qty:int}",
+                "name": "decrement"
+              }
+            ]
+          }
+        },
+        "transaction": true
+      }
+    },
+    "Set Batch Status": {
+      "kind": "virtualProcedure",
+      "returns": {
+        "fields": {
+          "rows_affected": {
+            "dataType": "int"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "batch_id",
+          "dataType": "string",
+          "description": "Batch to change"
+        },
+        {
+          "name": "new_status",
+          "dataType": "string",
+          "description": "Available or Quarantine"
+        }
+      ],
+      "description": "Places a live batch in Quarantine or releases it back to Available. Quarantined stock is excluded from available stock.",
+      "implementation": {
+        "dialects": {
+          "snowflake": {
+            "result": {
+              "mode": "affectedRows",
+              "field": "rows_affected",
+              "statement": "set_status"
+            },
+            "statements": [
+              {
+                "sql": "UPDATE ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES SET \"status\"={new_status:string} WHERE \"batch_id\"={batch_id:string} AND \"qty_on_hand\">0 AND \"status\" IN ('Available','Quarantine') AND {new_status:string} IN ('Available','Quarantine')",
+                "name": "set_status"
+              }
+            ]
+          }
+        },
+        "transaction": true
+      }
+    },
+    "Transfer Stock": {
+      "kind": "virtualProcedure",
+      "returns": {
+        "fields": {
+          "rows_affected": {
+            "dataType": "int"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "batch_id",
+          "dataType": "string",
+          "description": "Source batch"
+        },
+        {
+          "name": "qty",
+          "dataType": "int",
+          "description": "Units to move"
+        },
+        {
+          "name": "new_batch_id",
+          "dataType": "string",
+          "description": "Child batch id"
+        }
+      ],
+      "description": "Moves units of an Available batch to the other warehouse as a child batch keeping its expiry, and logs both movements.",
+      "implementation": {
+        "dialects": {
+          "snowflake": {
+            "result": {
+              "mode": "affectedRows",
+              "field": "rows_affected",
+              "statement": "decrement"
+            },
+            "statements": [
+              {
+                "sql": "INSERT INTO ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES (\"batch_id\",\"sku\",\"warehouse_id\",\"supplier_id\",\"received_date\",\"expiry_date\",\"qty_received\",\"qty_on_hand\",\"unit_cost_gbp\",\"status\") SELECT {new_batch_id:string},\"sku\",IFF(\"warehouse_id\"='WH-UK','WH-US','WH-UK'),\"supplier_id\",\"received_date\",\"expiry_date\",{qty:int},{qty:int},\"unit_cost_gbp\",'Available' FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES WHERE \"batch_id\"={batch_id:string} AND \"status\"='Available' AND \"qty_on_hand\">={qty:int}",
+                "name": "create_child"
+              },
+              {
+                "sql": "INSERT INTO ASTRATO_GALLERY.ASTRATO.CORVO_INV_MOVEMENTS (\"movement_id\",\"movement_date\",\"batch_id\",\"sku\",\"warehouse_id\",\"movement_type\",\"qty\",\"reference\",\"created_by\") SELECT 'MV-'||UUID_STRING(),CURRENT_DATE,\"batch_id\",\"sku\",\"warehouse_id\",'Transfer Out',-{qty:int},{new_batch_id:string},'workflow' FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES WHERE \"batch_id\"={batch_id:string} AND \"status\"='Available' AND \"qty_on_hand\">={qty:int}",
+                "name": "log_out"
+              },
+              {
+                "sql": "INSERT INTO ASTRATO_GALLERY.ASTRATO.CORVO_INV_MOVEMENTS (\"movement_id\",\"movement_date\",\"batch_id\",\"sku\",\"warehouse_id\",\"movement_type\",\"qty\",\"reference\",\"created_by\") SELECT 'MV-'||UUID_STRING(),CURRENT_DATE,\"batch_id\",\"sku\",\"warehouse_id\",'Transfer In',{qty:int},{batch_id:string},'workflow' FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES WHERE \"batch_id\"={new_batch_id:string}",
+                "name": "log_in"
+              },
+              {
+                "sql": "UPDATE ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES SET \"qty_on_hand\"=\"qty_on_hand\"-{qty:int} WHERE \"batch_id\"={batch_id:string} AND \"status\"='Available' AND \"qty_on_hand\">={qty:int}",
+                "name": "decrement"
+              }
+            ]
+          }
+        },
+        "transaction": true
+      }
+    },
+    "Write Off Batch": {
+      "kind": "virtualProcedure",
+      "returns": {
+        "fields": {
+          "rows_affected": {
+            "dataType": "int"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "batch_id",
+          "dataType": "string",
+          "description": "Batch to write off"
+        },
+        {
+          "name": "reason",
+          "dataType": "string",
+          "description": "Reason, e.g. Short-dated or Damaged"
+        }
+      ],
+      "description": "Writes off all remaining stock in a batch: logs a Manual Write-off movement, zeroes the batch and marks it Written Off.",
+      "implementation": {
+        "dialects": {
+          "snowflake": {
+            "result": {
+              "mode": "affectedRows",
+              "field": "rows_affected",
+              "statement": "zero_batch"
+            },
+            "statements": [
+              {
+                "sql": "INSERT INTO ASTRATO_GALLERY.ASTRATO.CORVO_INV_MOVEMENTS (\"movement_id\",\"movement_date\",\"batch_id\",\"sku\",\"warehouse_id\",\"movement_type\",\"qty\",\"reference\",\"created_by\") SELECT 'MV-'||UUID_STRING(),CURRENT_DATE,\"batch_id\",\"sku\",\"warehouse_id\",'Manual Write-off',-\"qty_on_hand\",{reason:string},'workflow' FROM ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES WHERE \"batch_id\"={batch_id:string} AND \"qty_on_hand\">0",
+                "name": "log_movement"
+              },
+              {
+                "sql": "UPDATE ASTRATO_GALLERY.ASTRATO.CORVO_INV_BATCHES SET \"qty_on_hand\"=0,\"status\"='Written Off' WHERE \"batch_id\"={batch_id:string} AND \"qty_on_hand\">0",
+                "name": "zero_batch"
+              }
+            ]
+          }
+        },
+        "transaction": true
+      }
+    }
+  },
+  "writeback": {
+    "mode": "dataActions"
+  },
+  "layout": {},
+  "engineProperties": {
+    "csvSourcedTables": [
+      "ASTRATO.CORVO_INV_BATCHES",
+      "ASTRATO.CORVO_INV_MOVEMENTS",
+      "ASTRATO.CORVO_INV_PRODUCTS",
+      "ASTRATO.CORVO_INV_PURCHASE_ORDERS",
+      "ASTRATO.CORVO_INV_SALES_ORDERS",
+      "ASTRATO.CORVO_INV_SUPPLIERS",
+      "ASTRATO.CORVO_INV_WAREHOUSES"
+    ]
+  }
+}

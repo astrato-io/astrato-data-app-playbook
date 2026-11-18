@@ -1,0 +1,70 @@
+slug: report-builder
+title: Report builder
+company: Superstore (the public Superstore sample dataset); the app itself names no brand
+layer: superstore-sample
+summary: >-
+  The small, standalone, copyable flexible custom report: anyone who asks for "a self-service
+  report" picks rows, figures, filters and a period, compares with the previous period or the same
+  period last year, switches between a native table, bar and line, saves and reopens the report,
+  shares it as a link and exports exactly what the object shows to Excel. It works on any semantic
+  layer: the field catalogue is read at run time and nothing in the app names a field. The one to
+  start from for a custom report; the people-intelligence tab is the larger, branded version.
+industry: retail
+function: sales
+persona: Analyst or business user building their own report
+archetype: explorer
+look: >-
+  light and plain: a grey page (#F8FAFC), white cards, one blue accent (#2563EB), amber note text;
+  Roboto throughout, bundled from npm; a top bar with the editable report name, New, Saved reports,
+  Save, Share link and Export .xlsx; a 250px field panel on the left (search, Rows and Figures,
+  each field tagged abc, date or 123); a chip bar of rows and figures with move and remove buttons
+  and a grain picker on date rows; one control row (Table / Bar / Line, period, compare, sort, row
+  limit); a filter bar with chips; the one native object fills the rest; one screen, no page scroll
+tabs:
+  - Report builder — what do these figures look like by these rows, for this period and these filters, and how did each period change against the one before or the same one last year?
+patterns:
+  - report-builder
+  - selection-bar
+  - query-scheduler
+  - xlsx-export
+charts: [table, bar, stacked-bar, line]
+interactions: [click-to-filter, selection-bar, search, compare, period-picker, deep-link]
+workflows: []
+writeback: false
+exports: [xlsx]
+objects: 1  # one native object at a time, remounted on every change; compile-check covers 32 (16 report states at two widths)
+start_here:
+  - project/src/builder.js — the whole UI: field panel, chip bar, period and filters as selections, chart clicks, save / reopen / share link, Excel export of the object's own rows
+  - project/src/report.js — report state → spec → compiled vSpec (pure, so the compile check runs it), the comparison rule, formats, column widths, chart colours, starter reports
+  - project/src/catalogue.js — the field catalogue built at run time from whatever layer the app is bound to
+  - project/src/app.js — boot, the getData wrapper (operator fix, 4 lanes, retry, cache), mounting the one object and refitting its columns on resize
+capabilities:
+  - report-builder — project/src/builder.js:33
+  - saved-views — project/src/builder.js:252
+  - excel-export — project/src/builder.js:281
+stealable:
+  - "A field catalogue read at run time: rows are the layer's string, date and boolean view columns (named by a stored dimension where one points at them), figures are its governed measures with their own format and description; starter reports name fields and drop any the layer lacks — project/src/catalogue.js:12"
+  - "Report state → spec → vSpec as pure functions: the same code the app mounts is what the offline compile check runs over every view and starter — project/src/report.js:50"
+  - "Period comparison with no comparison measures: a native inter-record growth (diff for ratio measures) along a date row moved to the first column, sorted ascending, at offset −1 (previous) or −12 / −4 / −1 (same month, quarter or year last year), with a note when it cannot apply — project/src/report.js:37"
+  - "Two columns on one measure: rename the change column with setColumnLabel, then format it by that name, because format operations match the label the figure and its copy share — project/src/report.js:134"
+  - "Filters and the period are applied selections in one group (inList filters, a between period counting back from the last date in the data), so the object follows them and a chart click becomes a filter chip — project/src/builder.js:60"
+  - "Excel from runtime.getData(tileId): the workbook holds the object's own rows, comparison columns included, with the layer's formats and a Definitions sheet; the .xlsx writer has no dependencies — project/src/builder.js:281"
+  - "The address always carries the report as #r=<base64url JSON>, so reload, bookmark and Share link all reopen it with its filters and period — project/src/builder.js:268"
+  - "Table columns as pixel widths from the header and the layer's format pattern, refitted in place on resize with no remount — project/src/report.js:107"
+caveats:
+  - "Public sample data: the classic Superstore orders table, one view and no joins, January 2016 to 30 Dec 2019. Periods count back from the last date in the data (src/builder.js:44), so Year to date and Last 12 months are the same range on this sample."
+  - "The comparison is row to row, not calendar-based: the layer has no time axis, so a missing month shifts the offset, and the first period (or first year) of the range is blank. It needs a date row at month, quarter or year and shows only in the table (src/report.js:37)."
+  - "While comparing, sort is disabled and the table is sorted by date ascending (src/builder.js:170, src/report.js:61)."
+  - "A ratio's change is a difference in points (diff), but it is formatted with a % sign; the header says (pts) (src/report.js:56). In the second screenshot Profit Ratio vs LY reads \"-48.8%\" for Jan 2017, meaning −48.8 points."
+  - "Charts use the first two rows, and with two rows only the first figure; they never show the comparison (src/report.js:57). The note under the controls says so."
+  - "A 7-column comparison report (the second starter) scrolls sideways inside the table at 1024 px: text columns never go below 120 px (src/report.js:113)."
+  - "Saved reports live in one browser's localStorage, per layer (src/builder.js:35); Share link is the only way to move a report between people or devices."
+  - "No stored business question behind the object: reports are ad hoc by design, over the layer's calculations and raw view columns. There is no KPI band, no narrative and no what-if; it is one report, not a dashboard. Offering raw view columns as rows counts as an unmatched object under the rubric's A3 note; patterns/report-builder.md says to offer stored dimensions only."
+  - "A bar with one row and several figures would stack on 0.9, so it sends setBarChartLayout 'groups' (src/report.js:150); compile-checked, not yet re-checked in a browser. A Line view does not select on click on 0.9."
+  - "The filter picker offers non-date rows only, reads the first 500 values and lists 300 at a time, with a search (src/builder.js:182, src/builder.js:191). A chart click on a date is dropped, since it would replace the period (src/builder.js:319)."
+  - "The app runs on any layer, but its smoke checks (src/checks.js:30) and tools/compile-adapter.mjs name Superstore fields (Region, Category, Sales, West); rewrite them for another layer."
+  - "Checked in staging: smoke test PASS at 1440, 1280 and 1024 with no page scroll, landing in about 1.7 s, 7/7 app checks (build from the panel, Region filter and Clear all, Year to date period, Bar / Line / Table switch, save + reopen + share link, Excel export, and the comparison value checked by hand: Dec 2019 Sales vs LY −23.55% = (96,410.63 − 126,106.54) / 126,106.54); compile-check 32/32; build passes; figures cross-checked against an MCP query."
+  - "Library quirks behind the comparison (a descending sort with a positive offset returned nulls on 0.9) are in knowledge/engine-and-queries.md, Window calculations."
+  - "tools/available-fields.json is the field catalogue a smoke run saved; the compile check reads it."
+  - Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite.
+  - astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too.

@@ -1,0 +1,73 @@
+slug: stock-rotation
+title: Stock Rotation
+company: Corvo (fictional retailer)
+layer: inventory-rotation
+summary: >-
+  A stock planner and the warehouse, quality and operations people around them keep short-dated
+  stock rotating across two fulfilment hubs: see what is held and what expires unsold, book goods
+  in, ship oldest-expiry-first, transfer, count, trace and recall batches, propose purchase orders
+  and write-offs for approval, and test options for at-risk stock. Stock moves are written back to
+  the warehouse.
+industry: retail
+function: supply-chain
+persona: Stock Planner (also Operations Manager, Quality Lead, Warehouse Operator)
+archetype: workbench
+look: >-
+  light; white page, green header band (#3BB273) with the wordmark, uppercase Antonio headline and
+  Inter body, ink (#2D3246) tab strip, pill-shaped role picker and export button; native tables with
+  traffic-light indicator text; plain HTML queue tables with status pills on the workflow tabs
+tabs:
+  - Stock — what do we hold, where, what is at risk of expiring unsold, and how have receipts and shipments moved against the prior 30 days?
+  - Goods in — which purchase orders are due, and booking a counted delivery in as a batch
+  - Goods out — which batch must ship next (oldest eligible expiry first, enforced) and dispatching it
+  - Transfers — which at-risk stock should move to the other warehouse?
+  - Stock count — does the counted quantity match the system, and does the variance need approval?
+  - Trace & recall — where did a batch come from, where did it go, and quarantining what is left
+  - Reorder — which products need ordering now, and proposing purchase orders
+  - Expiry — which batches expire within 30 days, are at risk or in quarantine, and what to do with them
+  - Ledger — every stock movement behind the figures
+  - Approvals — requests waiting for a second person, and the audit trail
+  - Plan — what do a promotion, a discount, a transfer, a demand change or a supplier delay do to value at risk and reorders?
+patterns:
+  - kpi-sparkline-comparison
+  - selection-bar
+  - table-sparklines
+  - writeback-workflow
+  - role-switcher
+  - xlsx-export
+  - query-scheduler
+charts: [table, table-sparklines, kpi, sparkline]
+interactions: [click-to-filter, selection-bar, tabs, role-switcher, sliders, search]
+workflows: [goods-in, fefo-dispatch, stock-transfer, stock-count, batch-recall, reorder-approval, write-off-approval]
+writeback: true
+exports: [xlsx]
+objects: 21   # 6 filters (3 on Stock, 3 on Ledger), 4 KPI cards of 3 objects each, 3 tables; the workflow tabs are HTML over governed queries
+start_here:
+  - project/src/workflow.js — the operational screens, the writes behind each step, FEFO and shelf-life blocks, requests and approvals
+  - project/src/app.js — shell, governed query helper, writeback, queue loading, trace, Plan levers, Excel report, smoke checks
+  - project/src/dashboard.js — the 21 native objects (KPI cards, stock and batch tables, ledger)
+capabilities:
+  - writeback-workflow — project/src/workflow.js:48
+  - role-switcher — project/src/app.js:92
+  - what-if — project/src/app.js:187
+  - excel-export — project/src/app.js:274
+stealable:
+  - "Each stock step as a sequence of app.writeback inserts and updates on governed tables (batch, movement, purchase order), then a cache clear and a re-query of every mounted object — project/src/workflow.js:48"
+  - "First-expired-first-out enforced at the pick list: a batch is blocked if quarantined, below the product's minimum shelf life, or not the oldest eligible batch for that product and warehouse — project/src/workflow.js:35"
+  - "Two-person rules: count variances over 5%, write-offs and purchase orders become requests that only the named approver role can approve — project/src/workflow.js:96"
+  - "Batch trace from governed movements: the root batch and its transfer children, received, shipped, distinct shipment references and stock still held — project/src/app.js:257"
+  - "Value at risk modelled in the layer: a SQL view projects each batch's units expiring unsold from the 28-day run rate and the stock ahead of it in expiry order, so the app only reads a measure — layers/inventory-rotation/layer.json:134"
+  - "KPI card = number + monthly mini-chart + one-row prior-period table with red/green bands — project/src/dashboard.js:64"
+caveats:
+  - The app writes the tables directly. The layer's nine Data Actions describe the same steps (the code notes the App runtime cannot call a named Data Action), but the guards here run in the browser, and FEFO and minimum shelf life are checked only by the app.
+  - Steps are several separate writes (a transfer is four), so a failure part-way leaves partial state. A failed write is logged as FAILED in the audit trail; there is no browser-storage fallback.
+  - Requests, approvals and the audit trail live in localStorage only (key corvo-ops-v1). An approval is marked Approved before its write runs and stays Approved if the write fails (src/workflow.js:151). Roles come from the picker, so one person can request and approve by switching role.
+  - Inactive tabs use display:none (src/app.js:134); the ledger table is mounted hidden and refits when first shown. Prefer off-screen panes (patterns/preload-tabs.md).
+  - None of the layer's 10 stored business questions is used; native objects query layer measures directly.
+  - Figures are relative to CURRENT_DATE (expiry, 28-day run rate, 30-day windows), so they drift as the sample data ages.
+  - No data generator or reset script is shipped; the layer's tables were loaded from CSV files that are not included. layers/inventory-rotation/schema/ddl.sql gives the shapes, but lists the Month and Period custom fields of Movements and Sales Orders as columns. The SQL views hard-code ASTRATO_GALLERY.ASTRATO.
+  - Transfers assume exactly two warehouses (WH-UK and WH-US). The Plan tab is browser arithmetic over a governed baseline. The Value at risk card's mini-chart plots units expired by month, not value at risk.
+  - styles.css, objects.css and ops.css carry rules for screens this app does not have.
+  - Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite. Verified with compile-check (21/21) and vite build; the app registers six smoke checks, but no smoke-test run is recorded for this export.
+  - No screenshots are shipped yet.
+  - astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too.

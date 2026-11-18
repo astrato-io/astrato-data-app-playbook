@@ -1,0 +1,88 @@
+slug: agency-client-reporting
+title: Client Reporting, explained
+company: Tidewater Media (fictional digital-marketing agency)
+layer: agency-performance
+summary: >-
+  Account managers and directors at a digital-marketing agency report monthly to 8 clients from
+  four source systems (Google Ads, Meta, GA4 and Search Console, mock data) joined through shared
+  Clients, Channels and Months tables. They decide which clients need attention, explain why each
+  number moved (driver bridges stored in the layer split every month-on-month change exactly into
+  reach, click-through and conversion-rate effects, read out in plain English), plan where next
+  month's budget goes, and sign off and send each client's report with a multi-sheet Excel pack.
+industry: marketing-services
+function: client-services
+persona: Account Manager / Account Director (digital-marketing agency)
+archetype: report
+look: >-
+  light; aubergine ink (#1E1B3A) on a lilac-white page (#F6F5FB), coral (#FF5A5F), teal (#12B3A8)
+  and violet (#7C6CF2) accents; gradient aubergine header with a lowercase "tidewater" wordmark,
+  four source chips and pill buttons; sticky white tab bar with a coral underline; soft rounded
+  white cards, KPI cards with a coral-to-violet left edge; Plus Jakarta Sans and Inter, Roboto inside
+  charts; a dark "what changed and why" panel, a chat with a Nash badge, a poster-style infographic
+  one-pager and a spreadsheet-styled Excel view
+tabs:
+  - Agency portfolio — how did September go across all eight clients against August, which clients moved, and how do spend and ROAS compare between Google Ads and Meta?
+  - Client performance — for one client, what did every source (paid, web, organic) do this month and over 21 months? The page the client sees.
+  - Why it changed — what moved this client's conversions, value, spend and organic clicks, split exactly into reach, click-through and conversion-rate effects by channel, campaign, keyword group and device, month on month and year on year?
+  - Paid media — how does the funnel from impressions to ROAS run by channel, campaign type and campaign?
+  - SEO & web — how are organic visibility and rankings moving, and what do visitors do on site?
+  - Ask Nash — mock-up chat that answers in plain English from governed queries and mounts a native chart under each answer
+  - Budget planner — if we move Q4 budget between channels and change CPC, conversion rate and organic growth, what happens to conversion value, spend and ROAS against the September run-rate?
+  - Infographic — a one-page September summary for any client (KPIs, growth, revenue mix, insights, next month's strategy)
+  - Report (Excel view) — the Excel pack's sheets rendered live as a spreadsheet, per client or for the portfolio, with a download
+  - Client reports — which reports are drafted, in review, approved or sent; explain the flagged anomalies, edit the commentary, sign off and send
+patterns:
+  - kpi-sparkline-comparison
+  - table-sparklines
+  - what-if-parameters
+  - role-switcher
+  - xlsx-export
+  - preload-tabs
+  - query-scheduler
+charts: [kpi, sparkline, line, bar, stacked-bar, grouped-bar, pie, table, table-sparklines]
+interactions: [click-to-filter, tabs, sliders, role-switcher, chat, client-switch, spreadsheet-view]
+workflows: [report-sign-off, anomaly-explanation, maker-checker-approval, client-email]
+writeback: false
+exports: [xlsx, email]
+objects: 165  # all mounted at load (19 filter dropdowns, 38 KPI cards of 3 objects each, 32 charts and tables), the opening tab's 33 first; plus one native chart per Ask Nash answer
+start_here:
+  - project/src/app.js — shell and tabs, governed query helper, narrative panel, Ask Nash, budget planner, Excel pack, report send, smoke checks
+  - project/src/dashboard.js — every native object declared as data (KPI cards, driver bridges, tables with sparkline columns, Nash answer charts)
+  - project/src/explain.js — reads the driver-bridge measures and writes "what changed and why", next steps and anomaly flags
+  - project/src/workflow.js — the report sign-off workflow (maker–checker, audit trail, localStorage)
+  - project/tools/entities.mjs — the layer's views, joins, dimensions and 208 measures, including the driver bridges
+capabilities:
+  - narrative-headline — project/src/explain.js:37
+  - assistant — project/src/app.js:282
+  - what-if — project/src/app.js:338
+  - excel-export — project/src/app.js:385
+  - simulated-workflow — project/src/workflow.js:46
+  - role-switcher — project/src/workflow.js:66
+stealable:
+  - "Driver bridges stored in the layer: each month-on-month (and year-on-year) change is split by sequential substitution into effects that add up exactly (conversions = impressions × CTR × CVR; value = conversions × value per conversion; spend = clicks × CPC; organic clicks = impressions × CTR; key events = sessions × rate) — project/tools/entities.mjs:52"
+  - "Plain-English explanation from governed numbers: one query per grain for every client, then the biggest effects in the direction of the change become bullets with their share of the change, each mapped to a next step; only the wording is in the app — project/src/explain.js:37"
+  - "Bridge chart: a stacked horizontal bar of the effect measures by channel, keyword group or device, with friendly legend names set through updateMeasure customLabel — project/src/dashboard.js:69"
+  - "KPI card = native number + line or bar sparkline by month + header-less one-row table with last month and the change, coloured by whether that direction is good — project/src/dashboard.js:89"
+  - "One-row delta tables split a fixed pixel width between their columns (fitWidth), so 'Aug £…' never ends in an ellipsis — project/src/theme.js:239"
+  - "Sparklines without point markers on visualizations 0.9: setMeasureShape with shape null on each measure — project/src/theme.js:159"
+  - "Table column formats on 0.8+ address the column by its exact name; every other column operation still takes the data-item keys — project/src/theme.js:211"
+  - "Native tables with a sparkline column over Month and two- or three-band indicator text — project/src/dashboard.js:380"
+  - "Ask Nash answers carry a native chart: an ad-hoc tile built, compiled, themed and mounted at run time in its own selection group, pinned to the client by a static filter — project/src/app.js:243"
+  - "Report sign-off: anomalies flagged from the same facts must be explained or escalated before an account manager can submit; only a director or head of client services can approve and send — project/src/workflow.js:80"
+  - "Send = build the client's Excel pack, download it, and open a mailto with the approved commentary as the body — project/src/app.js:457"
+  - "Spreadsheet view of the Excel pack: the same sheet objects the .xlsx is written from, drawn as a grid with lettered columns, frozen rows, number formats and sheet tabs — project/src/sheetview.js:18"
+caveats:
+  - Mock data. The four source systems are mimicked, not connected; the "synced 06:00 today" source checks in the workflow are fixed strings (src/workflow.js:21).
+  - "No writeback. Report status, explained anomalies, commentary edits and the audit trail live in localStorage (key tidewater-reports-v1) over a seeded state; Reset demo clears it. \"Send\" downloads the Excel pack and opens a mailto: the pack is not attached, and the monthly auto-send checkbox only records the choice."
+  - The layer has no stored business questions (questions.md lists 0). Every object queries layer measures over raw view columns directly; the layer's 16 governed dimensions are unused by the app.
+  - Narratives, Nash answers, anomaly flags and the budget planner are browser arithmetic over governed rows. Nash routes by keywords to four canned answer types and hard-codes "208 governed measures"; its budget answer always splits £3,000 / £2,000 with a fixed 0.8 marginal-ROAS factor (src/app.js:315). The planner multiplies September by 3 for Q4 with a fixed elasticity of 0.75 (src/app.js:337).
+  - "Dates are fixed: the data's Month Bucket columns make September 2026 \"this month\", and the app hard-codes \"September 2026\", \"Sep\" and \"Aug\" in titles, sheet names and the KPI delta formats (src/dashboard.js:102)."
+  - "No selection bar: each tab has its own filter dropdowns and selection group, and pending selections are applied after 250 ms (src/app.js:68), but there are no chips or Clear all. The client tabs open on one fixed client (src/app.js:111)."
+  - "Landing: all 165 objects are compiled and themed before anything mounts (src/app.js:83), so landing-ready (~13 s in staging) sits near the 15 s budget; all objects settle in ~32 s with 884 queries."
+  - "Layout: donut slice labels are clipped on the infographic; the header source chips stack at 1024 wide."
+  - "Inert leftovers: an --accent variable block in src/objects.css, LinkedIn button and story-chapter styles in src/styles.css, a stale throttle.js header (timetable, prefetch.js) and an unused prefetchSelections, comments in fields.js and dashboard.js from other apps, and sheetview.js says buildSheets is in main.js."
+  - "tools/layer.mjs is reference only: it needs tools/mcp.mjs and tools/types.txt, neither included in this repo (it reads types.txt on load, so no command runs), creates the layer with a zero datasource id and hard-codes ASTRATO_GALLERY.MOCK_DATA. The script that generated the AGENCY_* mock data is not included in this repo; layers/agency-performance/schema/ddl.sql gives the tables. Recreate the layer from layer.json."
+  - Web fonts (Plus Jakarta Sans, Inter, Material Icons) load from a public font CDN in index.html.
+  - "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite. Checked in staging with the kit smoke test at 1440, 1280 and 1024 (165 objects rendered, 9 app checks: 5 tab selections, a Nash chart mount, a budget lever, the infographic client switch and the Excel download), compile-check 165/165 and vite build."
+  - No screenshots are shipped yet.
+  - astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too.
