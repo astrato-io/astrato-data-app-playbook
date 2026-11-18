@@ -59,10 +59,19 @@ export const actionStore = (ctx) => {
     for (const f of listeners) f();
   }, 0);
   const log = (id, what) => { state.audit.unshift({ at: now(), who: who(), id, what }); writeEvent(id, what); };
+  /** Whether the current persona may see an action (the register is read unscoped, then narrowed here). */
+  const inScope = (a) => {
+    const p = ctx.persona;
+    if (p.key === 'hrbp') return a.bu === 'Technology' && ['United Kingdom', 'Group'].includes(a.country);
+    if (p.key === 'bul') return a.bu === 'Technology';
+    if (p.key === 'rhrd') return ['United Kingdom', 'Ireland', 'Group'].includes(a.country);
+    return true;
+  };
   const approverFor = (a) => (Number(a.investment) >= 1e6 ? 'chro' : a.bu === 'Technology' ? 'bul' : 'chro');
   const store = {
     load, all, onChange: (f) => listeners.push(f), audit: (id) => state.audit.filter((x) => !id || x.id === id), statuses: STATUSES, owners: OWNERS, bus: BUS, types: TYPES,
     get: (id) => all().find((a) => a.id === id),
+    inScope,
     approverFor,
     create: (a) => {
       const id = `PA-${(200 + state.created.length + 1)}`;
@@ -90,13 +99,7 @@ export const mountActions = (ctx, host) => {
     if (a.actual == null || a.baseline == null || a.target == null || a.target === a.baseline) return a.milestones?.length ? a.milestones.filter((m) => m.done).length / a.milestones.length : 0;
     return Math.max(0, Math.min(1, (a.actual - a.baseline) / (a.target - a.baseline)));
   };
-  const inScope = (a) => {
-    const p = ctx.persona;
-    if (p.key === 'hrbp') return a.bu === 'Technology' && ['United Kingdom', 'Group'].includes(a.country);
-    if (p.key === 'bul') return a.bu === 'Technology';
-    if (p.key === 'rhrd') return ['United Kingdom', 'Ireland', 'Group'].includes(a.country);
-    return true;
-  };
+  const inScope = store.inScope;
 
   const modal = (a) => {
     const isNew = !a?.id;

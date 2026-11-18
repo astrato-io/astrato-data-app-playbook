@@ -74,9 +74,9 @@
       ],
       "capabilities": [
         "narrative-headline — project/src/explain.js:37",
-        "assistant — project/src/app.js:282",
-        "what-if — project/src/app.js:338",
-        "excel-export — project/src/app.js:385",
+        "assistant — project/src/app.js:288",
+        "what-if — project/src/app.js:344",
+        "excel-export — project/src/app.js:390",
         "simulated-workflow — project/src/workflow.js:46",
         "role-switcher — project/src/workflow.js:66"
       ],
@@ -89,21 +89,21 @@
         "Sparklines without point markers on visualizations 0.9: setMeasureShape with shape null on each measure — project/src/theme.js:159",
         "Table column formats on 0.8+ address the column by its exact name; every other column operation still takes the data-item keys — project/src/theme.js:211",
         "Native tables with a sparkline column over Month and two- or three-band indicator text — project/src/dashboard.js:380",
-        "Ask Nash answers carry a native chart: an ad-hoc tile built, compiled, themed and mounted at run time in its own selection group, pinned to the client by a static filter — project/src/app.js:243",
+        "Ask Nash answers carry a native chart: an ad-hoc tile built, compiled, themed and mounted at run time in its own selection group, pinned to the client by a static filter — project/src/app.js:249",
         "Report sign-off: anomalies flagged from the same facts must be explained or escalated before an account manager can submit; only a director or head of client services can approve and send — project/src/workflow.js:80",
-        "Send = build the client's Excel pack, download it, and open a mailto with the approved commentary as the body — project/src/app.js:457",
+        "Send = build the client's Excel pack, download it, and open a mailto with the approved commentary as the body — project/src/app.js:496",
         "Spreadsheet view of the Excel pack: the same sheet objects the .xlsx is written from, drawn as a grid with lettered columns, frozen rows, number formats and sheet tabs — project/src/sheetview.js:18"
       ],
       "caveats": [
         "Mock data. The four source systems are mimicked, not connected; the \"synced 06:00 today\" source checks in the workflow are fixed strings (src/workflow.js:21).",
         "No writeback. Report status, explained anomalies, commentary edits and the audit trail live in localStorage (key tidewater-reports-v1) over a seeded state; Reset demo clears it. \"Send\" downloads the Excel pack and opens a mailto: the pack is not attached, and the monthly auto-send checkbox only records the choice.",
         "The layer has no stored business questions (questions.md lists 0). Every object queries layer measures over raw view columns directly; the layer's 16 governed dimensions are unused by the app.",
-        "Narratives, Nash answers, anomaly flags and the budget planner are browser arithmetic over governed rows. Nash routes by keywords to four canned answer types and hard-codes \"208 governed measures\"; its budget answer always splits £3,000 / £2,000 with a fixed 0.8 marginal-ROAS factor (src/app.js:315). The planner multiplies September by 3 for Q4 with a fixed elasticity of 0.75 (src/app.js:337).",
+        "Narratives, Nash answers, anomaly flags and the budget planner are browser arithmetic over governed rows. Nash routes by keywords to four canned answer types and hard-codes \"208 governed measures\"; its budget answer always splits £3,000 / £2,000 with a fixed 0.8 marginal-ROAS factor (src/app.js:321). The planner multiplies September by 3 for Q4 with a fixed elasticity of 0.75 (src/app.js:343).",
         "Dates are fixed: the data's Month Bucket columns make September 2026 \"this month\", and the app hard-codes \"September 2026\", \"Sep\" and \"Aug\" in titles, sheet names and the KPI delta formats (src/dashboard.js:102).",
-        "No selection bar: each tab has its own filter dropdowns and selection group, and pending selections are applied after 250 ms (src/app.js:68), but there are no chips or Clear all. The client tabs open on one fixed client (src/app.js:111).",
-        "Landing: all 165 objects are compiled and themed before anything mounts (src/app.js:83), so landing-ready (~13 s in staging) sits near the 15 s budget; all objects settle in ~32 s with 884 queries.",
+        "No selection bar: each tab has its own filter dropdowns and selection group, and pending selections are applied after 250 ms (src/app.js:69), but there are no chips or Clear all. The client tabs open on one fixed client (src/app.js:115).",
+        "Landing: all 165 objects are compiled and themed before anything mounts (src/app.js:85), so landing-ready (~13 s in staging) sits near the 15 s budget; all objects settle in ~32 s with 884 queries.",
         "Layout: donut slice labels are clipped on the infographic; the header source chips stack at 1024 wide.",
-        "Inert leftovers: an --accent variable block in src/objects.css, LinkedIn button and story-chapter styles in src/styles.css, a stale throttle.js header (timetable, prefetch.js) and an unused prefetchSelections, comments in fields.js and dashboard.js from other apps, and sheetview.js says buildSheets is in main.js.",
+        "Inert leftovers: an --accent variable block in src/objects.css, LinkedIn button and story-chapter styles in src/styles.css, a stale throttle.js header (timetable, prefetch.js) and an unused prefetchSelections, comments in fields.js and dashboard.js from other apps.",
         "tools/layer.mjs is reference only: it needs tools/mcp.mjs and tools/types.txt, neither included in this repo (it reads types.txt on load, so no command runs), creates the layer with a zero datasource id and hard-codes ASTRATO_GALLERY.MOCK_DATA. The script that generated the AGENCY_* mock data is not included in this repo; layers/agency-performance/schema/ddl.sql gives the tables. Recreate the layer from layer.json.",
         "Web fonts (Plus Jakarta Sans, Inter, Material Icons) load from a public font CDN in index.html.",
         "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite. Checked in staging with the kit smoke test at 1440, 1280 and 1024 (165 objects rendered, 9 app checks: 5 tab selections, a Nash chart mount, a budget lever, the infographic client switch and the Excel download), compile-check 165/165 and vite build.",
@@ -506,21 +506,21 @@
       ],
       "capabilities": [
         "what-if — project/src/app.js:305",
-        "narrative-headline — project/src/app.js:147",
+        "narrative-headline — project/src/app.js:146",
         "simulated-workflow — project/src/workflow.js:32",
-        "excel-export — project/src/export.js:22"
+        "excel-export — project/src/export.js:40"
       ],
       "stealable": [
-        "A selection group per tab, mirrored from main by difference and only while the tab is visible, so a click re-queries only what is on screen; a self-check holds queries per selection to the visible objects — project/src/app.js:253",
-        "Chart clicks arrive as pending selections in the tab's group and are handed to main after 200 ms, so every tab and the chips follow — project/src/app.js:284",
-        "What-if through the layer: the slider sets the governed `score` parameter of Projected Rank at Score on the mounted object, with no remount — project/src/app.js:314",
-        "The same slider writes a governed `between` selection on Total Score (2027) into an `overtake` group, so the overtaken count and table are governed rows — project/src/app.js:247",
+        "A selection group per tab, mirrored from main by difference and only while the tab is visible, so a click re-queries only what is on screen; a self-check holds queries per selection to the visible objects — project/src/app.js:252",
+        "Chart clicks arrive as pending selections in the tab's group and are handed to main after 200 ms, so every tab and the chips follow — project/src/app.js:283",
+        "What-if through the layer: the slider sets the governed `score` parameter of Projected Rank at Score on the mounted object, with no remount — project/src/app.js:309",
+        "The same slider writes a governed `between` selection on Total Score (2027) into an `overtake` group, so the overtaken count and table are governed rows — project/src/app.js:246",
         "One pre-mount path for every tile (theme, governed parameters such as our score as `benchmark`, relabel by position), shared with the offline compile adapter so the check runs what the browser runs — project/src/prepare.js:63",
         "A stored question's rank-within-set and 2-edition moving average carried onto the tile as advanced-calculation operations — project/src/catalogue.js:84",
-        "Table column widths from header length at the font size, a wrapping name column sized for the longest name, row height from its line count; re-applied on resize without a remount (src/app.js:322) — project/src/prepare.js:18",
+        "Table column widths from header length at the font size, a wrapping name column sized for the longest name, row height from its line count; re-applied on resize without a remount (src/app.js:323) — project/src/prepare.js:18",
         "Bar charts narrower than 220 px drop their data labels rather than ellipsise them — project/src/prepare.js:89",
         "Rank-history sparkline column on the league table, from the joined history view's Edition Date — project/src/catalogue.js:167",
-        "Seven-sheet Excel report from each mounted object's own data (handle.getData), following the filters — project/src/export.js:22"
+        "Seven-sheet Excel report from each mounted object's own data (handle.getData), following the filters on every tab sheet (every tab group synced from main first) — project/src/export.js:40"
       ],
       "caveats": [
         {
@@ -529,14 +529,14 @@
         "Built by an agent from this repo in a clean environment as a test run, then brought up to standard: read it as what the playbook produces, not as a hand-polished demo.",
         "Third-party published data (licence unconfirmed, see DATA-SOURCES.md): 130 UK universities, 2027 edition, with the two prior overall ranks and a rank-history view (2025–2027). University names are public. The total score's component weights are not in the data, so the app shows gaps per component, not a modelled points bridge.",
         "The focus plan is not written back. Plan, decisions and audit trail live in localStorage (key climb-planner-plan-v1, src/workflow.js:22), and the screen says so.",
-        "The two what-if KPIs (projected rank, universities overtaken) are bare numbers, with no comparison or mini chart (src/app.js:190, src/app.js:191). Projected rank does not break ties.",
+        "The two what-if KPIs (projected rank, universities overtaken) are bare numbers, with no comparison or mini chart (src/app.js:189, src/app.js:190). Projected rank does not break ties.",
         "The rank-on-measure table has no sparkline column; only the league table on Where we stand carries one.",
-        "The hero's \"N points of total score separate us from the top 50\" is a subtraction in the app of two governed values (src/app.js:150), not a stored measure.",
+        "The hero's \"N points of total score separate us from the top 50\" is a subtraction in the app of two governed values (src/app.js:149), not a stored measure.",
         "Some bars draw no data label (in the test run, one of the largest movers on Who moved most, and most gap bars on What costs us places).",
         "Indicator columns (Moved, the within-set ranks) draw the same small up caret before every value, falls included; only the colour carries direction.",
         "Wrapped university names make table rows taller at 1280 and 1024, so fewer rows show without scrolling.",
         "Clicks on the KPI mini charts and on the moving-average line are untested.",
-        "Changing our university reloads the page with ?uni= (src/app.js:132).",
+        "Changing our university reloads the page with ?uni= (src/app.js:131).",
         "Inert leftovers: questions.js carries two questions no object uses (climbersBand, fallersBand); throttle.js exports a prefetch helper nothing calls, and its header comment still mentions a timetable.",
         "Checked in staging: smoke test PASS at 1440, 1280 and 1024, 29 objects, landing-ready in 5.8 s (24 s before compile and theming ran in parallel), 10 app checks (a Nation filter on each of the first three tabs with queries per selection held to the visible objects, a chart click that the next tab follows, the what-if, the focus table, the workflow, an empty selection, the Excel report, no overflow); compile-check 29/29; build passes. Not published, so no live smoke.",
         "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite.",
@@ -854,7 +854,7 @@
         "writeback-workflow — project/src/core.js:176",
         "what-if — project/src/pages/scenario.js:56",
         "excel-export — project/src/xlsx.js:207",
-        "pdf-export — project/src/export.js:48",
+        "pdf-export — project/src/export.js:95",
         "assistant — project/src/pages/nash.js:18",
         "role-switcher — project/src/core.js:46",
         "record-drawer — project/src/core.js:94"
@@ -1133,8 +1133,8 @@
       "capabilities": [
         "writeback-workflow — project/src/app.js:342",
         "role-switcher — project/src/app.js:285",
-        "what-if — project/src/app.js:481",
-        "excel-export — project/src/app.js:639",
+        "what-if — project/src/app.js:482",
+        "excel-export — project/src/app.js:655",
         "narrative-headline — project/src/app.js:300",
         "drill-down — project/src/app.js:370"
       ],
@@ -1153,7 +1153,7 @@
         "The smoke checks are read-only; no write was exercised by the smoke test.",
         "Visualizations 0.9: the Unreconciled statements comparison row shows the change as \"-13.1 pts\" with a decimal pts format, while the measure is +13.125 through MCP.",
         "At 1440 wide with six KPI cards per row, the calc-error comparison is truncated (\"impact $33,…\"). \"Acting as\" is clipped at 1280, and the header stacks below 1100px. Summary stays a narrow column even at 1440.",
-        "The Exception pivot is an HTML table drawn from governed queries (the native table here has a grand total only); the close simulator's bars are hand-drawn SVG and its projection is browser arithmetic, including a fixed 0.6 factor on residual exposure (src/app.js:498).",
+        "The Exception pivot is an HTML table drawn from governed queries (the native table here has a grand total only); the close simulator's bars are hand-drawn SVG and its projection is browser arithmetic, including a fixed 0.6 factor on residual exposure (src/app.js:501).",
         "Native tiles query layer measures directly, not stored questions; the \"BQ · …\" caption on each card is generated from the tile title (src/catalogue.js:172). Only the Business questions tab runs stored questions, and it hides the 7 that belong to the layer's sibling recovery app.",
         "The header Branch, Run and Currency dropdowns write the same selection into all four groups (src/app.js:292), so one change re-queries about 150 objects on every tab.",
         "No analyst in ROYALTY_USERS covers DE, ES or JP: nobody can open or submit a case on those branches, and seeded cases there are owned by an analyst scoped to US only.",
@@ -1355,7 +1355,7 @@
         "writeback-workflow — project/src/workflow.js:48",
         "role-switcher — project/src/app.js:92",
         "what-if — project/src/app.js:187",
-        "excel-export — project/src/app.js:274"
+        "excel-export — project/src/app.js:290"
       ],
       "stealable": [
         "Each stock step as a sequence of app.writeback inserts and updates on governed tables (batch, movement, purchase order), then a cache clear and a re-query of every mounted object — project/src/workflow.js:48",
@@ -1375,7 +1375,7 @@
         "No data generator or reset script is shipped; the layer's tables were loaded from CSV files that are not included. layers/inventory-rotation/schema/ddl.sql gives the shapes, but lists the Month and Period custom fields of Movements and Sales Orders as columns. The SQL views hard-code ASTRATO_GALLERY.ASTRATO.",
         "Transfers assume exactly two warehouses (WH-UK and WH-US). The Plan tab is browser arithmetic over a governed baseline. The Value at risk card's mini-chart plots units expired by month, not value at risk.",
         "styles.css, objects.css and ops.css carry rules for screens this app does not have.",
-        "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite. Verified with compile-check (21/21) and vite build; the app registers six smoke checks, but no smoke-test run is recorded for this export.",
+        "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite. Verified with compile-check (21/21) and vite build; the app registers six smoke checks and an export probe, but no smoke-test run is recorded for this export.",
         "No screenshots are shipped yet.",
         "astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too."
       ],
@@ -1822,7 +1822,7 @@
     {
       "slug": "xlsx-export",
       "title": "Formatted Excel report",
-      "summary": "An \"Excel report\" button that writes a formatted, multi-tab management report from the same governed queries as the screen, following the filters on screen.",
+      "summary": "An \"Excel report\" button that writes a formatted, multi-tab management report from the same governed queries as the screen, following the filters on screen on **every** sheet.",
       "path": "patterns/xlsx-export.md",
       "examples": [
         "agency-client-reporting",
@@ -2039,7 +2039,7 @@
     "assistant": [
       {
         "example": "agency-client-reporting",
-        "where": "project/src/app.js:282"
+        "where": "project/src/app.js:288"
       },
       {
         "example": "people-intelligence",
@@ -2109,7 +2109,7 @@
     "what-if": [
       {
         "example": "agency-client-reporting",
-        "where": "project/src/app.js:338"
+        "where": "project/src/app.js:344"
       },
       {
         "example": "ed-wait-watch",
@@ -2141,7 +2141,7 @@
       },
       {
         "example": "royalty-close",
-        "where": "project/src/app.js:481"
+        "where": "project/src/app.js:482"
       },
       {
         "example": "snowline",
@@ -2159,7 +2159,7 @@
     "excel-export": [
       {
         "example": "agency-client-reporting",
-        "where": "project/src/app.js:385"
+        "where": "project/src/app.js:390"
       },
       {
         "example": "ed-wait-watch",
@@ -2175,7 +2175,7 @@
       },
       {
         "example": "league-table-planner",
-        "where": "project/src/export.js:22"
+        "where": "project/src/export.js:40"
       },
       {
         "example": "people-intelligence",
@@ -2191,7 +2191,7 @@
       },
       {
         "example": "royalty-close",
-        "where": "project/src/app.js:639"
+        "where": "project/src/app.js:655"
       },
       {
         "example": "snowline",
@@ -2199,7 +2199,7 @@
       },
       {
         "example": "stock-rotation",
-        "where": "project/src/app.js:274"
+        "where": "project/src/app.js:290"
       },
       {
         "example": "superstore-explorer",
@@ -2213,7 +2213,7 @@
     "pdf-export": [
       {
         "example": "portfolio-os",
-        "where": "project/src/export.js:48"
+        "where": "project/src/export.js:95"
       }
     ],
     "data-blending": [
@@ -2265,7 +2265,7 @@
       },
       {
         "example": "league-table-planner",
-        "where": "project/src/app.js:147"
+        "where": "project/src/app.js:146"
       },
       {
         "example": "people-intelligence",

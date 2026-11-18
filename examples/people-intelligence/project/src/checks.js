@@ -10,6 +10,7 @@
  */
 import { appState } from './app-state.js';
 import { answerFor } from './throttle.js';
+import { buildWorkbook } from './export.js';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const textOf = (id) => (document.querySelector(`[data-slot="${id}"]`)?.innerText ?? '').replace(/\s+/g, ' ').trim();
@@ -104,6 +105,16 @@ export const registerChecks = (ctx, { exportBtn, mountPage }) => {
   });
 
   // ---------------------------------------------------------------- executive summary workbook
+  // The export follows the selections of the page on screen. The smoke test builds it from the landing
+  // page (My People Home) with and without a business unit selected there, and every governed sheet must
+  // change. Scenario (the simulator's own population) and Actions & audit (the persona-scoped register)
+  // rightly ignore page selections.
+  appState.exportProbe({
+    build: async () => (await buildWorkbook(ctx)).blob,
+    select: () => ctx.select('g-home', 'Business Unit', 'Business Units', ['Technology']),
+    clear: () => ctx.select('g-home', 'Business Unit', 'Business Units', []),
+    exempt: ['Scenario', 'Actions & audit'],
+  });
   appState.check('Export builds the executive-summary Excel workbook (7 sheets) and downloads it', async () => {
     await show('home');
     window.__lastExport = 0;

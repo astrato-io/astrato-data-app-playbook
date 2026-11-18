@@ -43,7 +43,7 @@ governed measures, with the layer's own format pattern and description
 ([catalogue.js:12](project/src/catalogue.js#L12)). A row is always the raw column key, because a chart
 click and a selection both select on the column. Starter reports name fields and drop any the
 layer lacks ([report.js:184](project/src/report.js#L184)); a saved or shared report drops them too
-([builder.js:243](project/src/builder.js#L243)).
+([builder.js:246](project/src/builder.js#L246)).
 
 **State → spec → vSpec, all pure.** The report is one plain object: view, ordered rows (with a
 grain on dates), ordered figures, compare, sort, row limit, period and filters. `reportSpec` turns
@@ -53,19 +53,19 @@ it into ordered columns with refs, labels and formats ([report.js:50](project/sr
 reported and never hides the rest ([report.js:156](project/src/report.js#L156)). Nothing needs a
 session, so `npm run compile-check` runs the same path over every view, every starter and both
 comparisons at two widths. Every change drops the object and mounts a new one, 300 ms after the
-last edit ([builder.js:207](project/src/builder.js#L207), [builder.js:231](project/src/builder.js#L231)).
+last edit ([builder.js:208](project/src/builder.js#L208), [builder.js:234](project/src/builder.js#L234)).
 
 **Filters and the period are selections.** Each filter is an applied `inList` selection in one
-group, `report` ([builder.js:60](project/src/builder.js#L60)); the value picker reads a field's values
-with a governed query ([builder.js:183](project/src/builder.js#L183)); the chips and Clear all are the
-app's own ([builder.js:174](project/src/builder.js#L174), [builder.js:72](project/src/builder.js#L72)).
+group, `report` ([builder.js:59](project/src/builder.js#L59)); the value picker reads a field's values
+with a governed query ([builder.js:184](project/src/builder.js#L184)); the chips and Clear all are the
+app's own ([builder.js:175](project/src/builder.js#L175), [builder.js:73](project/src/builder.js#L73)).
 The period is a `between` selection on the chosen date field
-([builder.js:65](project/src/builder.js#L65)), its presets counting back from the last date in the
-data, read once with a MIN / MAX query ([builder.js:44](project/src/builder.js#L44),
+([builder.js:66](project/src/builder.js#L66)), its presets counting back from the last date in the
+data, read once with a MIN / MAX query ([builder.js:43](project/src/builder.js#L43),
 [builder.js:18](project/src/builder.js#L18)). The native object follows the group by itself. A click
 on a bar or a cell leaves a pending selection that the app applies after 250 ms, so it becomes a
 filter chip; a click on a date is dropped, because it would replace the period
-([builder.js:317](project/src/builder.js#L317)).
+([builder.js:341](project/src/builder.js#L341)).
 
 **Period comparison without comparison measures.** The layer has no time axis and no
 vs-last-year measures, so the change is the table's own inter-record calculation
@@ -78,7 +78,7 @@ Each figure gets a change column: `growth`, or `diff` for a ratio (a figure whos
 labelled "vs LY %" or "vs LY (pts)" ([report.js:56](project/src/report.js#L56)), set with
 `setMeasureAdvancedCalculationType` and `setMeasureAdvancedOffset`
 ([report.js:130](project/src/report.js#L130)). The note under the controls says what is compared, or
-why nothing is ([builder.js:221](project/src/builder.js#L221)). Why ascending and negative: see
+why nothing is ([builder.js:224](project/src/builder.js#L224)). Why ascending and negative: see
 [Window calculations](../../knowledge/engine-and-queries.md#window-calculations-diff-growth-running-total-give-the-wrong-rows).
 
 **Two columns on one measure.** A change column is a second copy of its figure, and format
@@ -94,19 +94,25 @@ refits the widths in place with `applyRuntimeOperations`, without a remount
 ([app.js:112](project/src/app.js#L112)).
 
 **Save, reopen, share.** Save keeps up to 30 reports in `localStorage` under a key per layer
-([builder.js:252](project/src/builder.js#L252), [builder.js:35](project/src/builder.js#L35)); Saved reports
-lists them with the starters ([builder.js:259](project/src/builder.js#L259)) and reopens one, filters and
-period included ([builder.js:244](project/src/builder.js#L244)). The address always carries the current
-report as `#r=<base64url JSON>` ([builder.js:268](project/src/builder.js#L268),
-[builder.js:272](project/src/builder.js#L272)), so a reload or bookmark keeps it, and Share link copies it.
+([builder.js:255](project/src/builder.js#L255), [builder.js:35](project/src/builder.js#L35)); Saved reports
+lists them with the starters ([builder.js:262](project/src/builder.js#L262)) and reopens one, filters and
+period included ([builder.js:247](project/src/builder.js#L247)). The address always carries the current
+report as `#r=<base64url JSON>` ([builder.js:271](project/src/builder.js#L271),
+[builder.js:275](project/src/builder.js#L275)), so a reload or bookmark keeps it, and Share link copies it.
 
-**Excel of exactly what is shown.** Export reads the mounted object's own rows with
-`runtime.getData(tileId)` ([builder.js:281](project/src/builder.js#L281)), so the workbook holds the
-comparison columns the table computed. The Report sheet carries the period, filters and comparison
-in its header, each figure in the layer's format turned into an Excel format
-([catalogue.js:36](project/src/catalogue.js#L36)); a Definitions sheet gives each column's
-meaning from the layer's descriptions. The `.xlsx` writer has no dependencies
-([xlsx.js:109](project/src/xlsx.js#L109)).
+**Excel of exactly what is shown.** `buildWorkbook()` returns the workbook as a Blob and the
+Export .xlsx button downloads it ([builder.js:287](project/src/builder.js#L287)). It reads the mounted object's own
+rows with `runtime.getData(tileId)`, so the workbook holds the comparison columns the table computed
+and follows every filter and the period: they are applied selections in the object's one group.
+Before reading, it applies a chart click still pending, waits for a period change to be applied and
+flushes the 300 ms re-render, so the rows and the header describe the same report. The Report sheet's
+header states the period (with its date field), the filters, the comparison and the row count, and
+says when the row limit cut the rows. Each figure keeps the layer's format turned into an Excel format
+([catalogue.js:36](project/src/catalogue.js#L36)); a Definitions sheet gives each column's meaning
+from the layer's descriptions. The `.xlsx` writer has no dependencies
+([xlsx.js:109](project/src/xlsx.js#L109)). The app registers `appState.exportProbe` with a Region =
+West filter ([checks.js:36](project/src/checks.js#L36)), so the smoke test proves the Report sheet
+follows it.
 
 Also useful:
 - the chart definitions: a bar is horizontal unless its first row is a date, a second row stacks it, and colours are dealt from an ordered palette rather than hashed, which collides ([report.js:86](project/src/report.js#L86), [report.js:144](project/src/report.js#L144));
@@ -125,7 +131,7 @@ joins, 6 dimensions, 5 measures and 8 stored business questions.
 
 On another layer, set `semanticLayerId` and the same app lists that layer's fields; starters whose
 fields are missing are dropped, and with none left the first report is the first row by the first
-figure ([builder.js:329](project/src/builder.js#L329)).
+figure ([builder.js:352](project/src/builder.js#L352)).
 
 ## Rebuild from nothing
 
@@ -151,14 +157,14 @@ Needs Node 24.18 or later. Roboto is bundled from npm; nothing loads from a CDN.
 ## Caveats
 
 - **The comparison is row to row, not calendar-based.** The layer has no time axis, so a gap in the dates shifts the offset, and the first period (or first year) of the range is blank. It shows only in the table, with a date row at month, quarter or year.
-- While comparing, Sort is disabled and the table is sorted by date ascending ([builder.js:170](project/src/builder.js#L170)).
+- While comparing, Sort is disabled and the table is sorted by date ascending ([builder.js:171](project/src/builder.js#L171)).
 - A ratio's change is a difference in points but is formatted with a % sign; the header says "(pts)". In the second screenshot, Profit Ratio vs LY for Jan 2017 reads "-48.8%", meaning −48.8 points.
 - Charts use the first two rows, and with two rows only the first figure ([report.js:57](project/src/report.js#L57)); they never show the comparison.
 - The 7-column comparison starter scrolls sideways inside the table at 1024 px.
 - Saved reports stay in one browser; Share link is how a report travels.
 - **No stored business questions** behind the object: ad hoc by design. No KPI band, narrative or what-if: it is one report, not a dashboard. It also offers raw view columns as rows, which the [rubric's A3 note](../../playbook/rubric.md) counts as an unmatched object; the [pattern](../../patterns/report-builder.md) says to offer stored dimensions only.
 - A bar with one row and several figures would stack on 0.9, so the example sends `setBarChartLayout: 'groups'` for it ([report.js:150](project/src/report.js#L150)); not yet re-checked in a browser. A Line view does not select on click on 0.9.
-- The filter picker offers non-date rows only and reads the first 500 values of a field, listing 300 at a time with a search ([builder.js:182](project/src/builder.js#L182)).
+- The filter picker offers non-date rows only and reads the first 500 values of a field, listing 300 at a time with a search ([builder.js:183](project/src/builder.js#L183)).
 - Periods count back from the last date in the data, so on this sample Year to date and Last 12 months are the same range (1 Jan – 30 Dec 2019).
 - The app runs on any layer, but the smoke checks ([checks.js:30](project/src/checks.js#L30)) and `tools/compile-adapter.mjs` name Superstore fields; rewrite them for another layer. `tools/available-fields.json` is the catalogue a smoke run saved.
 - Checked in staging with the kit smoke test at 1440, 1280 and 1024: PASS with no page scroll, landing in about 1.7 s, 7/7 app checks (build from the panel, Region filter and Clear all, Year to date, Bar / Line / Table, save + reopen + share link, Excel export, and the Dec 2019 comparison value above); `npm run compile-check` 32/32 and `vite build`; figures cross-checked against an MCP query.

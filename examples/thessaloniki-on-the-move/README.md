@@ -44,7 +44,7 @@ re-runs the query shapes of the chapter on screen with each filter value added, 
 yielding whenever a real query starts ([throttle.js:66](project/src/throttle.js#L66)), so the
 next click is usually answered from the cache. The values come once from the layer, and
 prefetch does not start until every object has mounted
-([app.js:742](project/src/app.js#L742), [app.js:1128](project/src/app.js#L1128)): started during
+([app.js:748](project/src/app.js#L748), [app.js:1145](project/src/app.js#L1145)): started during
 boot, it held two lanes and slowed the last mounts. 429s back off up to six times; 502, 503 and
 504 are retried at most twice ([throttle.js:117](project/src/throttle.js#L117)).
 
@@ -52,15 +52,15 @@ boot, it held two lanes and slowed the last mounts. 429s back off up to six time
 is moved into its chapter's own group ([dashboard.js:457](project/src/dashboard.js#L457)). A
 filter-bar change marks every chapter dirty, mirrors it into the chapter on screen at once and
 into the chapters either side 1.8 s later; the rest catch up when scrolled to
-([app.js:769](project/src/app.js#L769)). A click inside a chapter is moved to the filter bar as a
-pending selection, which the app applies after 300 ms ([app.js:781](project/src/app.js#L781)).
+([app.js:775](project/src/app.js#L775)). A click inside a chapter is moved to the filter bar as a
+pending selection, which the app applies after 300 ms ([app.js:787](project/src/app.js#L787)).
 The chips and Reset are the app's own; Reset removes the main group's selections outside the
 mirroring flag, so chips, chapters and narratives all refresh ([app.js:261](project/src/app.js#L261)).
 
 **A map from a scatter.** A stop map is a scatter whose measures are `Stop Lon` and `Stop Lat`,
 coloured by the raw `AM Peak Buses Per Hour` field ([dashboard.js:130](project/src/dashboard.js#L130)).
 Its axes are pinned to a lon/lat window ([dashboard.js:488](project/src/dashboard.js#L488)) widened
-to the plot's own aspect, so a kilometre across equals a kilometre down ([app.js:487](project/src/app.js#L487)).
+to the plot's own aspect, so a kilometre across equals a kilometre down ([app.js:493](project/src/app.js#L493)).
 Raster street tiles sit behind the chart's plot canvas, each placed by its own lon/lat bounds
 ([basemap.js:37](project/src/basemap.js#L37)). On visualizations 0.9 the gradient's 0–18 limits
 take effect only after `setColoringGradientAuto: false` ([theme.js:298](project/src/theme.js#L298)).
@@ -74,27 +74,27 @@ scheduled times of consecutive stops ([sim.js:33](project/src/sim.js#L33)) and d
 laid exactly over the stop map's plot canvas ([sim.js:56](project/src/sim.js#L56)). The governed
 fleet chart below is mounted three times (2-, 5- and 15-minute bars, one shown per speed,
 [dashboard.js:239](project/src/dashboard.js#L239)); the clock moves a native reference line on its
-time axis, at most four times a second ([app.js:952](project/src/app.js#L952)).
+time axis, at most four times a second ([app.js:958](project/src/app.js#L958)).
 
 **Route explorer in its own group.** A click on a line anywhere in the story opens it in the route
-explorer instead of filtering ([app.js:712](project/src/app.js#L712)). The pick is written on the
+explorer instead of filtering ([app.js:718](project/src/app.js#L718)). The pick is written on the
 dropdown's own `Line Label` field, so the dropdown's other labels stay selectable
-([app.js:702](project/src/app.js#L702)); several lines can be compared, each path drawn in its own
-colour from the day file, and the map refits to their stops ([app.js:820](project/src/app.js#L820)).
+([app.js:708](project/src/app.js#L708)); several lines can be compared, each path drawn in its own
+colour from the day file, and the map refits to their stops ([app.js:826](project/src/app.js#L826)).
 
 **Narratives and a what-if on governed numbers.** One batch of governed queries, filtered like the
 screen, feeds every chapter's sentence, the three findings and the scatter's average and median
-lines ([app.js:570](project/src/app.js#L570), [app.js:650](project/src/app.js#L650)). The bus-priority
+lines ([app.js:576](project/src/app.js#L576), [app.js:656](project/src/app.js#L656)). The bus-priority
 what-if takes the lines under 18 km/h from the same rows: a speed gain *g* saves bus-hours × g/(1+g),
-and the reinvested share becomes extra trips at the average trip length ([app.js:671](project/src/app.js#L671)).
+and the reinvested share becomes extra trips at the average trip length ([app.js:677](project/src/app.js#L677)).
 
 Also useful:
 - KPIs are one-row tables over the one-value `City` column, so they narrow with selections ([dashboard.js:99](project/src/dashboard.js#L99)); their mini charts are lines by service day, a bar by distance band and the fleet by hour ([dashboard.js:162](project/src/dashboard.js#L162));
-- all 54 objects mount at load through four lanes, hero numbers first, and the splash closes when the six hero values are in ([app.js:1121](project/src/app.js#L1121));
-- table columns are pixel shares of the slot, refitted on resize without a remount ([app.js:533](project/src/app.js#L533));
-- a seven-sheet management report (summary with bullets, lines, daily rhythm, access, opportunities, every stop, definitions) from governed queries scoped to the filters on screen ([report.js:23](project/src/report.js#L23)), written by a dependency-free OOXML writer ([xlsx.js:201](project/src/xlsx.js#L201));
-- a 1200×627 share card drawn on a canvas from the governed figures, with an editable suggested post, a download and the system share sheet where the browser has one ([share.js:41](project/src/share.js#L41), [app.js:1048](project/src/app.js#L1048));
-- thirteen smoke checks the app registers: on each of the ten sections a line-category filter moves a figure and an object and Reset restores them, the route explorer changes line and back, the what-if moves with its slider, and the Excel report downloads ([app.js:1157](project/src/app.js#L1157)).
+- all 54 objects mount at load through four lanes, hero numbers first, and the splash closes when the six hero values are in ([app.js:1139](project/src/app.js#L1139));
+- table columns are pixel shares of the slot, refitted on resize without a remount ([app.js:539](project/src/app.js#L539));
+- a seven-sheet management report (summary with bullets, lines, daily rhythm, access, opportunities, every stop, definitions) from governed queries that pass the filter bar's applied selections explicitly, so every sheet follows them whichever chapter is on screen; a pick still in its 300 ms debounce is applied first, and each sheet's subtitle lists every filter value in full ([report.js:32](project/src/report.js#L32), [app.js:1104](project/src/app.js#L1104)). `buildWorkbook()` returns the Blob and the button downloads it; the app registers `appState.exportProbe` with a line-category filter, so the smoke test proves every sheet but Definitions moves with it ([app.js:1236](project/src/app.js#L1236)). Written by a dependency-free OOXML writer ([xlsx.js:202](project/src/xlsx.js#L202));
+- a 1200×627 share card drawn on a canvas from the governed figures, with an editable suggested post, a download and the system share sheet where the browser has one ([share.js:41](project/src/share.js#L41), [app.js:1054](project/src/app.js#L1054));
+- thirteen smoke checks the app registers: on each of the ten sections a line-category filter moves a figure and an object and Reset restores them, the route explorer changes line and back, the what-if moves with its slider, and the Excel report downloads ([app.js:1175](project/src/app.js#L1175)).
 
 ## Semantic layer
 
@@ -112,7 +112,7 @@ has 7 views, 7 joins, 26 dimensions, 63 measures and no stored business question
 
 1. **Data.** The app reads five warehouse tables derived from the authority's public GTFS feed for 14 Jul – 3 Aug 2026: `TH_SERVICE`, `TH_LINES`, `TH_STOPS`, `TH_LINE_STOPS` and `TH_FLEET_MINUTE`. Their columns and types are listed in [`tools/types.txt`](project/tools/types.txt). The step that turned the feed into these tables is **not included in this repo**, and no rows are. For the animated day, also write one weekday's trips to `project/public/sim-day.json` in the shape documented at the top of [sim.js](project/src/sim.js); without it the live-day panel shows "needs a trips extract".
 2. **Layer.** Recreate it from [`layers/thessaloniki-transit/layer.json`](../../layers/thessaloniki-transit/layer.json), replacing `ASTRATO_GALLERY.MOCK_DATA` in the five table views and in the `Categories` SQL view with your database and schema. [`tools/layer.mjs`](project/tools/layer.mjs) is reference only: it needs a `tools/mcp.mjs` MCP client (taking `<tool> @argsfile` and printing `{ok,data}`), which is **not included in this repo**, creates the layer with a zero datasource id, and its [`entities.mjs`](project/tools/entities.mjs) declares 5 views and 2 joins, not the 7 and 7 in `layer.json`.
-3. **App.** See Run it. The layer must be published before the app can see it. Change the source line in the hero ([app.js:369](project/src/app.js#L369)) and the report ([report.js:15](project/src/report.js#L15)), which name the `ASTRATO_GALLERY.MOCK_DATA.TH_*` tables, to your own.
+3. **App.** See Run it. The layer must be published before the app can see it. Change the source line in the hero ([app.js:375](project/src/app.js#L375)) and the report ([report.js:19](project/src/report.js#L19)), which name the `ASTRATO_GALLERY.MOCK_DATA.TH_*` tables, to your own.
 
 ## Run it
 
@@ -133,16 +133,16 @@ servers at run time.
 ## Caveats
 
 - **Scheduled service, not ridership.** The Boarding chapter uses scheduled departures as a stand-in for demand.
-- **Landing.** The hero is ready in 4–6.5 s; all 54 objects settle in 14–23 s on a shared backend. The staging run failed the 15 s landing budget because the app marked only `hero-ready`, so the kit timed `all-settled`; it now also marks `landing-ready` ([app.js:1226](project/src/app.js#L1226)), not yet re-run. Otherwise 13/13 smoke checks pass at 1440, 1280 and 1024, 54/54 objects render, `npm run compile-check` passes 54/54 and `vite build` passes.
+- **Landing.** The hero is ready in 4–6.5 s; all 54 objects settle in 14–23 s on a shared backend. The staging run failed the 15 s landing budget because the app marked only `hero-ready`, so the kit timed `all-settled`; it now also marks `landing-ready` ([app.js:1253](project/src/app.js#L1253)), not yet re-run. Otherwise 13/13 smoke checks pass at 1440, 1280 and 1024, 54/54 objects render, `npm run compile-check` passes 54/54 and `vite build` passes.
 - **No stored business questions.** Every object queries layer measures over raw view columns; the layer's governed dimensions go unused. The playbook asks for stored questions.
 - Hero KPIs are one-row tables with a mini chart and no period comparison.
-- Narratives, findings, the what-if, the share card and the report are browser arithmetic over governed rows (for example, the bus-hours on slow lines are summed in the app, [app.js:615](project/src/app.js#L615)).
-- Some figures are hard-coded and ignore the filters: the chapter titles "nearly 8,000 bus trips a day" and "Watch 8,015 trips", the live map's "3,673 stops" note, and the live category bars' fixed scale of 260 ([app.js:939](project/src/app.js#L939)).
-- The live day needs a trips extract that is not shipped (`public/sim-day.json`); without it the play button is disabled and the route map draws no coloured paths. When present, it is a static file, not a governed query. It follows only the line-category filter ([app.js:924](project/src/app.js#L924)), the route map's coloured paths come from it too ([sim.js:108](project/src/sim.js#L108)), and the narrative's fleet peak is queried without the filter bar ([app.js:585](project/src/app.js#L585)).
-- The live narrative says the governed chart is "averaged per ten minutes" ([app.js:640](project/src/app.js#L640)); its bars are 2, 5 or 15 minutes, 5 by default.
+- Narratives, findings, the what-if, the share card and the report are browser arithmetic over governed rows (for example, the bus-hours on slow lines are summed in the app, [app.js:621](project/src/app.js#L621)).
+- Some figures are hard-coded and ignore the filters: the chapter titles "nearly 8,000 bus trips a day" and "Watch 8,015 trips", the live map's "3,673 stops" note, and the live category bars' fixed scale of 260 ([app.js:945](project/src/app.js#L945)).
+- The live day needs a trips extract that is not shipped (`public/sim-day.json`); without it the play button is disabled and the route map draws no coloured paths. When present, it is a static file, not a governed query. It follows only the line-category filter ([app.js:930](project/src/app.js#L930)), the route map's coloured paths come from it too ([sim.js:108](project/src/sim.js#L108)), and the narrative's fleet peak is queried without the filter bar ([app.js:591](project/src/app.js#L591)).
+- The live narrative says the governed chart is "averaged per ten minutes" ([app.js:646](project/src/app.js#L646)); its bars are 2, 5 or 15 minutes, 5 by default.
 - Basemap tiles come from a public tile server with no key ([basemap.js:15](project/src/basemap.js#L15)); use a licensed tile provider in production. Some tiles are missing in the whole-region view (see the Geography screenshot), and the "Coordinates as measures" badge still says there is no basemap service ([app.js:167](project/src/app.js#L167)).
 - Layout: the bus-hours-by-time-band chart has a short plot under rotated labels; the buses-at-08:00 line labels are cut to an ellipsis; the opportunity and route tables are cramped at 1024; the route dropdown shows a "Line Label" prefix and the filter dropdowns show column names (Category, Dist Band) as placeholders; band labels keep their sort prefix ("1. Centre (<2 km)"); the stop-map legend title is truncated.
-- On desktop the wheel and arrow keys move a whole chapter per gesture ([app.js:881](project/src/app.js#L881)); a table that can still scroll keeps the wheel.
+- On desktop the wheel and arrow keys move a whole chapter per gesture ([app.js:887](project/src/app.js#L887)); a table that can still scroll keeps the wheel.
 - Stale comments: the [dashboard.js](project/src/dashboard.js) header names only the main and route groups and its Live section says the live chapter has its own group (the `LIVE` group is unused); the [share.js](project/src/share.js) header says the card is copied to the clipboard, which the app does not do.
 - Web fonts (Fraunces, Inter, Material Icons) load from a public font CDN in `index.html`.
 - `astrato.json` carries a zero placeholder `semanticLayerId`; `layer.json`'s datasource is a placeholder too.

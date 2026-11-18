@@ -53,9 +53,9 @@ start_here:
   - project/tools/entities.mjs — the layer's views, joins, dimensions and 208 measures, including the driver bridges
 capabilities:
   - narrative-headline — project/src/explain.js:37
-  - assistant — project/src/app.js:282
-  - what-if — project/src/app.js:338
-  - excel-export — project/src/app.js:385
+  - assistant — project/src/app.js:288
+  - what-if — project/src/app.js:344
+  - excel-export — project/src/app.js:390
   - simulated-workflow — project/src/workflow.js:46
   - role-switcher — project/src/workflow.js:66
 stealable:
@@ -67,20 +67,20 @@ stealable:
   - "Sparklines without point markers on visualizations 0.9: setMeasureShape with shape null on each measure — project/src/theme.js:159"
   - "Table column formats on 0.8+ address the column by its exact name; every other column operation still takes the data-item keys — project/src/theme.js:211"
   - "Native tables with a sparkline column over Month and two- or three-band indicator text — project/src/dashboard.js:380"
-  - "Ask Nash answers carry a native chart: an ad-hoc tile built, compiled, themed and mounted at run time in its own selection group, pinned to the client by a static filter — project/src/app.js:243"
+  - "Ask Nash answers carry a native chart: an ad-hoc tile built, compiled, themed and mounted at run time in its own selection group, pinned to the client by a static filter — project/src/app.js:249"
   - "Report sign-off: anomalies flagged from the same facts must be explained or escalated before an account manager can submit; only a director or head of client services can approve and send — project/src/workflow.js:80"
-  - "Send = build the client's Excel pack, download it, and open a mailto with the approved commentary as the body — project/src/app.js:457"
+  - "Send = build the client's Excel pack, download it, and open a mailto with the approved commentary as the body — project/src/app.js:496"
   - "Spreadsheet view of the Excel pack: the same sheet objects the .xlsx is written from, drawn as a grid with lettered columns, frozen rows, number formats and sheet tabs — project/src/sheetview.js:18"
 caveats:
   - Mock data. The four source systems are mimicked, not connected; the "synced 06:00 today" source checks in the workflow are fixed strings (src/workflow.js:21).
   - "No writeback. Report status, explained anomalies, commentary edits and the audit trail live in localStorage (key tidewater-reports-v1) over a seeded state; Reset demo clears it. \"Send\" downloads the Excel pack and opens a mailto: the pack is not attached, and the monthly auto-send checkbox only records the choice."
   - The layer has no stored business questions (questions.md lists 0). Every object queries layer measures over raw view columns directly; the layer's 16 governed dimensions are unused by the app.
-  - Narratives, Nash answers, anomaly flags and the budget planner are browser arithmetic over governed rows. Nash routes by keywords to four canned answer types and hard-codes "208 governed measures"; its budget answer always splits £3,000 / £2,000 with a fixed 0.8 marginal-ROAS factor (src/app.js:315). The planner multiplies September by 3 for Q4 with a fixed elasticity of 0.75 (src/app.js:337).
+  - Narratives, Nash answers, anomaly flags and the budget planner are browser arithmetic over governed rows. Nash routes by keywords to four canned answer types and hard-codes "208 governed measures"; its budget answer always splits £3,000 / £2,000 with a fixed 0.8 marginal-ROAS factor (src/app.js:321). The planner multiplies September by 3 for Q4 with a fixed elasticity of 0.75 (src/app.js:343).
   - "Dates are fixed: the data's Month Bucket columns make September 2026 \"this month\", and the app hard-codes \"September 2026\", \"Sep\" and \"Aug\" in titles, sheet names and the KPI delta formats (src/dashboard.js:102)."
-  - "No selection bar: each tab has its own filter dropdowns and selection group, and pending selections are applied after 250 ms (src/app.js:68), but there are no chips or Clear all. The client tabs open on one fixed client (src/app.js:111)."
-  - "Landing: all 165 objects are compiled and themed before anything mounts (src/app.js:83), so landing-ready (~13 s in staging) sits near the 15 s budget; all objects settle in ~32 s with 884 queries."
+  - "No selection bar: each tab has its own filter dropdowns and selection group, and pending selections are applied after 250 ms (src/app.js:69), but there are no chips or Clear all. The client tabs open on one fixed client (src/app.js:115)."
+  - "Landing: all 165 objects are compiled and themed before anything mounts (src/app.js:85), so landing-ready (~13 s in staging) sits near the 15 s budget; all objects settle in ~32 s with 884 queries."
   - "Layout: donut slice labels are clipped on the infographic; the header source chips stack at 1024 wide."
-  - "Inert leftovers: an --accent variable block in src/objects.css, LinkedIn button and story-chapter styles in src/styles.css, a stale throttle.js header (timetable, prefetch.js) and an unused prefetchSelections, comments in fields.js and dashboard.js from other apps, and sheetview.js says buildSheets is in main.js."
+  - "Inert leftovers: an --accent variable block in src/objects.css, LinkedIn button and story-chapter styles in src/styles.css, a stale throttle.js header (timetable, prefetch.js) and an unused prefetchSelections, comments in fields.js and dashboard.js from other apps."
   - "tools/layer.mjs is reference only: it needs tools/mcp.mjs and tools/types.txt, neither included in this repo (it reads types.txt on load, so no command runs), creates the layer with a zero datasource id and hard-codes ASTRATO_GALLERY.MOCK_DATA. The script that generated the AGENCY_* mock data is not included in this repo; layers/agency-performance/schema/ddl.sql gives the tables. Recreate the layer from layer.json."
   - Web fonts (Plus Jakarta Sans, Inter, Material Icons) load from a public font CDN in index.html.
   - "Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite. Checked in staging with the kit smoke test at 1440, 1280 and 1024 (165 objects rendered, 9 app checks: 5 tab selections, a Nash chart mount, a budget lever, the infographic client switch and the Excel download), compile-check 165/165 and vite build."

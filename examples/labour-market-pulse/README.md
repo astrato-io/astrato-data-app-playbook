@@ -83,7 +83,7 @@ The mini line is its own object on its own question ([catalogue.js:35](project/s
 label }`, the shape charts send; `{ fieldKey: '[dimension]…' }` is refused with HTTP 400
 "Astrato rejected the runtime request" ([app.js:70](project/src/app.js#L70)). `contains` filters were
 refused by `getData` too, so the Excel pack reads sectors through the `Sector` dimension and the
-sector measures' own filter ([export.js:55](project/src/export.js#L55)); the `contains` static filter
+sector measures' own filter ([export.js:71](project/src/export.js#L71)); the `contains` static filter
 on charts is fine ([tiles.js:31](project/src/tiles.js#L31)).
 
 Also useful:
@@ -94,9 +94,9 @@ Also useful:
 - one pre-mount path (definition → compile → operations) shared with the compile check ([tiles.js:196](project/src/tiles.js#L196), [tools/compile-adapter.mjs](project/tools/compile-adapter.mjs)), which also replays the static-filter swap and the parameter;
 - a query lane with 429 backoff, timeouts and a session cache keyed by the exact request ([throttle.js:112](project/src/throttle.js#L112));
 - the maker–checker call with "Acting as" and the four-eyes rule ([workflow.js:43](project/src/workflow.js#L43), [workflow.js:62](project/src/workflow.js#L62));
-- a seven-sheet Excel pack (Summary with the current call, Market, Demand, Pay, Regions, Data, Definitions) from governed queries with the on-screen selections ([export.js:30](project/src/export.js#L30));
+- a seven-sheet Excel pack (Summary with the current call, Market, Demand, Pay, Regions, Data, Definitions) from governed queries that carry the app-wide selections explicitly, so hidden tabs follow them too; each sheet takes the selections its tab takes on screen, and its banner names those it follows and those it does not (a Region on the UK-wide Summary, say) ([export.js:37](project/src/export.js#L37)). `buildWorkbook` returns the Blob and the button downloads it; `appState.exportProbe` lets the kit smoke test build the pack with and without a Year from the landing tab and fail any sheet that did not change ([app.js:536](project/src/app.js#L536));
 - `?tab=` opens on a tab ([app.js:414](project/src/app.js#L414));
-- nine self-checks the smoke test runs, each through the app's real selection path ([app.js:476](project/src/app.js#L476)).
+- nine self-checks the smoke test runs, each through the app's real selection path ([app.js:465](project/src/app.js#L465)).
 
 ## Semantic layer
 
@@ -142,7 +142,7 @@ Needs Node 24.18 or later. [docs/brief.md](project/docs/brief.md) and
 - KPIs query twice under a time selection: once for the selection, once for the static-filter swap.
 - The sector trend reuses similar purples; several lines are hard to tell apart.
 - The questions are written from the app's catalogue, not synced back from the stored definitions; the five owner-authored questions the app uses are restated in the catalogue and could drift. The header of `questions.mjs` names a `src/questions.js` and a `tools/sync-questions.mjs` that do not exist.
-- The Excel Definitions sheet uses notes written in the app ([export.js:9](project/src/export.js#L9)), not the layer's descriptions; the Pay sheet holds only the three pay KPIs. Export with a Sector selection is untested.
+- The Excel Definitions sheet uses notes written in the app ([export.js:14](project/src/export.js#L14)), not the layer's descriptions, and omit some measures the pack uses (Redundancies, the pay "Change on Year" measures, the pre-pandemic level); the Pay sheet holds only the three pay KPIs, not the what-if. With a time selected the Data sheet lists every selected month per indicator (the screen's table averages them), capped at 10,000 rows with a note if reached. Export with a Sector selection is untested.
 - The pay and regional tables scroll inside their cards at 1440.
 - Inert leftovers: an unused prefetch helper in `throttle.js`, whose header still mentions a timetable and a `prefetch.js`.
 - A library console error on visualizations 0.9 (TypeError reading `reduce` in the table's `pivotRowDimensionsAsColumns`) is allow-listed in [tools/smoke-allow.txt](project/tools/smoke-allow.txt); the table still renders. Its second line matches any "visualization reported an error", so it would hide other object errors too.

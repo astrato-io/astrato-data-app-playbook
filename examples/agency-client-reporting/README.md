@@ -76,27 +76,27 @@ and colour their change columns with two- or three-band indicator text
 name, as visualizations 0.8 and later require ([theme.js:211](project/src/theme.js#L211)).
 
 **Ask Nash, with native charts.** A keyword router picks one of four answer types and a client
-([app.js:272](project/src/app.js#L272)); the answer shows the MCP tool steps, is computed from the
+([app.js:278](project/src/app.js#L278)); the answer shows the MCP tool steps, is computed from the
 governed facts, and ends with a native chart: an ad-hoc tile built, compiled, themed and mounted at
 run time in its own `g-nash` group, pinned to the client by a static filter
-([app.js:243](project/src/app.js#L243), [dashboard.js:442](project/src/dashboard.js#L442)). A summary
+([app.js:249](project/src/app.js#L249), [dashboard.js:442](project/src/dashboard.js#L442)). A summary
 answer can be inserted straight into that client's report.
 
 **Report sign-off, then send.** An account manager must explain or escalate every flagged anomaly
 before submitting ([workflow.js:80](project/src/workflow.js#L80)); only a director or head of client
 services can approve, return or send ([workflow.js:10](project/src/workflow.js#L10)). Send builds that
 client's pack, downloads it and opens a `mailto:` addressed to the client contact with the approved
-commentary as the body ([app.js:457](project/src/app.js#L457)). State and the audit trail are kept
+commentary as the body ([app.js:496](project/src/app.js#L496)). State and the audit trail are kept
 in `localStorage` ([workflow.js:8](project/src/workflow.js#L8)).
 
 Also useful:
-- a governed query helper over `engine.getData` that returns named rows, used by the narratives, Nash, the planner, the workflow and the Excel pack ([app.js:97](project/src/app.js#L97));
-- the budget planner's projection: extra paid budget converts with an elasticity of 0.75, CPC inflation buys fewer clicks, conversion-rate uplift lifts every channel, September × 3 for the quarter ([app.js:338](project/src/app.js#L338));
-- an eight-sheet portfolio pack, or seven sheets per client (summary with Sep / Aug / Sep 2025, MoM and YoY; client scorecard; conversion bridge with the explanation; monthly trend; campaigns; SEO; budget plan; sign-off and audit trail) ([app.js:385](project/src/app.js#L385)), written by a dependency-free OOXML writer ([xlsx.js:209](project/src/xlsx.js#L209)) and drawn on screen from the same sheet objects ([sheetview.js:18](project/src/sheetview.js#L18));
-- one selection group per tab, each with its own filter dropdowns, and pending selections applied after 250 ms ([app.js:68](project/src/app.js#L68));
-- every tab mounted at load, the opening tab's 33 objects first ([app.js:231](project/src/app.js#L231)); inactive panes stay laid out off-screen with `visibility: hidden` ([tidewater.css:122](project/src/tidewater.css#L122));
+- a governed query helper over `engine.getData` that returns named rows, used by the narratives, Nash, the planner, the workflow and the Excel pack ([app.js:101](project/src/app.js#L101));
+- the budget planner's projection: extra paid budget converts with an elasticity of 0.75, CPC inflation buys fewer clicks, conversion-rate uplift lifts every channel, September × 3 for the quarter ([app.js:344](project/src/app.js#L344));
+- a seven-sheet portfolio pack (summary with Sep / Aug / Sep 2025, MoM and YoY; client scorecard; conversion bridge; monthly trend; campaigns; SEO; sign-off and audit trail), or seven sheets per client (no scorecard; the bridge carries the explanation; plus that client's budget plan with the levers as set on the Budget planner tab) ([app.js:390](project/src/app.js#L390)). Every query carries the export's filters, read when you export: the header pack follows the filter bar of the tab on screen (Agency portfolio's on tabs without one) and every subtitle names those filters; a client pack (Excel view, Send) is scoped to that client alone and says so, and its sign-off sheet lists only that client's status and audit entries. Rate changes are in percentage points, a change against a zero month is left blank, and a query that fills its 2,000-row limit is flagged in the sheet. Written by a dependency-free OOXML writer ([xlsx.js:210](project/src/xlsx.js#L210)) and drawn on screen from the same sheet objects ([sheetview.js:18](project/src/sheetview.js#L18));
+- one selection group per tab, each with its own filter dropdowns, and pending selections applied after 250 ms ([app.js:69](project/src/app.js#L69));
+- every tab mounted at load, the opening tab's 33 objects first ([app.js:237](project/src/app.js#L237)); inactive panes stay laid out off-screen with `visibility: hidden` ([tidewater.css:122](project/src/tidewater.css#L122));
 - query lanes with 429 backoff and a session cache around `engine.getData` ([throttle.js:105](project/src/throttle.js#L105));
-- nine smoke checks the app registers: on five tabs a selection moves a KPI, its vs-last-month row and a table and clearing restores them; the infographic's client switch moves its KPIs; a Nash answer mounts its chart; a planner lever moves the projection; the Excel pack downloads ([app.js:476](project/src/app.js#L476)).
+- nine smoke checks the app registers: on five tabs a selection moves a KPI, its vs-last-month row and a table and clearing restores them; the infographic's client switch moves its KPIs; a Nash answer mounts its chart; a planner lever moves the projection; the Excel pack downloads ([app.js:515](project/src/app.js#L515)), and an export probe: a Sector selection on Agency portfolio must change every sheet of the pack except Sign-off ([app.js:592](project/src/app.js#L592)).
 
 ## Semantic layer
 
@@ -129,6 +129,10 @@ node ../../../kit/verify/smoke.mjs "<that sign-in URL>"
 astrato build .
 ```
 
+If your layer lives on a different Astrato host than the CLI's default, pass `--host <your Astrato URL>` to `astrato dev`; otherwise the runtime answers "Resource not found" and the app shows "Astrato rejected the runtime request". The CLI also passes its own `--port`, so the dev server may not use the port in `vite.config`.
+
+`project/src/app-state.js` is a copy of the kit's `kit/verify/app-state.js`. Keep it in step with the kit: `app.js` calls `appState.exportProbe(...)`, and an older copy without that method stops the app at boot.
+
 Needs Node 24.18 or later. Web fonts load from a public font CDN at run time.
 
 ## Caveats
@@ -136,10 +140,10 @@ Needs Node 24.18 or later. Web fonts load from a public font CDN at run time.
 - **Mock data.** The four source systems are mimicked, not connected; the workflow's "synced 06:00 today" source checks are fixed strings ([workflow.js:21](project/src/workflow.js#L21)).
 - **No writeback.** Report status, explained anomalies, commentary edits and the audit trail live in `localStorage` (`tidewater-reports-v1`) over a seeded state; Reset demo clears it. Send downloads the Excel pack and opens a `mailto:`, so the pack is not attached; the monthly auto-send checkbox only records the choice.
 - **No stored business questions.** Every object queries layer measures over raw view columns; the 16 governed dimensions go unused. The playbook asks for stored questions.
-- Narratives, Nash answers, anomaly flags and the planner are browser arithmetic over governed rows. Nash routes by keywords to four canned answer types and hard-codes "208 governed measures"; its budget answer always splits £3,000 / £2,000 with a fixed 0.8 marginal-ROAS factor ([app.js:315](project/src/app.js#L315)). The planner takes September × 3 for Q4 with a fixed elasticity of 0.75 ([app.js:337](project/src/app.js#L337)).
+- Narratives, Nash answers, anomaly flags and the planner are browser arithmetic over governed rows. Nash routes by keywords to four canned answer types and hard-codes "208 governed measures"; its budget answer always splits £3,000 / £2,000 with a fixed 0.8 marginal-ROAS factor ([app.js:321](project/src/app.js#L321)). The planner takes September × 3 for Q4 with a fixed elasticity of 0.75 ([app.js:337](project/src/app.js#L337)).
 - Dates are fixed: the data's `Month Bucket` makes September 2026 "this month", and the app hard-codes "September 2026", "Sep" and "Aug" in titles, sheet names and the KPI delta formats ([dashboard.js:102](project/src/dashboard.js#L102)).
-- **No selection bar.** Each tab has its own filters and group and pending selections are applied, but there are no chips or Clear all. The client tabs open on one fixed client ([app.js:111](project/src/app.js#L111)).
-- **Landing.** All 165 objects are compiled and themed before anything mounts ([app.js:83](project/src/app.js#L83)), so landing-ready (about 13 s in staging) sits near the 15 s budget; all objects settle in about 32 s, with 884 queries.
+- **No selection bar.** Each tab has its own filters and group and pending selections are applied, but there are no chips or Clear all. The client tabs open on one fixed client ([app.js:115](project/src/app.js#L115)).
+- **Landing.** All 165 objects are compiled and themed before anything mounts ([app.js:85](project/src/app.js#L85)), so landing-ready (about 13 s in staging) sits near the 15 s budget; all objects settle in about 32 s, with 884 queries.
 - Layout: donut slice labels are clipped on the infographic, and the header source chips stack at 1024 wide.
 - Inert leftovers: an `--accent` variable block in [objects.css](project/src/objects.css), LinkedIn button and story-chapter styles in [styles.css](project/src/styles.css), a stale [throttle.js](project/src/throttle.js) header (timetable, `prefetch.js`) and an unused `prefetchSelections`, comments in `fields.js` and `dashboard.js` from other apps, and [sheetview.js](project/src/sheetview.js) says `buildSheets` is in `main.js`.
 - `tools/layer.mjs` needs `tools/mcp.mjs` and `tools/types.txt`, which are not included in this repo (it reads `types.txt` on load, so no command runs), and hard-codes `ASTRATO_GALLERY.MOCK_DATA` ([layer.mjs:29](project/tools/layer.mjs#L29)).

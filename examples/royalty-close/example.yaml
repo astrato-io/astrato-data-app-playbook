@@ -46,8 +46,8 @@ start_here:
 capabilities:
   - writeback-workflow — project/src/app.js:342
   - role-switcher — project/src/app.js:285
-  - what-if — project/src/app.js:481
-  - excel-export — project/src/app.js:639
+  - what-if — project/src/app.js:482
+  - excel-export — project/src/app.js:655
   - narrative-headline — project/src/app.js:300
   - drill-down — project/src/app.js:370
 stealable:
@@ -64,7 +64,7 @@ caveats:
   - The smoke checks are read-only; no write was exercised by the smoke test.
   - "Visualizations 0.9: the Unreconciled statements comparison row shows the change as \"-13.1 pts\" with a decimal pts format, while the measure is +13.125 through MCP."
   - At 1440 wide with six KPI cards per row, the calc-error comparison is truncated ("impact $33,…"). "Acting as" is clipped at 1280, and the header stacks below 1100px. Summary stays a narrow column even at 1440.
-  - The Exception pivot is an HTML table drawn from governed queries (the native table here has a grand total only); the close simulator's bars are hand-drawn SVG and its projection is browser arithmetic, including a fixed 0.6 factor on residual exposure (src/app.js:498).
+  - The Exception pivot is an HTML table drawn from governed queries (the native table here has a grand total only); the close simulator's bars are hand-drawn SVG and its projection is browser arithmetic, including a fixed 0.6 factor on residual exposure (src/app.js:501).
   - Native tiles query layer measures directly, not stored questions; the "BQ · …" caption on each card is generated from the tile title (src/catalogue.js:172). Only the Business questions tab runs stored questions, and it hides the 7 that belong to the layer's sibling recovery app.
   - The header Branch, Run and Currency dropdowns write the same selection into all four groups (src/app.js:292), so one change re-queries about 150 objects on every tab.
   - "No analyst in ROYALTY_USERS covers DE, ES or JP: nobody can open or submit a case on those branches, and seeded cases there are owned by an analyst scoped to US only."

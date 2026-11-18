@@ -13,11 +13,10 @@ import { applyRuntimeOperations } from '@astrato-io/visualizations/operations';
 import { appState } from './app-state.js';
 import { buildTiles, DISPLAY, GROUPS, TAB_GROUPS } from './catalogue.js';
 import { createFieldIndex } from './fields.js';
-import { QUESTIONS } from './questions.js';
 import { fitOps, fitTile, fits, GAIN_DEFAULT, prepareTile, scoreParamOp } from './prepare.js';
 import { clearQueryCache, queryLog, throttleQueries } from './throttle.js';
 import { createWorkflow, MEASURES } from './workflow.js';
-import { exportWorkbook } from './export.js';
+import { buildWorkbook as buildSheets, downloadWorkbook } from './export.js';
 
 const root = document.getElementById('app');
 const DEFAULT_US = 'Kent';
@@ -300,19 +299,21 @@ const main = async () => {
   for (const [id] of TABS) appState.tab(id, () => showTab(id));
 
   // ---------------------------------------------------- what-if
-  let gainTimer;
+  let gainTimer = null;
   let gain = GAIN_DEFAULT;
+  const applyGain = async () => {
+    gainTimer = null;
+    setOvertake(gain);
+    const t = byId.get('kpi-proj');
+    const item = t.resolvedRefs.proj;
+    await applyRuntimeOperations({ runtime, instanceId: 'kpi-proj', operationRequests: [{ id: 'p', ...scoreParamOp(item, ourScore + gain) }] });
+  };
   gainInput.addEventListener('input', () => {
     gain = Number(gainInput.value);
     gainOut.textContent = `+${gain} points`;
     renderGainNote(gain);
     clearTimeout(gainTimer);
-    gainTimer = setTimeout(async () => {
-      setOvertake(gain);
-      const t = byId.get('kpi-proj');
-      const item = t.resolvedRefs.proj;
-      await applyRuntimeOperations({ runtime, instanceId: 'kpi-proj', operationRequests: [{ id: 'p', ...scoreParamOp(item, ourScore + gain) }] });
-    }, 300);
+    gainTimer = setTimeout(applyGain, 300);
   });
 
   // ---------------------------------------------------- mounting
@@ -384,16 +385,47 @@ const main = async () => {
   const queue = [...tiles].sort((a, b) => order(a) - order(b));
   let next = 0;
   const lane = async () => { while (next < queue.length) await mountTile(queue[next++]); };
-  await Promise.all(Array.from({ length: LANES }, lane));
-  appState.mark('mounted-all');
+  const mountedAll = Promise.all(Array.from({ length: LANES }, lane));
 
   // ---------------------------------------------------- export
-  exportBtn.addEventListener('click', () => exportWorkbook({
-    us, ourRank, ourScore, gain, tabs: TABS, tiles, mounted, plan: workflow.plan(), measures: MEASURES, display: DISPLAY, questions: QUESTIONS,
-    selectionText: describeMain(),
-  }).catch((e) => { console.error('[export]', e); exportBtn.textContent = 'Export failed'; }));
-
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const describeMain = () => selections.getSelection(GROUPS.main).applied.map((s) => `${fields.nameOf(s.field.fieldKey)}: ${s.operator === 'between' ? `${s.values[0]}–${s.values[1]}` : s.values.join(', ')}`).join('; ') || 'none (all 130 universities)';
+  /** The workbook Blob under the filters on screen, every tab included. Hidden tabs' groups are
+   *  mirrored only while shown, so copy main into every tab group first and wait for the
+   *  re-queries; a slider move still inside its debounce is applied first, too. */
+  const buildWorkbook = async () => {
+    await mountedAll;
+    if (gainTimer) { clearTimeout(gainTimer); await applyGain(); }
+    for (const g of Object.values(TAB_GROUPS)) mirror(g);
+    await sleep(300);
+    for (let i = 0; i < 120 && queryLog().some((e) => e.ms == null); i++) await sleep(250);
+    await appState.quiet({ paintMs: 0 });
+    return buildSheets({
+      us, ourRank, ourScore, gain, tabs: TABS, tiles, mounted, plan: workflow.plan(), measures: MEASURES, display: DISPLAY,
+      rivalGroups: [GROUPS.main, ...Object.values(TAB_GROUPS)], selectionText: describeMain(),
+    });
+  };
+  let exporting = false;
+  exportBtn.addEventListener('click', async () => {
+    if (exporting) return;
+    exporting = true; exportBtn.disabled = true; exportBtn.textContent = 'Preparing…';
+    try { downloadWorkbook(await buildWorkbook()); exportBtn.textContent = 'Excel report'; } catch (e) {
+      console.error('[export]', e); exportBtn.textContent = 'Export failed';
+      setTimeout(() => { exportBtn.textContent = 'Excel report'; }, 4000);
+    } finally { exporting = false; exportBtn.disabled = false; }
+  });
+  // The smoke test builds the workbook without and with Nation = Scotland on the rival set, from
+  // the landing tab, and fails any sheet whose figures do not move. Summary (our university and
+  // the what-if), Focus plan (the plan rivals), the audit trail and Definitions rightly stay put.
+  appState.exportProbe({
+    build: async () => (await buildWorkbook()).blob,
+    select: () => { seedMain(); setOne(GROUPS.main, rawOf('Nation'), sel(rawOf('Nation'), 'inList', ['Scotland'])); },
+    clear: () => seedMain(),
+    exempt: ['Summary', 'Focus plan (tab)', 'Plan audit trail', 'Definitions'],
+  });
+
+  await mountedAll;
+  appState.mark('mounted-all');
 
   // ---------------------------------------------------- self-checks (run by the smoke test)
   // Each tab's check selects through the app's real path (a value in the main group, as the
@@ -401,7 +433,6 @@ const main = async () => {
   // plan's rival list), waits for the queries to finish, reads a KPI and a table or chart,
   // restores the default rival set, and reads them again. None of them writes anywhere.
   const textOf = (id) => (root.querySelector(`[data-slot="${id}"]`)?.innerText ?? '').replace(/\s+/g, ' ').trim();
-  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   /** Queries finished (none open in the scheduler), then the kit's quiet + repaint wait. */
   const settle = async () => {
     await sleep(300);

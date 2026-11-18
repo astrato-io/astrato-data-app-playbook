@@ -3,6 +3,9 @@
  *
  * Every sheet is built from a fresh query, not from the screen: governed sheets from the
  * semantic layer, weather and blended sheets from DuckDB with the same WHERE the charts use.
+ * app.js reads the selections once and passes them in, so every sheet follows the same reading.
+ * Governed figures follow City and Stay Date only (the layer has no weather field); weather-band
+ * selections narrow the API and blended figures, and the banners say which applies where.
  *   Summary   the finding, the five KPIs and the selections it was taken under
  *   Cities    governed: occupancy and revenue by city against last autumn
  *   Weather   API: average high, rainfall and wet days by city, both autumns
@@ -18,9 +21,11 @@ import { EXTRACT_QUESTION } from './questions.js';
 
 const H = (labels) => labels.map((v) => ({ v, s: 'head' }));
 
-/** gov(q), duck(sql), figures, selectionText: supplied by app.js. Returns { blob, filename, sheets }. */
-export const buildWorkbook = async ({ gov, duckRun, where, figures, finding, comparing = true, selectionText, plan, offers }) => {
+/** gov(q), duckRun(sql), where(), figures and the selection texts: supplied by app.js, all under
+ *  one reading of the selections. Returns { blob, filename, sheets }. */
+export const buildWorkbook = async ({ gov, duckRun, where, figures, finding, comparing = true, selectionText, govSelectionText = selectionText, bandsSelected = false, plan, offers }) => {
   const f = figures;
+  const bandNote = bandsSelected ? ` Weather bands narrow the API and blended rows only; governed rows follow ${govSelectionText}.` : '';
   // Under a date selection there are no like-for-like nights last autumn: no comparison is written.
   const cmp = (v) => (comparing ? v : null);
   const w = where();
@@ -40,7 +45,7 @@ export const buildWorkbook = async ({ gov, duckRun, where, figures, finding, com
     name: 'Summary', cols: [34, 18, 22, 60],
     rows: [
       [{ v: 'Hotel demand × weather, Aug–Oct 2026', s: 'title' }, { v: '', s: 'title' }, { v: '', s: 'title' }, { v: '', s: 'title' }],
-      [{ v: `Selections: ${selectionText}. Generated ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC. Fictional hotels; real weather.`, s: 'subtitle' }],
+      [{ v: `Selections: ${selectionText}.${bandNote} Generated ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC. Fictional hotels; real weather.`, s: 'subtitle' }],
       [],
       [{ v: finding, s: 'note' }],
       [],
@@ -63,7 +68,7 @@ export const buildWorkbook = async ({ gov, duckRun, where, figures, finding, com
   const weatherSheet = {
     name: 'Weather', cols: [18, 14, 14, 14, 12, 12], freeze: { row: 1 },
     rows: [H(['City', 'Avg high °C', 'Avg high LY', 'Rain mm', 'Wet days', 'Wet days LY']),
-      ...weather.map((r) => [r.city, { v: r.hi, s: 'num1' }, { v: r.hi_ly, s: 'num1' }, { v: r.rain, s: 'int' }, { v: r.wet, s: 'int' }, { v: r.wet_ly, s: 'int' }])],
+      ...weather.map((r) => [r.city, { v: r.hi, s: 'num1' }, { v: cmp(r.hi_ly), s: 'num1' }, { v: r.rain, s: 'int' }, { v: r.wet, s: 'int' }, { v: cmp(r.wet_ly), s: 'int' }])],
   };
   const blendSheet = {
     name: 'Blend', cols: [18, 16, 16, 16, 12, 12], freeze: { row: 1 },
@@ -81,7 +86,7 @@ export const buildWorkbook = async ({ gov, duckRun, where, figures, finding, com
     name: 'What-if', cols: [34, 18, 18, 18, 50], freeze: { row: 6 },
     rows: [
       [{ v: 'Wet-night offer: governed baseline against governed scenario', s: 'title' }, { v: '', s: 'title' }, { v: '', s: 'title' }, { v: '', s: 'title' }, { v: '', s: 'title' }],
-      [{ v: `Selections: ${selectionText}. Layer parameters: wet_share = ${lv.wet_share}, occ_uplift_pts = ${lv.occ_uplift_pts}, rate_discount_pct = ${lv.rate_discount_pct}.${p.planCurrent === false ? ' Open the Wet-night offer tab before exporting to refresh these figures.' : ''}`, s: 'subtitle' }],
+      [{ v: `Selections: ${govSelectionText}${bandsSelected ? ' (weather bands do not apply to governed figures)' : ''}. Layer parameters: wet_share = ${lv.wet_share}, occ_uplift_pts = ${lv.occ_uplift_pts}, rate_discount_pct = ${lv.rate_discount_pct}.${p.planCurrent === false ? ' Some offer figures could not be read: export again.' : ''}`, s: 'subtitle' }],
       [],
       H(['Figure', 'As booked', 'With the offer', 'Change', 'Source']),
       ['Room revenue, Aug–Oct 2026', { v: p.base, s: 'usdint' }, { v: p.scenario, s: 'usdint' }, { v: p.change, s: 'usdint' }, 'Governed: Room Revenue L3M; Room Revenue L3M Wet-Night Offer; Wet-Night Offer Revenue Change L3M'],
@@ -115,6 +120,8 @@ export const buildWorkbook = async ({ gov, duckRun, where, figures, finding, com
       ['Dry / wet night', 'Dry: under 1 mm of rain that day. Wet: 5 mm or more. Showers (1–5 mm) count in neither.'],
       ['Wet vs dry (pts)', 'Average nightly occupancy on wet nights minus dry nights, in percentage points; a simple average of city-nights.'],
       ['Periods', 'This autumn: 1 Aug–31 Oct 2026. Last autumn: 1 Aug–31 Oct 2025 (the layer\'s L3M and L3M LY).'],
+      ['Selections', 'Every sheet but Offers and Notes follows the selections applied when the report was built. City and Stay Date filter every figure. Rain and temperature bands exist only in the weather, so they filter the Weather, Blend and Nights sheets and the API and blended Summary rows; governed figures (Cities, What-if, governed Summary rows) ignore them.'],
+      ['Comparisons', 'Under a Stay Date selection there are no like-for-like nights last autumn, so every comparison column (vs LY, LY) is left blank.'],
       ['Share of revenue', 'Room Revenue Share L3M: a city\'s room revenue over the total of the cities in the answer (governed).'],
       ['Wet-night offer', 'Layer measures with three parameters: wet_share (share of nights that are wet, from the weather API), occ_uplift_pts and rate_discount_pct. Change = wet_share × (1 − discount) × rooms available × uplift × ADR − wet_share × room revenue × discount.'],
       ['Offer flags', 'A demo workflow kept in this browser (labelled fallback): a revenue manager raises a flag, a general manager approves or rejects it; the proposer cannot decide their own flag.'],

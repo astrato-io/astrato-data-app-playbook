@@ -27,7 +27,7 @@ import { createVisualizationRuntime, registry } from '@astrato-io/visualizations
 import { createVisualizationAvailableFields } from '@astrato-io/visualizations/definitions';
 import { appState } from './app-state.js';
 import { DATE, GROUP, INK, ITEM, LEVELS, METRICS, metricById, prepareChart, typeOf, V } from './charts.js';
-import { exportCsv, exportXlsx } from './exports.js';
+import { downloadXlsx, exportCsv, toXlsx } from './exports.js';
 
 const root = document.getElementById('root');
 const READY_TIMEOUT_MS = 30000;
@@ -255,6 +255,17 @@ const main = async () => {
     const r = range ?? currentRange();
     out.push({ field: { fieldKey: DATE }, operator: 'between', values: [{ dataType: 'date', valueDate: iso(r.from) }, { dataType: 'date', valueDate: iso(r.to) }] });
     return out;
+  };
+  /** The same filters as filtersFor, in words, for the line under an export's title. */
+  const scopeFor = ({ exclude = [] } = {}) => {
+    const out = [`${periodName()} (${rangeText(currentRange())})`];
+    for (const s of state.applied) {
+      const key = keyOfSel(s);
+      if (exclude.includes(key) || key === DATE) continue;
+      out.push(`${NAMES[key] ?? key}: ${s.values.join(', ')}`);
+    }
+    if (ITEM_KEYS.every((k) => exclude.includes(k))) out.push('all customers and products');
+    return out.join(' · ');
   };
 
   // -------------------------------------------------------------- objects
@@ -601,16 +612,22 @@ const main = async () => {
     for (const s of selections.getSelection(ALL_ITEMS).applied) selections.removeSelection(ALL_ITEMS, s);
     for (const s of want) selections.selectValues(ALL_ITEMS, { field: { fieldKey: keyOfSel(s) }, fieldKey: keyOfSel(s), kind: 'VALUE', operator: s.operator ?? 'inList', values: s.values }, { state: 'applied' });
   };
+  /** The KPI cards' answers: the period, the comparison period and the period by month. */
+  const kpiFigures = async (exclude) => {
+    const cmp = compareRange();
+    const calcs = METRICS.map(calc);
+    const [cur] = await q({ calculations: calcs, filters: filtersFor({ exclude }), limit: 1 });
+    const [prev] = cmp ? await q({ calculations: calcs, filters: filtersFor({ exclude, range: cmp }), limit: 1 }) : [null];
+    const months = await q({ dimensions: [dim(DATE, 'Month', { dateLevel: 'month' })], calculations: calcs, filters: filtersFor({ exclude }), orders: [{ columnIdx: 0, direction: 'asc' }], limit: 60 });
+    return { cur, prev, months, cmp };
+  };
+  /** The overview's cards leave the pick out; the detail page's cards follow it. */
+  const KPI_EXCLUDE = { kpi: ITEM_KEYS, dkpi: [] };
   const kpiData = {};
   const refreshKpis = async (cards, key, exclude) => {
     cards.forEach((k) => k.node.classList.add('is-loading'));
-    const cmp = compareRange();
     try {
-      const calcs = METRICS.map(calc);
-      const [cur] = await q({ calculations: calcs, filters: filtersFor({ exclude }), limit: 1 });
-      const [prev] = cmp ? await q({ calculations: calcs, filters: filtersFor({ exclude, range: cmp }), limit: 1 }) : [null];
-      const months = await q({ dimensions: [dim(DATE, 'Month', { dateLevel: 'month' })], calculations: calcs, filters: filtersFor({ exclude }), orders: [{ columnIdx: 0, direction: 'asc' }], limit: 60 });
-      kpiData[key] = { cur, prev, months, cmp };
+      const { cur, prev, cmp } = (kpiData[key] = await kpiFigures(exclude));
       cards.forEach(({ m, node, value, change, spark }, i) => {
         const v = cur?.[i];
         value.textContent = typeof v === 'number' ? m.fmt(v) : '–';
@@ -622,6 +639,7 @@ const main = async () => {
       });
     } catch (error) {
       console.error('[kpi]', error);
+      delete kpiData[key]; // never let the narrative read the previous selection's figures
       cards.forEach(({ value, change }) => {
         value.textContent = '–';
         change.textContent = 'Could not load';
@@ -634,14 +652,15 @@ const main = async () => {
 
   // ---- master list
   let listRun = 0;
+  const listRows = async () => (await q({ dimensions: [dim(itemField(), ITEM[state.listTab].label)], calculations: [calc(metric())], filters: filtersFor({ exclude: ITEM_KEYS }), orders: [{ columnIdx: 1, direction: 'desc' }], limit: 2500 })).filter((r) => r[0] !== null && r[0] !== '');
   const refreshList = async () => {
     const my = ++listRun;
     listSection.classList.add('is-loading');
     try {
       // The list leaves its own field out of its filters, or a pick would filter it to one item.
-      const rows = await q({ dimensions: [dim(itemField(), ITEM[state.listTab].label)], calculations: [calc(metric())], filters: filtersFor({ exclude: ITEM_KEYS }), orders: [{ columnIdx: 1, direction: 'desc' }], limit: 2500 });
+      const rows = await listRows();
       if (my !== listRun) return;
-      state.list = rows.filter((r) => r[0] !== null && r[0] !== '');
+      state.list = rows;
       state.listError = null;
       renderList();
       // Select a default item on load and whenever the pick falls out of the list.
@@ -654,9 +673,9 @@ const main = async () => {
       if (my === listRun) listSection.classList.remove('is-loading');
     }
   };
-  const visibleList = () => {
+  const visibleList = (list = state.list) => {
     const s = state.search.trim().toLowerCase();
-    return s ? state.list.filter((r) => String(r[0]).toLowerCase().includes(s)) : state.list;
+    return s ? list.filter((r) => String(r[0]).toLowerCase().includes(s)) : list;
   };
   const renderList = () => {
     const rows = visibleList();
@@ -897,50 +916,92 @@ const main = async () => {
   };
 
   // ---- object registry: every object can show and export its data
-  const kpiTable = (key, label) => () => {
-    const d = kpiData[key];
-    const cmp = d?.cmp;
+  // Every table() re-runs its object's query with the selections applied now (the session cache
+  // answers it when the figures are already on screen), so an export never carries cached rows
+  // from an earlier selection. `scope` names the period and the filters those rows follow.
+  const kpiTable = async (key, label) => {
+    const exclude = KPI_EXCLUDE[key];
+    const d = await kpiFigures(exclude);
     return {
       title: `${label} — headline figures`,
-      columns: ['Measure', `${periodName()} (${rangeText(currentRange())})`, cmp ? `Comparison (${rangeText(cmp)})` : 'Comparison'],
-      rows: METRICS.map((m, i) => [m.label, d?.cur?.[i] ?? null, d?.prev?.[i] ?? null]),
+      scope: scopeFor({ exclude }),
+      columns: ['Measure', `${periodName()} (${rangeText(currentRange())})`, d.cmp ? `Comparison (${rangeText(d.cmp)})` : 'Comparison'],
+      rows: METRICS.map((m, i) => [m.label, d.cur?.[i] ?? null, d.prev?.[i] ?? null]),
     };
   };
-  const monthsTable = (key, title) => () => ({ title, columns: ['Month', ...METRICS.map((m) => m.label)], rows: (kpiData[key]?.months ?? []).map((r) => [monthLabel(r[0]), ...r.slice(1)]) });
+  const monthsTable = async (key, title) => {
+    const exclude = KPI_EXCLUDE[key];
+    const { months } = await kpiFigures(exclude);
+    return { title, scope: scopeFor({ exclude }), columns: ['Month', ...METRICS.map((m) => m.label)], rows: months.map((r) => [monthLabel(r[0]), ...r.slice(1)]) };
+  };
   for (const [prefix, label] of [['kpi', 'All items'], ['dkpi', 'Selected item']]) {
     for (const [i, m] of METRICS.entries()) {
-      register(`${prefix}-${m.id}`, { title: `${m.label} (${label})`, table: async () => monthsTable(prefix, `${m.label} by month (${label})`)(), copy: () => (prefix === 'kpi' ? kpis : dkpis)[i].value.textContent });
+      register(`${prefix}-${m.id}`, { title: `${m.label} (${label})`, table: () => monthsTable(prefix, `${m.label} by month (${label})`), copy: () => (prefix === 'kpi' ? kpis : dkpis)[i].value.textContent });
     }
   }
-  register('narrative', { title: 'Narrative', copy: () => narrative.textContent, table: async () => kpiTable('kpi', 'All items')() });
-  register('list', { title: 'List', table: async () => ({ title: `${ITEM[state.listTab].label}s by ${metric().label.toLowerCase()}`, columns: [ITEM[state.listTab].label, metric().label], rows: visibleList() }) });
+  register('narrative', { title: 'Narrative', copy: () => narrative.textContent, table: () => kpiTable('kpi', 'All items') });
+  register('list', {
+    title: 'List',
+    table: async () => ({
+      title: `${ITEM[state.listTab].label}s by ${metric().label.toLowerCase()}`,
+      scope: `${scopeFor({ exclude: ITEM_KEYS })}${state.search ? ` · search: “${state.search}”` : ''}`,
+      columns: [ITEM[state.listTab].label, metric().label],
+      rows: visibleList(await listRows()),
+    }),
+  });
   register('drill', {
     title: 'Drill-down',
     table: async () => {
       const lv = LEVELS[drillLevel()];
       const rows = await q({ dimensions: [dim(lv.field, lv.label)], calculations: [calc(metric())], filters: filtersFor(), orders: [{ columnIdx: 1, direction: 'desc' }], limit: 500 });
-      return { title: `${metric().label} by ${lv.label.toLowerCase()}`, columns: [lv.label, metric().label], rows };
+      return { title: `${metric().label} by ${lv.label.toLowerCase()}`, scope: scopeFor(), columns: [lv.label, metric().label], rows };
     },
   });
   const trendTable = async () => {
     const rows = await q({ dimensions: [dim(DATE, 'Month', { dateLevel: 'month' })], calculations: [calc(metric())], filters: filtersFor(), orders: [{ columnIdx: 0, direction: 'asc' }], limit: 60 });
-    return { title: `${metric().label} by month — ${picked() ?? 'all'}`, columns: ['Month', metric().label], rows: rows.map((r) => [monthLabel(r[0]), r[1]]) };
+    return { title: `${metric().label} by month — ${picked() ?? 'all'}`, scope: scopeFor(), columns: ['Month', metric().label], rows: rows.map((r) => [monthLabel(r[0]), r[1]]) };
   };
   register('trend', { title: 'Trend', table: trendTable });
   register('dtrend', { title: 'Trend', table: trendTable });
+  const LINES_MAX = 5000;
   const linesTable = async () => {
-    const { columns, query } = recordsQuery(5000);
+    // Ask for one row more than the cap, so a cut is reported instead of passing silently.
+    const { columns, query } = recordsQuery(LINES_MAX + 1);
     const rows = await q(query);
-    return { title: `Order lines — ${picked() ?? 'all'}`, columns, rows: rows.map((r) => [iso(r[0]), ...r.slice(1)]) };
+    const truncated = rows.length > LINES_MAX;
+    const note = truncated ? ` · first ${LINES_MAX.toLocaleString('en-US')} rows only, newest first; narrow the period or filters for the rest` : '';
+    return { title: `Order lines — ${picked() ?? 'all'}`, scope: `${scopeFor()} · one row per order, ${columns[2].toLowerCase()} and ship mode${note}`, columns, rows: rows.slice(0, LINES_MAX).map((r) => [iso(r[0]), ...r.slice(1)]), truncated };
   };
   register('records', { title: 'Order lines', table: linesTable });
   register('dlines', { title: 'Order lines', table: linesTable });
 
+  /** Wait for a selection change still on its way (the 120 ms debounce, then the refresh it runs). */
+  const settled = async () => {
+    for (let i = 0; i < 50; i++) {
+      while (pendingRefresh) await new Promise((r) => setTimeout(r, 50));
+      const run = refreshing;
+      await run;
+      if (!pendingRefresh && run === refreshing) return;
+    }
+  };
+  /** One object's table under the selections applied now. */
+  const tableOf = async (id) => {
+    await settled();
+    return objects.get(id).table();
+  };
+  /** The Excel workbook of one or more objects as a Blob: one sheet each, named after the object
+   *  (a single object's sheet is "Data", as its menu's download writes it). */
+  const buildWorkbook = async (ids) => {
+    const tables = [];
+    for (const id of ids) tables.push(await tableOf(id)); // in turn, so repeated queries hit the session cache
+    return toXlsx(tables.map((t, i) => ({ ...t, sheet: ids.length === 1 ? 'Data' : ids[i] })));
+  };
+
   const doExport = async (kind, data) => {
     try {
-      const size = kind === 'csv' ? exportCsv(data) : exportXlsx(data);
+      const size = kind === 'csv' ? exportCsv(data) : downloadXlsx(toXlsx({ ...data, sheet: 'Data' }), data.title);
       state.lastExport = { kind, title: data.title, rows: data.rows.length, size };
-      toast(`Exported ${data.rows.length.toLocaleString('en-US')} rows as ${kind === 'csv' ? 'CSV' : 'Excel'}.`);
+      toast(`Exported ${data.rows.length.toLocaleString('en-US')} rows as ${kind === 'csv' ? 'CSV' : 'Excel'}${data.truncated ? ` (the first ${data.rows.length.toLocaleString('en-US')} only)` : ''}.`);
     } catch (error) {
       console.error('[export]', error);
       toast('The export failed.', 'error');
@@ -948,7 +1009,7 @@ const main = async () => {
   };
   const withTable = async (id, fn) => {
     try {
-      const data = await objects.get(id).table();
+      const data = await tableOf(id);
       await fn(data);
     } catch (error) {
       console.error('[menu]', error);
@@ -958,13 +1019,14 @@ const main = async () => {
   const showTable = (data) => {
     dialogData = data;
     dialogTitle.textContent = data.title;
-    dialogTable.replaceChildren(
+    dialogTable.replaceChildren(...[
+      data.scope ? el('p', { class: 'card-sub', text: data.scope }) : null,
       el('table', { class: 'grid' }, [
         el('thead', {}, el('tr', {}, data.columns.map((h) => el('th', { scope: 'col', text: h })))),
         el('tbody', {}, data.rows.slice(0, 500).map((r) => el('tr', {}, r.map((v) => el('td', { role: 'gridcell', class: typeof v === 'number' ? 'num' : '', text: typeof v === 'number' ? v.toLocaleString('en-US', { maximumFractionDigits: 2 }) : (v ?? '') }))))),
       ]),
       data.rows.length > 500 ? el('p', { class: 'card-sub', text: `First 500 of ${data.rows.length} rows; the exports carry all of them.` }) : null,
-    );
+    ].filter(Boolean));
     dialog.showModal();
   };
   const copyText = async (text) => {
@@ -1112,6 +1174,29 @@ const main = async () => {
       while (!state.lastExport && performance.now() - start < 30000) await new Promise((r) => setTimeout(r, 200));
       const e = state.lastExport;
       return { pass: e?.kind === 'xlsx' && e.rows > 0 && e.size > 0, detail: e ? `${e.title}: ${e.rows} rows, ${e.size} bytes` : 'no export' };
+    });
+    // Every object's Excel export, one sheet per object (detail page's included, though that page
+    // is hidden), without and with Region = West from the drawer: every sheet must move.
+    let probePick = null;
+    appState.exportProbe({
+      build: () => buildWorkbook([...objects.keys()]),
+      select: async () => {
+        if (state.page !== 'overview') showPage('overview');
+        await idle();
+        probePick = picked();
+        drawer.querySelector(`input[data-key="${V('Region')}"][value="West"]`).click();
+        await idle();
+      },
+      clear: async () => {
+        clearAllBtn.click();
+        await idle();
+        // West may drop the picked customer, which picks the new top one; pick back.
+        if (probePick && picked() !== probePick) {
+          pick(probePick);
+          await idle();
+        }
+      },
+      exempt: [],
     });
   };
 

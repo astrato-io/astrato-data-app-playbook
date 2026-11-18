@@ -15,7 +15,8 @@
  *   - the landing timing ("landing-ready" mark, else "all-settled") is within budget;
  *   - on every tab, at every width: no horizontal page scroll, and no vertical page scroll
  *     unless --scroll-ok; no broken images;
- *   - every app-registered check (appState.check) passes.
+ *   - every app-registered check (appState.check) passes;
+ *   - with appState.exportProbe: every Excel sheet changes under a filter (hidden tabs included).
  * Evidence: one screenshot per tab per width, and report.json, in --out. --full-page also saves
  * <tab>-<width>-full.png, the whole scrolling page, so content below the fold gets looked at.
  * Exit code 0 = pass, 1 = fail, 2 = usage.
@@ -329,6 +330,45 @@ else {
     const c = report.checks.at(-1);
     if (!c.pass) fail.push(`check failed: ${c.name ?? name} ${c.detail ? `(${c.detail})` : ''}`);
   }
+  // ---------------------------------------------------------------- export follows the filters
+  // appState.exportProbe: build the workbook without and with a filter, from the landing tab (so
+  // the other tabs are hidden), and fail every sheet whose figures did not move. This catches the
+  // classic bug: hidden tabs' selection groups are mirrored only while shown, so their sheets
+  // export unfiltered rows under a banner that names the filter.
+  const hasProbe = !aborted && (await evaluate(`!!window.__appState.exportProbe`));
+  report.exportProbe = hasProbe ? undefined : 'not registered (appState.exportProbe)';
+  if (hasProbe) {
+    stage = 'the export probe';
+    console.log('export probe: building the workbook without and with the filter');
+    const r = await evaluate(`(async () => {
+      const p = window.__appState.exportProbe;
+      const b64 = async (blob) => { const u = new Uint8Array(await blob.arrayBuffer()); let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); };
+      const settle = () => window.__appState.quiet ? window.__appState.quiet({ paintMs: 300 }) : new Promise((r) => setTimeout(r, 3000));
+      try {
+        await p.clear?.(); await settle();
+        const before = await b64(await p.build());
+        await p.select(); await settle();
+        const after = await b64(await p.build());
+        await p.clear?.(); await settle();
+        return { before, after, exempt: p.exempt ?? [] };
+      } catch (e) { return { error: String(e?.message ?? e) }; }
+    })()`, CHECK_MS * 3);
+    if (!r || r.error) fail.push(`export probe: ${r?.error ?? 'no result'}`);
+    else {
+      const { diffWorkbooks } = await import('./xlsx-diff.mjs');
+      const before = Buffer.from(r.before, 'base64');
+      const after = Buffer.from(r.after, 'base64');
+      writeFileSync(join(downloadDir, 'probe-unfiltered.xlsx'), before);
+      writeFileSync(join(downloadDir, 'probe-filtered.xlsx'), after);
+      try {
+        const d = diffWorkbooks(before, after, r.exempt);
+        report.exportProbe = d.sheets;
+        for (const s of d.sheets) console.log(`  ${s.status.padEnd(15)} ${s.name}`);
+        if (d.ignoring.length) fail.push(`export ignores the filter on sheet(s): ${d.ignoring.join(', ')} (see downloads/probe-*.xlsx)`);
+      } catch (e) { fail.push(`export probe: could not read the workbook (${e.message})`); }
+    }
+  }
+
   // An app that registered its field catalogue gets it saved, for the offline compile check.
   const fields = aborted ? '' : await evaluate(`window.__appState.fields ? JSON.stringify(window.__appState.fields) : ''`);
   if (fields) { mkdirSync(outDir, { recursive: true }); writeFileSync(join(outDir, 'available-fields.json'), fields); report.fieldsSaved = 'available-fields.json'; }

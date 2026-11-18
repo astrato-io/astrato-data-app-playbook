@@ -82,8 +82,8 @@ Also useful:
 - a query lane with 429 and 502/503/504 backoff, timeouts and a session cache keyed by the exact request ([throttle.js:120](project/src/throttle.js#L120));
 - table column widths from header length at the font size ([prepare.js:34](project/src/prepare.js#L34)), refitted on resize by a ResizeObserver without a remount ([app.js:376](project/src/app.js#L376));
 - the maker–checker plan with "Acting as" and the four-eyes rule ([workflow.js:75](project/src/workflow.js#L75), [workflow.js:96](project/src/workflow.js#L96));
-- an eight-sheet Excel report (Summary, one sheet per tab from each object's own `handle.getData`, Plan audit trail, Definitions) ([export.js:22](project/src/export.js#L22), [export.js:45](project/src/export.js#L45));
-- 17 self-checks the smoke test runs, including real-click checks on five chart types ([app.js:568](project/src/app.js#L568)).
+- an eight-sheet Excel report (Summary, one sheet per tab from each object's own `handle.getData`, Plan audit trail, Definitions) ([export.js:30](project/src/export.js#L30), [export.js:56](project/src/export.js#L56)); before reading, it copies `main` into every tab's selection group and waits for the re-queries, so hidden tabs follow the filters too, and the kit's export probe checks it ([app.js:452](project/src/app.js#L452));
+- 17 self-checks the smoke test runs, including real-click checks on five chart types ([app.js:598](project/src/app.js#L598)).
 
 ## Semantic layer
 
@@ -127,7 +127,7 @@ are the agent's own brief and data brief from the build; [SCORE.md](SCORE.md) is
 
 The judge's main gaps first ([SCORE.md](SCORE.md), 47/52):
 
-- **Dropdown filters need Apply; chart clicks apply at once.** A dropdown pick makes a pending chip with Cancel / Apply, and nothing changes until Apply. The app's selection checks set applied selections through the API ([app.js:487](project/src/app.js#L487)), so they never meet this step.
+- **Dropdown filters need Apply; chart clicks apply at once.** A dropdown pick makes a pending chip with Cancel / Apply, and nothing changes until Apply. The app's selection checks set applied selections through the API ([app.js:517](project/src/app.js#L517)), so they never meet this step.
 - **The plan's resort-split chart labels only half the resorts** (5 of 10) at 1440 and 1280.
 - **Best-tab tables cut a row at 1440, and headers ellipsise at 1280.** The three tables show a partial row, so ten rows need a scroll inside the card; at 1280 the By week and Headroom headers ellipsise.
 - **Filter chips show raw field names** (Season_Stage, Resort Name, Snowfall_Band), because selections are written on the raw columns ([app.js:303](project/src/app.js#L303)); filter controls truncate their value while a selection is held.
@@ -142,7 +142,7 @@ Also:
 - **Synthetic data.** Ten fictional resorts, 18 weeks in each of two seasons, ending 30 Mar 2026; not live. No visits, revenue or marketing spend: the Crowd Index stands in for visits, and the budget split is a planning rule, not a forecast.
 - Objects re-express their stored questions in `questions.js` rather than run them by id (`runQuestion` needs a published App); three stored questions are unused (`targets`, `split`, `splitStage`).
 - The 3-week moving-average chart has no clickable points; its card says so. Top 10 is a sort plus a 10-row limit, since tables take no topN on 0.9 ([catalogue.js:217](project/src/catalogue.js#L217)).
-- Excel report: change values are raw decimals, and the Definitions sheet says the comparison uses the Season Axis over 1 Dec 2025 – 5 Apr 2026 ([export.js:68](project/src/export.js#L68)); the measures filter Season explicitly and the data ends 30 Mar 2026.
+- Excel report: snowfall change and quiet-powder share are formatted as percentages; the other changes are plain numbers in their own units (index points, cm, weeks). The Definitions sheet dates 2025/26 as 1 Dec 2025 – 5 Apr 2026 ([export.js:87](project/src/export.js#L87)) while the data ends 30 Mar 2026.
 - The project's own [README](project/README.md) and docs predate the final layer revision in places (the data brief counts 43 measures and 28 questions); `layer.json` is the reference.
 - Checked by the judge: all 40 objects rendered with 0 console errors and 0 failed requests through the kit smoke (17 app checks, all tabs, 1440, 1280 and 1024) and two runs with real mouse input; the KPIs reconciled with MCP queries unfiltered and with Country = Italy. **Not published**, so no live smoke.
 - `astrato.json` carries a zero placeholder `semanticLayerId`; `layer.json`'s datasource is a placeholder too.

@@ -82,7 +82,7 @@ Also useful:
 - an independent check of the blend outside the browser: the same stored question over MCP and the same Open-Meteo request, joined in plain JavaScript ([tools/verify-blend.mjs](project/tools/verify-blend.mjs));
 - query lanes with 429 retry and a session cache keyed by the exact request ([throttle.js:32](project/src/throttle.js#L32));
 - the maker–checker flag store with "Acting as" ([offers.js:45](project/src/offers.js#L45), the four-eyes refusal at [offers.js:88](project/src/offers.js#L88), the selector at [app.js:130](project/src/app.js#L130));
-- an eight-sheet Excel report built from fresh queries, not from the screen (Summary, Cities, Weather, Blend, Nights, What-if, Offers, Notes) ([export.js:22](project/src/export.js#L22)), on a dependency-free styled xlsx writer ([xlsx.js](project/src/xlsx.js));
+- an eight-sheet Excel report built from fresh queries under one reading of the selections, hidden offer tab included (Summary, Cities, Weather, Blend, Nights, What-if, Offers, Notes) ([export.js:26](project/src/export.js#L26)), checked by `appState.exportProbe`, on a dependency-free styled xlsx writer ([xlsx.js](project/src/xlsx.js));
 - 12 self-checks the smoke test runs, including the blended KPI against an independent JavaScript join ([app.js:702](project/src/app.js#L702)).
 
 ## Semantic layer

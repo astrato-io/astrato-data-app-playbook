@@ -19,7 +19,7 @@ import { createFieldIndex } from './fields.js';
 import { fitOps, fitTile, fits, LEVERS, paramOps, prepareTile } from './prepare.js';
 import { clearQueryCache, prefetchSelections, queryLog, stopPrefetch, throttleQueries } from './throttle.js';
 import { createWorkflow } from './workflow.js';
-import { exportWorkbook } from './export.js';
+import { buildWorkbook, downloadWorkbook } from './export.js';
 
 const root = document.getElementById('app');
 const LANES = 4;
@@ -294,7 +294,7 @@ const main = async () => {
       headlineText = headline.textContent;
     } catch (e) {
       console.warn('[headline]', e);
-      headline.textContent = 'Did a snowier season bring more guests?';
+      headline.textContent = 'Did a snowier season bring more guests?'; headlineText = 'Not available: the headline query failed.';
     }
   };
 
@@ -445,9 +445,30 @@ const main = async () => {
 
   // ---------------------------------------------------- export
   const describeMain = () => selections.getSelection(GROUPS.main).applied.map((s) => `${fields.nameOf(s.field.fieldKey)}: ${s.values.join(', ')}`).join('; ') || 'none (all resorts, all weeks)';
-  exportBtn.addEventListener('click', () => exportWorkbook({
-    tabs: TABS, tiles, mounted, plan: workflow.plan(), display: DISPLAY, selectionText: describeMain(), headline: headlineText, levers: describeLevers(),
-  }).catch((e) => { console.error('[export]', e); exportBtn.textContent = 'Export failed'; }));
+  /** Every sheet follows the filters on screen, hidden tabs included: each object queries with its
+   *  tab's group, and a hidden tab's group was last mirrored when that tab showed. So copy main into
+   *  every tab group, refresh the headline for the current filters, and wait for the re-queries
+   *  before reading. The groups stay in sync afterwards; showTab's mirror then finds nothing to do. */
+  const buildReport = async () => {
+    stopPrefetch();
+    try {
+      for (const g of Object.values(TAB_GROUPS)) mirror(g);
+      await refreshHeadline();
+      await settle();
+      return await buildWorkbook({
+        tabs: TABS, tiles, mounted, plan: workflow.plan(), display: DISPLAY, selectionText: describeMain(), headline: headlineText, levers: describeLevers(),
+      });
+    } finally { schedulePrefetch(); }
+  };
+  exportBtn.addEventListener('click', async () => {
+    exportBtn.disabled = true;
+    try {
+      const { blob, sheets } = await buildReport();
+      downloadWorkbook(blob);
+      window.__lastExport = { bytes: blob.size, sheets };
+      exportBtn.textContent = 'Excel report';
+    } catch (e) { console.error('[export]', e); exportBtn.textContent = 'Export failed'; } finally { exportBtn.disabled = false; }
+  });
 
   // ---------------------------------------------------- self-checks (run by the smoke test)
   const textOf = (id) => (root.querySelector(`[data-slot="${id}"]`)?.innerText ?? '').replace(/\s+/g, ' ').trim();
@@ -465,6 +486,15 @@ const main = async () => {
     await appState.quiet();
   };
   const clearMain = () => selections.clearAllSelections(GROUPS.main);
+  // The kit's smoke test builds the workbook without and with Country = Austria from the landing
+  // tab (the other tabs hidden) and fails any sheet whose figures do not move. Every tab's objects
+  // follow Country; the audit trail and definitions rightly do not.
+  appState.exportProbe({
+    build: async () => (await buildReport()).blob,
+    select: () => setOne(GROUPS.main, rawOf('Country'), sel(rawOf('Country'), 'inList', ['Austria'])),
+    clear: () => clearMain(),
+    exempt: ['Plan audit trail', 'Definitions'],
+  });
   const visibleObjects = () => document.querySelectorAll('.pane.is-active [data-slot]').length;
   /** What one selection cost: distinct requests asked, how many went to the engine, and when the last answer came. */
   const measure = (from, t0) => {
@@ -608,12 +638,13 @@ const main = async () => {
     clearMain(); await settle();
     return { pass: err === 0, detail: `errors ${err}; airports card "${t.slice(0, 80)}"` };
   });
+  // Downloads only; whether every sheet follows the filter is the export probe's job (above).
   appState.check('Excel report downloads with a selection applied', async () => {
     showTab('review'); clearMain(); await settle();
     setOne(GROUPS.main, rawOf('Country'), sel(rawOf('Country'), 'inList', ['Austria'])); await settle();
     window.__lastExport = null;
     exportBtn.click();
-    for (let i = 0; i < 60 && !window.__lastExport; i++) await sleep(500);
+    for (let i = 0; i < 120 && !window.__lastExport; i++) await sleep(500);
     const out = window.__lastExport;
     clearMain(); await settle();
     return { pass: Boolean(out && out.bytes > 5000 && out.sheets.length >= 7), detail: out ? `${out.bytes} bytes, sheets: ${out.sheets.join(', ')}` : 'no export' };

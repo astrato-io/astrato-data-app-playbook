@@ -7,7 +7,8 @@
  *
  * Selection groups:
  *   main      the filters, the selection bar and chart clicks live here
- *   review / best / snow / market / plan   one per tab, mirrored from main only while the tab shows
+ *   review / best / snow / market / plan   one per tab, mirrored from main while the tab shows,
+ *             and all at once before the Excel report reads them (app.js buildReport)
  */
 import { createDefaultVSpec } from '@astrato-io/visualizations';
 import { compileVisualizationDefinition } from '@astrato-io/visualizations/definitions';

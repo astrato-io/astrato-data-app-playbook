@@ -191,6 +191,7 @@ workaround only if the test fails, and record which version you saw it on.
 - [A filter object never draws: "Cannot destructure property 'view' of undefined"](selections.md#a-filter-object-never-draws-cannot-destructure-property-view-of-undefined)
 - [A date window or numeric range as a selection](selections.md#a-date-window-or-numeric-range-as-a-selection)
 - [One click re-queries every chart, including hidden tabs](selections.md#one-click-re-queries-every-chart-including-hidden-tabs)
+- [The Excel export ignores the filters on hidden tabs](selections.md#the-excel-export-ignores-the-filters-on-hidden-tabs)
 - [A discarded pending selection keeps coming back](selections.md#a-discarded-pending-selection-keeps-coming-back)
 - [A chart should ignore one filter ("this chart ignores the month")](selections.md#a-chart-should-ignore-one-filter-this-chart-ignores-the-month)
 - [Click and brush behaviour on native charts](selections.md#click-and-brush-behaviour-on-native-charts)

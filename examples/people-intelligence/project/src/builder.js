@@ -273,11 +273,16 @@ export const mountBuilder = (ctx, grid) => {
     const s = specOf();
     if (!s.dims.length && !s.measures.length) { ctx.toast('Add fields to export', 'info'); return; }
     try {
-      const rows = await ctx.q({ dims: s.dims, measures: s.measures, filters: s.filters, limit: Math.max(st.top, 2000) });
+      // The report's own filters, plus any selection made by clicking the report (its g-rb group), as on screen.
+      const sels = ctx.appliedOf('g-rb');
+      const limit = Math.max(st.top, 2000);
+      const rows = await ctx.q({ dims: s.dims, measures: s.measures, filters: s.filters, selections: sels, limit });
       const ds = active().filter((f) => f.kind === 'd').map((f) => f.name).slice(0, s.dims.length), ms = s.measures;
+      const selNote = sels.length ? ` · selections: ${sels.map((x) => `${ctx.fields.nameOf(x.field?.fieldKey ?? x.fieldKey)} = ${x.values.join(', ')}`).join('; ')}` : '';
       const sheet = { name: st.name.slice(0, 28) || 'Report', cols: [...ds.map(() => 24), ...ms.map(() => 18)], freeze: { row: 4 },
-        rows: [[{ v: st.name, s: 'title' }], [{ v: `People Intelligence · ${ctx.persona.scopeLabel} · illustrative data as of 30 Sep 2026 · governed semantic layer`, s: 'note' }], [], [...ds, ...ms].map((v) => ({ v, s: 'head' })),
-          ...rows.map((r) => [...s.dims.map(([f]) => r[f] ?? ''), ...ms.map((m) => ({ v: Number(r[m] ?? 0), s: xs(FORMAT[m]) }))])] };
+        rows: [[{ v: st.name, s: 'title' }], [{ v: `People Intelligence · ${ctx.persona.scopeLabel}${selNote} · illustrative data as of 30 Sep 2026 · governed semantic layer`, s: 'note' }], [], [...ds, ...ms].map((v) => ({ v, s: 'head' })),
+          ...rows.map((r) => [...s.dims.map(([f]) => r[f] ?? ''), ...ms.map((m) => ({ v: r[m] == null ? null : Number(r[m]), s: xs(FORMAT[m]) }))]),
+          ...(rows.length >= limit ? [[], [{ v: `Only the first ${limit} rows were returned; the report may be incomplete.`, s: 'note' }]] : [])] };
       const blob = workbookBlob({ sheets: [sheet], title: st.name, author: ctx.persona.name });
       const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: `${st.name.replace(/[^\w]+/g, '_')}.xlsx` });
       document.body.append(a); a.click(); a.remove();

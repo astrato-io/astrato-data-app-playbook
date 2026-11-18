@@ -73,8 +73,8 @@ Also useful:
 - inactive panes are moved off-screen, not hidden, so every tab is mounted at load and keeps its size ([studio.css:42](project/src/studio.css#L42));
 - table column widths are pixel shares of the slot, refitted on resize without a remount ([app.js:247](project/src/app.js#L247));
 - query lanes with 429 backoff and a session cache around `engine.getData` ([throttle.js:107](project/src/throttle.js#L107));
-- a six-sheet styled close pack (summary vs prior run, branch scorecard, exception queue, cases, action history, what-if) from the same governed queries ([app.js:639](project/src/app.js#L639)), written by a dependency-free OOXML writer ([xlsx.js:206](project/src/xlsx.js#L206));
-- six smoke checks the app registers itself: header selections move a KPI, its comparison, a chart and a table on four tabs and restore on clear, and the Excel pack downloads ([app.js:675](project/src/app.js#L675)).
+- a six-sheet styled close pack (summary vs prior run, branch scorecard, exception queue, cases, action history, what-if), every sheet queried at export time with its tab group's applied selections passed explicitly: Summary, Branches, Exception queue and What-if follow the overview group, Cases and Action history the Controller review group, and each banner lists the filters its rows follow ([app.js:655](project/src/app.js#L655)). `buildWorkbook()` returns the Blob and the button downloads it; it is written by a dependency-free OOXML writer ([xlsx.js:206](project/src/xlsx.js#L206));
+- six smoke checks the app registers itself: header selections move a KPI, its comparison, a chart and a table on four tabs and restore on clear, and the Excel pack downloads ([app.js:714](project/src/app.js#L714)); plus `appState.exportProbe`, which builds the pack without and with header Branch = UK so the smoke test fails any sheet that does not narrow.
 
 ## Semantic layer
 
@@ -123,11 +123,11 @@ browser and is labelled as such.
 - **Reset demo** clears only this browser's fallback copy (`royalty-close-local-v1`); the warehouse reset (Rebuild from nothing, step 4) resets it for everyone.
 - On visualizations 0.9 the Unreconciled statements comparison row shows "-13.1 pts" with a decimal pts format, while the measure is +13.125 through MCP.
 - At 1440 wide with six KPI cards per row the calc-error comparison is truncated ("impact $33,…"). "Acting as" is clipped at 1280, the header stacks below 1100px, and Summary stays a narrow column even at 1440.
-- The exception pivot is an HTML table, not a native object. The simulator's bars are hand-drawn SVG and its projection is browser arithmetic, including a fixed 0.6 factor on residual exposure ([app.js:498](project/src/app.js#L498)).
+- The exception pivot is an HTML table, not a native object. The simulator's bars are hand-drawn SVG and its projection is browser arithmetic, including a fixed 0.6 factor on residual exposure ([app.js:501](project/src/app.js#L501)). Its baseline follows the overview group (header and overview filters).
 - Card captions "BQ · …" are generated from the tile title ([catalogue.js:172](project/src/catalogue.js#L172)); those tiles are not stored questions. Only the Business questions tab runs stored questions.
 - One header change writes the same selection into all four groups ([app.js:292](project/src/app.js#L292)), so it re-queries about 150 objects across every tab. Mirror into the visible tab's group only ([preload tabs](../../patterns/preload-tabs.md)).
 - No analyst in `ROYALTY_USERS` covers DE, ES or JP, so nobody can open or submit a case there, and the seeded cases on those branches belong to an analyst scoped to US.
-- Dates are fixed: demo date 2026-11-11, current run R-2026-10, deadline 14 Nov. The banner hard-codes "across 8 branches" ([app.js:308](project/src/app.js#L308)). The Excel summary's change column divides by the prior value with no zero guard ([app.js:648](project/src/app.js#L648)).
+- Dates are fixed: demo date 2026-11-11, current run R-2026-10, deadline 14 Nov. The banner hard-codes "across 8 branches" ([app.js:308](project/src/app.js#L308)). The Excel summary's columns are the fixed current-run and prior-run measures: under a header Processing run they show what the KPIs show for that filter, and the banner names it. The pack holds the warehouse copy of the cases; changes kept only in this browser by the writeback fallback are left out, with a note.
 - The Controller review KPI sparklines plot statements by run, not a case measure.
 - Some comments and dictionary strings still name the original source tables, and the header comment in [dashboard.js](project/src/dashboard.js) describes another app's selection groups.
 - Checked with the kit smoke test at 1440, 1280 and 1024 (79 objects, 6 checks including the Excel download), `npm run compile-check` (92/92) and `vite build`.
