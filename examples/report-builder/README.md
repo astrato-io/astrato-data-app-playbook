@@ -57,7 +57,7 @@ last edit ([builder.js:208](project/src/builder.js#L208), [builder.js:234](proje
 
 **Filters and the period are selections.** Each filter is an applied `inList` selection in one
 group, `report` ([builder.js:59](project/src/builder.js#L59)); the value picker reads a field's values
-with a governed query ([builder.js:184](project/src/builder.js#L184)); the chips and Clear all are the
+with a governed query ([builder.js:183](project/src/builder.js#L183)); the chips and Clear all are the
 app's own ([builder.js:175](project/src/builder.js#L175), [builder.js:73](project/src/builder.js#L73)).
 The period is a `between` selection on the chosen date field
 ([builder.js:66](project/src/builder.js#L66)), its presets counting back from the last date in the

@@ -4,7 +4,7 @@
  * Which filters each sheet follows (each sheet's subtitle states them):
  * - the five governed sheets (summary, business units, countries, trend, skills): the persona scope plus the
  *   applied selections of the page on screen. Pages keep independent selection groups and there is no shared
- *   one, so the page being looked at is the one the export follows. A selection the engine cannot apply to a
+ *   one, so the page being looked at is the one the export follows. A selection the engine rejects (a 4xx other than 429) for a
  *   sheet's query (a column with no join to it) is dropped for that sheet, and its subtitle says so;
  * - Scenario: the simulator's own population and persona scope (page selections do not apply);
  * - Actions & audit: the action register narrowed to the persona's scope (page selections do not apply).
@@ -22,16 +22,25 @@ export const buildWorkbook = async (ctx) => {
     ['Workforce Cost FYTD', 'Workforce Cost PY FYTD', 'gbpm', 'ratio', 'S/4HANA'], ['Cost vs Budget % FYTD', 'Cost vs Budget % PY FYTD', 'spct', 'pts', 'S/4HANA'], ['Replacement Cost Exposure', 'Replacement Cost Exposure PY', 'gbpm', 'ratio', 'SuccessFactors EC'],
     ['Critical Skills Coverage', 'Critical Skills Coverage PY', 'pct', 'pts', 'Talent Intelligence Hub'], ['Internal Fill Rate YTD', 'Internal Fill Rate PY YTD', 'pct', 'pts', 'SuccessFactors Recruiting']];
   const BU = ['Headcount', 'Headcount YoY', 'Voluntary Attrition', 'Voluntary Attrition vs PY', 'Voluntary Attrition vs P2Q', 'Regretted Attrition', 'Engagement Index CQ', 'Workforce Cost FYTD', 'Cost vs Budget % FYTD', 'Critical Skills Coverage', 'Open Critical Roles', 'Replacement Cost Exposure'];
-  // The selections on screen, read at export time: the applied selections of the current page's group.
+  // The selections on screen, read at export time: the applied selections of the current page's group. The
+  // Custom report page has no page group; its selections live in the report's own g-rb group.
   const pageLabel = ctx.panes[ctx.current]?.page.label ?? ctx.current;
-  const group = ctx.panes[ctx.current]?.page.group;
+  const group = ctx.panes[ctx.current]?.page.group ?? (ctx.current === 'rb' ? 'g-rb' : null);
   const sels = group ? ctx.appliedOf(group) : [];
   const selText = (list) => list.map((x) => `${ctx.fields.nameOf(x.field?.fieldKey ?? x.fieldKey)} = ${x.values.join(', ')}`).join('; ');
-  /** A governed query under the page selections; if the engine rejects them for this query, run it without and say which were dropped. */
+  /** True only when the engine refused the request itself (a 4xx other than 429), i.e. the selections cannot apply to this query. */
+  const rejected = (e) => { const s = Number(e?.status ?? e?.response?.status); return s >= 400 && s < 500 && s !== 429; };
+  /** A governed query under the page selections; if the engine rejects them for this query, run it without and say which were dropped.
+   *  Any other failure (network, 429, 5xx, a field missing from the layer) is rethrown, so the export reports it. */
   const run = async (spec) => {
     if (!sels.length) return { rows: await ctx.q(spec), note: `page selections (${pageLabel}): none`, limit: spec.limit };
     try { return { rows: await ctx.q({ ...spec, selections: sels }), note: `page selections (${pageLabel}): ${selText(sels)}`, limit: spec.limit }; }
-    catch (e) { console.warn('[export] selections not applicable', e); return { rows: await ctx.q(spec), note: `page selections (${pageLabel}) NOT applied to this sheet (the engine rejected them for its query): ${selText(sels)}`, limit: spec.limit }; }
+    catch (e) {
+      if (!rejected(e)) throw e;
+      console.warn('[export] selections not applicable', e);
+      const why = `${e.status ?? e.response?.status}${e.message ? ` ${e.message}` : ''}`;
+      return { rows: await ctx.q(spec), note: `page selections (${pageLabel}) NOT applied to this sheet (the engine rejected its query with them: ${why}): ${selText(sels)}`, limit: spec.limit };
+    }
   };
   const [tq, bus, countries, months, skills, base] = await Promise.all([
     run({ measures: K.flatMap(([a, b]) => [a, b]), limit: 1 }),

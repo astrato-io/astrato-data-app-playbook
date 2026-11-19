@@ -51,40 +51,40 @@ start_here:
   - project/src/sim.js — the animated day, buses interpolated stop to stop on a canvas over the map
 capabilities:
   - story-mode — project/src/app.js:183
-  - narrative-headline — project/src/app.js:607
+  - narrative-headline — project/src/app.js:613
   - map — project/src/dashboard.js:130
-  - what-if — project/src/app.js:671
-  - excel-export — project/src/report.js:23
-  - drill-down — project/src/app.js:712
+  - what-if — project/src/app.js:677
+  - excel-export — project/src/report.js:32
+  - drill-down — project/src/app.js:718
 stealable:
   - "Instant selections: every answer is cached for the session by its exact request, and when idle the app re-runs the visible chapter's query shapes with each filter value added, two at a time, yielding to real queries, so a click is usually a cache hit — project/src/throttle.js:66"
-  - "Prefetch waits until every object has mounted: started during boot it held two of the four lanes and slowed the last mounts — project/src/app.js:742"
-  - "One selection group per chapter, mirrored from the filter bar only for the chapter on screen and, 1.8 s later, the chapters either side; a chart click inside a chapter is forwarded to the filter bar as a pending selection — project/src/app.js:769"
-  - "Stop map with no map object: a scatter of Stop Lon / Stop Lat measures whose axes are pinned to a lon/lat window, widened to the plot's own aspect so 1 km across equals 1 km down — project/src/app.js:487"
+  - "Prefetch waits until every object has mounted: started during boot it held two of the four lanes and slowed the last mounts — project/src/app.js:748"
+  - "One selection group per chapter, mirrored from the filter bar only for the chapter on screen and, 1.8 s later, the chapters either side; a chart click inside a chapter is forwarded to the filter bar as a pending selection — project/src/app.js:775"
+  - "Stop map with no map object: a scatter of Stop Lon / Stop Lat measures whose axes are pinned to a lon/lat window, widened to the plot's own aspect so 1 km across equals 1 km down — project/src/app.js:493"
   - "Raster street tiles laid behind the scatter's plot canvas, each placed by its own lon/lat bounds and re-measured on resize — project/src/basemap.js:37"
   - "Scatter coloured by a raw field with fixed limits: on visualizations 0.9 the stored min/max apply only after setColoringGradientAuto false — project/src/theme.js:298"
   - "A day of 8,015 scheduled trips from a compacted timetable file (a trips extract, not shipped; the panel says so when it is absent), each bus interpolated between its stops and drawn on a canvas aligned to the scatter's plot canvas — project/src/sim.js:33"
-  - "Playhead on a governed chart: the clock moves a native reference line on the fleet chart's time axis, at most four times a second — project/src/app.js:952"
-  - "Average and median reference lines on both axes of a scatter, recomputed from a governed query for the lines in scope — project/src/app.js:650"
-  - "Route explorer in its own selection group: a click on a line anywhere opens it there instead of filtering, and the pick is written on the dropdown's own field so other labels stay selectable — project/src/app.js:702"
+  - "Playhead on a governed chart: the clock moves a native reference line on the fleet chart's time axis, at most four times a second — project/src/app.js:958"
+  - "Average and median reference lines on both axes of a scatter, recomputed from a governed query for the lines in scope — project/src/app.js:656"
+  - "Route explorer in its own selection group: a click on a line anywhere opens it there instead of filtering, and the pick is written on the dropdown's own field so other labels stay selectable — project/src/app.js:708"
   - "Reset that clears: the main group's selections are removed outside the mirroring flag, so chips, chapters and narratives all refresh — project/src/app.js:261"
   - "502/503/504 retried at most twice beside the 429 backoff — project/src/throttle.js:117"
-  - "Seven-sheet management report from governed queries scoped to the filters on screen, with in-cell bars standing in for charts — project/src/report.js:23"
+  - "Seven-sheet management report from governed queries scoped to the filters on screen, with in-cell bars standing in for charts — project/src/report.js:32"
   - "Share card: a 1200×627 image drawn on a canvas from the governed figures on screen, with an editable suggested post — project/src/share.js:41"
 caveats:
   - Real public data, scheduled service only. The Boarding chapter uses scheduled departures as a stand-in for demand; no ridership is published.
-  - "Landing: the hero is ready in 4–6.5 s and all 54 objects settle in 14–23 s on a shared backend. The staging smoke run failed its 15 s landing budget because the app then marked only hero-ready, so the kit timed all-settled; it now also marks landing-ready there (src/app.js:1226), not yet re-run. Otherwise 13/13 smoke checks pass at 1440, 1280 and 1024, 54/54 objects render, compile-check passes 54/54 and the build passes."
+  - "Landing: the hero is ready in 4–6.5 s and all 54 objects settle in 14–23 s on a shared backend. The staging smoke run failed its 15 s landing budget because the app then marked only hero-ready, so the kit timed all-settled; it now also marks landing-ready there (src/app.js:1257), not yet re-run. Otherwise 13/13 smoke checks pass at 1440, 1280 and 1024, 54/54 objects render, compile-check passes 54/54 and the build passes."
   - The layer has no stored business questions (questions.md lists 0). Every object queries layer measures over raw view columns directly; the layer's 26 governed dimensions are unused by the app.
   - Hero KPIs are one-row tables with a mini chart and no period comparison.
-  - Narratives, the three findings, the what-if, the share card and the report are browser arithmetic over governed query rows (for example, bus-hours on lines under 18 km/h are summed in the app, src/app.js:615).
-  - "Hard-coded figures that do not follow the filters: the chapter titles \"nearly 8,000 bus trips a day\" and \"Watch 8,015 trips\", the live map note \"3,673 stops\", and the live category bars' fixed scale of 260 (src/app.js:939)."
-  - "The live day needs a trips extract that is not in this repo (public/sim-day.json, Tue 21 Jul 2026); without it the play button is disabled, the panel says \"needs a trips extract\" and the route map draws no coloured paths. When present it is a static file, not a governed query; it follows only the line-category filter (src/app.js:924), and the route map's coloured paths come from the same file (src/sim.js:108). The narrative's fleet peak is queried without the filter bar (src/app.js:585)."
-  - "The live narrative says the governed chart is \"averaged per ten minutes\" (src/app.js:640), but its bars are 2, 5 or 15 minutes (5 by default)."
+  - Narratives, the three findings, the what-if, the share card and the report are browser arithmetic over governed query rows (for example, bus-hours on lines under 18 km/h are summed in the app, src/app.js:621).
+  - "Hard-coded figures that do not follow the filters: the chapter titles \"nearly 8,000 bus trips a day\" and \"Watch 8,015 trips\", the live map note \"3,673 stops\", and the live category bars' fixed scale of 260 (src/app.js:945)."
+  - "The live day needs a trips extract that is not in this repo (public/sim-day.json, Tue 21 Jul 2026); without it the play button is disabled, the panel says \"needs a trips extract\" and the route map draws no coloured paths. When present it is a static file, not a governed query; it follows only the line-category filter (src/app.js:930), and the route map's coloured paths come from the same file (src/sim.js:108). The narrative's fleet peak is queried without the filter bar (src/app.js:591)."
+  - "The live narrative says the governed chart is \"averaged per ten minutes\" (src/app.js:646), but its bars are 2, 5 or 15 minutes (5 by default)."
   - "Basemap tiles come at run time from a public tile server with no key (src/basemap.js:15); use a licensed tile provider in production. Some tiles are missing in the whole-region view (screenshots/geo.png). The \"Coordinates as measures\" badge still says there is no basemap service (src/app.js:167)."
   - "Layout: op-vh has a short plot under rotated labels; op-fleet line labels are ellipsed; the opportunity and route tables are cramped at 1024; the route dropdown shows a \"Line Label\" prefix and the filter dropdowns show column names (Category, Dist Band) as placeholders; band labels keep their sort prefix (\"1. Centre (<2 km)\"); the stop-map legend title is truncated."
   - On desktop (901px and wider) the wheel and arrow keys move one whole chapter per gesture; a table that can still scroll keeps the wheel.
   - "tools/layer.mjs is reference only: it needs an MCP client at tools/mcp.mjs taking `<tool> @argsfile` and printing {ok,data}, which is not included in this repo; it creates the layer with a zero datasource id; and tools/entities.mjs declares 5 views and 2 joins, while layer.json has 7 views (two Custom SQL views, Categories and Hours) and 7 joins. Recreate the layer from layer.json."
-  - The source line in the hero and the report names the warehouse tables (ASTRATO_GALLERY.MOCK_DATA.TH_*, src/app.js:369, src/report.js:15); point it, the two SQL views and layer.mjs at your own database and schema. The step that turned the GTFS feed into the TH_* tables and sim-day.json is not included in this repo, and no data rows are.
+  - The source line in the hero and the report names the warehouse tables (ASTRATO_GALLERY.MOCK_DATA.TH_*, src/app.js:375, src/report.js:19); point it, the two SQL views and layer.mjs at your own database and schema. The step that turned the GTFS feed into the TH_* tables and sim-day.json is not included in this repo, and no data rows are.
   - Web fonts (Fraunces, Inter, Material Icons) load from a public font CDN in index.html.
   - "Stale comments: the dashboard.js header names only the main and route groups, and its Live section says the live chapter has its own group (the LIVE group is unused); the share.js header says the card is copied to the clipboard, which the app does not do."
   - Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite.

@@ -69,7 +69,7 @@ stealable:
   - "Native tables with a sparkline column over Month and two- or three-band indicator text — project/src/dashboard.js:380"
   - "Ask Nash answers carry a native chart: an ad-hoc tile built, compiled, themed and mounted at run time in its own selection group, pinned to the client by a static filter — project/src/app.js:249"
   - "Report sign-off: anomalies flagged from the same facts must be explained or escalated before an account manager can submit; only a director or head of client services can approve and send — project/src/workflow.js:80"
-  - "Send = build the client's Excel pack, download it, and open a mailto with the approved commentary as the body — project/src/app.js:496"
+  - "Send = build the client's Excel pack, download it, and open a mailto with the approved commentary as the body — project/src/app.js:499"
   - "Spreadsheet view of the Excel pack: the same sheet objects the .xlsx is written from, drawn as a grid with lettered columns, frozen rows, number formats and sheet tabs — project/src/sheetview.js:18"
 caveats:
   - Mock data. The four source systems are mimicked, not connected; the "synced 06:00 today" source checks in the workflow are fixed strings (src/workflow.js:21).

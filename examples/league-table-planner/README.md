@@ -36,7 +36,7 @@ each of the first three tabs has its own group ([catalogue.js:21](project/src/ca
 which copies `main` by difference ([app.js:252](project/src/app.js#L252)) when `main` changes and
 that tab is showing ([app.js:270](project/src/app.js#L270)), and again when the tab is opened
 ([app.js:296](project/src/app.js#L296)). One click costs one query per visible object, and a self-check
-holds it to that ([app.js:446](project/src/app.js#L446)). A chart click lands as a pending selection in
+holds it to that ([app.js:447](project/src/app.js#L447)). A chart click lands as a pending selection in
 the tab's group; the app clears it and applies it to `main` after 200 ms
 ([app.js:283](project/src/app.js#L283)), so the chips and every other tab follow. Fixed groups sit beside
 them: `us` (pinned to our university, [app.js:264](project/src/app.js#L264)), `whatif`, `overtake` and
@@ -85,8 +85,8 @@ Also useful:
 - a rank-history sparkline column on the league table, from the joined history view ([catalogue.js:167](project/src/catalogue.js#L167), built at [catalogue.js:263](project/src/catalogue.js#L263));
 - a query lane with 429 backoff, timeouts and a session cache keyed by the exact request ([throttle.js:112](project/src/throttle.js#L112));
 - the maker–checker plan with "Acting as" and the four-eyes rule ([workflow.js:86](project/src/workflow.js#L86), [workflow.js:107](project/src/workflow.js#L107));
-- a seven-sheet Excel report (Summary, one sheet per tab from each object's own `handle.getData`, Plan audit trail, Definitions) ([export.js:40](project/src/export.js#L40), [export.js:70](project/src/export.js#L70)). Before reading, it copies `main` into every tab group, hidden tabs included, and waits for the re-queries ([app.js:396](project/src/app.js#L396)), so every rival-set section follows the filters on screen; sections on the fixed groups (our university, the whole-league what-if and overtake, the plan rivals) say what they follow instead. `appState.exportProbe` lets the smoke test prove it with Nation = Scotland ([app.js:420](project/src/app.js#L420));
-- ten self-checks the smoke test runs, each through the app's real selection path ([app.js:456](project/src/app.js#L456)).
+- a seven-sheet Excel report (Summary, one sheet per tab from each object's own `handle.getData`, Plan audit trail, Definitions) ([export.js:40](project/src/export.js#L40), [export.js:70](project/src/export.js#L70)). Before reading, it copies `main` into every tab group, hidden tabs included, and waits for the re-queries ([app.js:396](project/src/app.js#L396)), so every rival-set section follows the filters on screen; sections on the fixed groups (our university, the whole-league what-if and overtake, the plan rivals) say what they follow instead. `appState.exportProbe` lets the smoke test prove it with Nation = Scotland ([app.js:421](project/src/app.js#L421));
+- ten self-checks the smoke test runs, each through the app's real selection path ([app.js:457](project/src/app.js#L457)).
 
 ## Semantic layer
 

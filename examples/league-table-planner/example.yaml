@@ -47,7 +47,7 @@ start_here:
   - project/src/prepare.js — the one pre-mount path (theme, governed parameters, relabel, widths) shared with tools/compile-adapter.mjs
   - project/src/workflow.js — the focus plan: propose, approve or return, four-eyes rule, audit trail (browser-only)
 capabilities:
-  - what-if — project/src/app.js:305
+  - what-if — project/src/app.js:304
   - narrative-headline — project/src/app.js:146
   - simulated-workflow — project/src/workflow.js:32
   - excel-export — project/src/export.js:40

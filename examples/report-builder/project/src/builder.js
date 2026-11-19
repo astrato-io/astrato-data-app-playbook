@@ -327,7 +327,7 @@ export const mountBuilder = async (ctx, root) => {
       const { blob, rows, cols } = built;
       const a = el('a', { href: URL.createObjectURL(blob), download: `${st.name.replace(/[^\p{L}\p{N}]+/gu, '_') || 'report'}.xlsx` });
       document.body.append(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 0);
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
       ctx.toast(`Exported ${rows.length.toLocaleString('en-US')} rows.`);
       lastExport = { rows: rows.length, cols: cols.length, width: rows[0]?.length ?? 0, size: blob.size, first: rows[0] };
       return lastExport;

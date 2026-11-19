@@ -44,7 +44,7 @@ const buildPack = async ({ q, keyOf, mainSel, timeSelected, chipLabel, scope }) 
   /** The banner of a sheet: the selections its rows follow, and those they ignore. */
   const selText = (tab, { kpi = false } = {}) => {
     const allowed = fieldsFor(tab, kpi);
-    const label = ([k, v]) => chipLabel(k, v).join(': ');
+    const label = ([k, v]) => chipLabel(k, v, true).join(': ');
     const applied = [...mainSel].filter(([k]) => allowed.has(k)).map(label);
     const ignored = [...mainSel].filter(([k]) => !allowed.has(k)).map(label);
     return `Selections applied: ${applied.join('; ') || 'none'}.${ignored.length ? ` Not applied to this sheet: ${ignored.join('; ')}.` : ''}`;

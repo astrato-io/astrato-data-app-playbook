@@ -356,18 +356,26 @@ const main = async () => {
 
   // ---------------------------------------------------- what-if
   let leverTimer;
+  const applyLevers = async () => {
+    const values = leverValues();
+    // Every tile marked `params` (KPI, its change and mini chart, both split charts).
+    for (const id of tiles.filter((x) => x.params).map((x) => x.id)) {
+      const t = byId.get(id);
+      if (!t || !mounted.get(id)?.handle) continue;
+      await applyRuntimeOperations({ runtime, instanceId: id, operationRequests: paramOps(t, values).map((r, i) => ({ id: `p${i}`, ...r })) }).catch((e) => console.warn('[lever]', id, e));
+    }
+    workflow.render();
+  };
   const scheduleLevers = () => {
     clearTimeout(leverTimer);
-    leverTimer = setTimeout(async () => {
-      const values = leverValues();
-      // Every tile marked `params` (KPI, its change and mini chart, both split charts).
-      for (const id of tiles.filter((x) => x.params).map((x) => x.id)) {
-        const t = byId.get(id);
-        if (!t || !mounted.get(id)?.handle) continue;
-        await applyRuntimeOperations({ runtime, instanceId: id, operationRequests: paramOps(t, values).map((r, i) => ({ id: `p${i}`, ...r })) }).catch((e) => console.warn('[lever]', id, e));
-      }
-      workflow.render();
-    }, 300);
+    leverTimer = setTimeout(() => { leverTimer = undefined; applyLevers(); }, 300);
+  };
+  /** A slider moved inside the debounce window: apply it now, so nothing reads the previous parameters. */
+  const flushLevers = async () => {
+    if (leverTimer === undefined) return;
+    clearTimeout(leverTimer);
+    leverTimer = undefined;
+    await applyLevers();
   };
 
   // ---------------------------------------------------- mounting
@@ -452,6 +460,7 @@ const main = async () => {
   const buildReport = async () => {
     stopPrefetch();
     try {
+      await flushLevers();
       for (const g of Object.values(TAB_GROUPS)) mirror(g);
       await refreshHeadline();
       await settle();

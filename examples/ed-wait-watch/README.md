@@ -48,7 +48,7 @@ raises; an open flag is started, resolved or reassigned; only an ED operations l
 reopens; **four eyes**: nobody signs off a flag they raised or resolved (the resolver is read from
 the audit trail); a note is required to resolve, reassign or reopen. Every action button is always
 shown, and a refused one says why. Both modes go through the same path: check the rule, then
-record the change ([workflow.js:125](project/src/workflow.js#L125)). *Acting as* switches between
+record the change ([workflow.js:126](project/src/workflow.js#L126)). *Acting as* switches between
 four demo personas, two duty managers and two leads ([workflow.js:28](project/src/workflow.js#L28)).
 
 **Live mode** writes through governed writeback (`app.writeback`): a flag is a row in the records
@@ -61,11 +61,11 @@ offered only when the runtime can write ([workflow.js:96](project/src/workflow.j
 
 **Practice mode** (the default, labelled "nothing saved") runs the same rules on flags kept in the
 browser tab's `sessionStorage`, with a practice audit trail that also lists refused attempts and a
-*Reset practice* ([workflow.js:120](project/src/workflow.js#L120)). Nothing is written and the
+*Reset practice* ([workflow.js:314](project/src/workflow.js#L314)). Nothing is written and the
 native flag tables do not change. The app's own workflow check drives it through the UI (raise,
 start, resolve without a note (refused), resolve, self sign-off (refused, four eyes), duty manager
 sign-off (refused), another lead signs off, reset) and asserts that no writeback call was made
-([app.js:772](project/src/app.js#L772)).
+([app.js:778](project/src/app.js#L778)).
 
 ## Worth copying
 
@@ -102,8 +102,8 @@ Also useful:
 - every tab mounted at load through four lanes, the visible tab first ([app.js:275](project/src/app.js#L275)), inactive panes off-screen rather than `display: none` ([styles.css:58](project/src/styles.css#L58));
 - a query lane with 429 and 502/503/504 backoff, timeouts and a session cache ([throttle.js:117](project/src/throttle.js#L117));
 - table widths refitted on window resize with width operations, no remount ([app.js:273](project/src/app.js#L273));
-- a seven-sheet Excel report (Summary, When, Who, Satisfaction, Flags, Data, Definitions) whose queries pass filters rebuilt from the app-wide selections at the click, so hidden tabs cannot export stale rows: visit sheets follow the visit selections, the Flags sheet the flag selections, and each banner names exactly those ([export.js:29](project/src/export.js#L29), [export.js:63](project/src/export.js#L63)); the smoke test's export probe proves it ([app.js:691](project/src/app.js#L691));
-- 15 self-checks the smoke test runs, including the stale-text check, two empty-state edges and the Practice workflow ([app.js:632](project/src/app.js#L632)).
+- a seven-sheet Excel report (Summary, When, Who, Satisfaction, Flags, Data, Definitions) whose queries pass filters rebuilt from the app-wide selections at the click, so hidden tabs cannot export stale rows: visit sheets follow the visit selections, the Flags sheet the flag selections, and each banner names exactly those ([export.js:29](project/src/export.js#L29), [export.js:63](project/src/export.js#L63)); the smoke test's export probe proves it ([app.js:698](project/src/app.js#L698));
+- 15 self-checks the smoke test runs, including the stale-text check, two empty-state edges and the Practice workflow ([app.js:638](project/src/app.js#L638)).
 
 ## Semantic layer
 

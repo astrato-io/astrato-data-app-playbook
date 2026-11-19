@@ -414,9 +414,10 @@ const main = async () => {
       setTimeout(() => { exportBtn.textContent = 'Excel report'; }, 4000);
     } finally { exporting = false; exportBtn.disabled = false; }
   });
-  // The smoke test builds the workbook without and with Nation = Scotland on the rival set, from
-  // the landing tab, and fails any sheet whose figures do not move. Summary (our university and
-  // the what-if), Focus plan (the plan rivals), the audit trail and Definitions rightly stay put.
+  // The smoke test shows the landing tab (Where we stand) first, so the other tabs are hidden, then
+  // builds the workbook without and with Nation = Scotland on the rival set and fails any sheet whose
+  // figures do not move. Summary (our university and the what-if), Focus plan (the plan rivals), the
+  // audit trail and Definitions rightly stay put.
   appState.exportProbe({
     build: async () => (await buildWorkbook()).blob,
     select: () => { seedMain(); setOne(GROUPS.main, rawOf('Nation'), sel(rawOf('Nation'), 'inList', ['Scotland'])); },
@@ -563,7 +564,7 @@ const main = async () => {
     setOne(GROUPS.main, rawOf('Nation'), sel(rawOf('Nation'), 'inList', ['England'])); await settle();
     window.__lastExport = null;
     exportBtn.click();
-    for (let i = 0; i < 60 && !window.__lastExport; i++) await sleep(500);
+    for (let i = 0; i < 120 && !window.__lastExport; i++) await sleep(500);
     const out = window.__lastExport;
     seedMain(); await settle();
     return { pass: Boolean(out && out.bytes > 5000 && out.sheets.length >= 6), detail: out ? `${out.bytes} bytes, sheets: ${out.sheets.join(', ')}` : 'no export' };

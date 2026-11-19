@@ -73,7 +73,7 @@ Custom Report object, in two files and a block of CSS. To copy one into your own
   thin tab ([builder.js:194](project/src/builder.js#L194)). Only fields that exist in the layer are
   offered, and pay-by-gender, ethnicity and disability fields only to the cleared roles
   ([builder.js:83](project/src/builder.js#L83)); switching persona drops the fields the new role may
-  not see ([builder.js:302](project/src/builder.js#L302)). Tooltips carry each field's description
+  not see ([builder.js:303](project/src/builder.js#L303)). Tooltips carry each field's description
   from the layer.
 - *Bookmarks.* Up to 20 named reports in `localStorage` (`people-reports-v1`), stamped with who and
   when, plus seven starter reports filtered to what the role may see
@@ -97,7 +97,7 @@ Custom Report object, in two files and a block of CSS. To copy one into your own
 
 **One link, four scopes.** Each persona carries a row scope as `[field, view, values]`
 ([app.js:84](project/src/app.js#L84)). It is added to every governed query
-([app.js:219](project/src/app.js#L219)) and set as a static filter group on every native object
+([app.js:226](project/src/app.js#L226)) and set as a static filter group on every native object
 ([app.js:381](project/src/app.js#L381)); switching persona re-filters the page on screen first, then
 every other page, without remounting ([app.js:687](project/src/app.js#L687)). Objects a role is not
 cleared for show a lock and are never mounted, so never queried
@@ -152,8 +152,8 @@ Also useful:
 - a sticky bar with the persona scope, the page's selections as removable chips and Clear all ([app.js:331](project/src/app.js#L331)), with pending selections applied after 250 ms ([app.js:139](project/src/app.js#L139));
 - a written briefing composed from governed queries for the viewer's scope ([home.js:16](project/src/home.js#L16));
 - a scatter map with a raster basemap laid under its plot area, the axes pinned to a lon/lat extent and refitted to true scale ([basemap.js:37](project/src/basemap.js#L37), [app.js:414](project/src/app.js#L414));
-- the executive-summary workbook, seven sheets: five governed queries under the persona scope and the applied selections of the page on screen (pages keep independent selection groups, so the export follows the one being looked at, and each sheet's subtitle names the selections it follows), the scenario for the simulator's own population, and the action register in the persona's scope ([export.js:18](project/src/export.js#L18)). `buildWorkbook` returns the Blob, the header button downloads it, and `appState.exportProbe` lets the smoke test prove a Home selection narrows every governed sheet ([checks.js:112](project/src/checks.js#L112));
-- nine smoke checks the app registers: on six tabs and Data operations a selection moves a KPI, a chart and a table and clearing restores the KPI; the custom report builds a table, changes when a measure is added and exports; the header export downloads its workbook ([checks.js:61](project/src/checks.js#L61)).
+- the executive-summary workbook, seven sheets: five governed queries under the persona scope and the applied selections of the page on screen (pages keep independent selection groups, so the export follows the one being looked at (on Custom report, the report's own `g-rb` group); only an engine rejection of the selections drops them from a sheet, any other query failure fails the export; each sheet's subtitle names the selections it follows), the scenario for the simulator's own population, and the action register in the persona's scope ([export.js:18](project/src/export.js#L18)). `buildWorkbook` returns the Blob, the header button downloads it, and `appState.exportProbe` lets the smoke test prove a Home selection narrows every governed sheet ([checks.js:112](project/src/checks.js#L112));
+- nine smoke checks the app registers: on six tabs and Data operations a selection moves a KPI, a chart and a table and clearing restores the KPI; the custom report builds a table, changes when a measure is added and exports; the header export downloads its workbook ([checks.js:21](project/src/checks.js#L21)).
 
 ## Semantic layer
 

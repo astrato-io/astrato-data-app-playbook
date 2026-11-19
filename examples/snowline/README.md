@@ -49,14 +49,14 @@ Budget and Target Weeks measures declare `budget`, `minSnow` and `maxCrowd`. The
 ([prepare.js:10](project/src/prepare.js#L10)) are bound before mount by `prepareTile`
 ([prepare.js:70](project/src/prepare.js#L70)) and, on every move, set on each mounted tile marked
 `params` with `setMeasureDefinedParameter` through `applyRuntimeOperations`, no remount
-([app.js:364](project/src/app.js#L364), the operations at [prepare.js:22](project/src/prepare.js#L22)).
+([app.js:365](project/src/app.js#L365), the operations at [prepare.js:22](project/src/prepare.js#L22)).
 The split charts put the stored, parameter-free Suggested Budget at Default Rule beside the
 parameterised measure in one question, relabelled Default plan and Scenario
 ([catalogue.js:257](project/src/catalogue.js#L257)), so the baseline is governed too.
 
 **Every object on a stored question.** All 36 charts, tables and KPI parts are tiles over 29 of
 the layer's 32 stored questions, copied into [questions.js](project/src/questions.js) from the
-published layer, with the question as the card title ([catalogue.js:259](project/src/catalogue.js#L259)).
+published layer, with the question as the card title ([catalogue.js:260](project/src/catalogue.js#L260)).
 Rank and moving averages travel as advanced-calculation operations
 ([catalogue.js:93](project/src/catalogue.js#L93)); this-season questions carry Season = 2025/26
 as a static filter group on the raw Season column ([catalogue.js:289](project/src/catalogue.js#L289)).
@@ -67,10 +67,10 @@ Only the headline reads stored measures through one app-side governed query
 one-row table with a three-segment indicator, red, grey inside ±flat (what the format rounds to
 zero) and green, with up or down good per measure ([catalogue.js:114](project/src/catalogue.js#L114),
 [catalogue.js:128](project/src/catalogue.js#L128)); the mini chart is a line or bars with axes and
-legend hidden ([catalogue.js:133](project/src/catalogue.js#L133)).
+legend hidden ([catalogue.js:134](project/src/catalogue.js#L134)).
 
 **A selection group per tab, and an idle prefetch.** Filters and chips write to `main`; each tab
-has its own group ([catalogue.js:17](project/src/catalogue.js#L17)) that copies `main` by
+has its own group ([catalogue.js:18](project/src/catalogue.js#L18)) that copies `main` by
 difference ([app.js:311](project/src/app.js#L311)) only while it shows. A chart click lands
 pending in the tab's group and is handed to `main` after 200 ms ([app.js:331](project/src/app.js#L331)).
 When the screen is idle, the app re-runs the active tab's queries with each Country, Stage and
@@ -78,11 +78,11 @@ Week type value added, so the next pick is answered from the session cache
 ([app.js:111](project/src/app.js#L111), [throttle.js:74](project/src/throttle.js#L74)).
 
 Also useful:
-- every tab mounted at load through four lanes, filters and the visible tab first ([app.js:435](project/src/app.js#L435)), inactive panes off-screen rather than `display: none` ([styles.css:56](project/src/styles.css#L56));
+- every tab mounted at load through four lanes, filters and the visible tab first ([app.js:443](project/src/app.js#L443)), inactive panes off-screen rather than `display: none` ([styles.css:56](project/src/styles.css#L56));
 - a query lane with 429 and 502/503/504 backoff, timeouts and a session cache keyed by the exact request ([throttle.js:120](project/src/throttle.js#L120));
-- table column widths from header length at the font size ([prepare.js:34](project/src/prepare.js#L34)), refitted on resize by a ResizeObserver without a remount ([app.js:376](project/src/app.js#L376));
+- table column widths from header length at the font size ([prepare.js:34](project/src/prepare.js#L34)), refitted on resize by a ResizeObserver without a remount ([app.js:384](project/src/app.js#L384));
 - the maker–checker plan with "Acting as" and the four-eyes rule ([workflow.js:75](project/src/workflow.js#L75), [workflow.js:96](project/src/workflow.js#L96));
-- an eight-sheet Excel report (Summary, one sheet per tab from each object's own `handle.getData`, Plan audit trail, Definitions) ([export.js:30](project/src/export.js#L30), [export.js:56](project/src/export.js#L56)); before reading, it copies `main` into every tab's selection group and waits for the re-queries, so hidden tabs follow the filters too, and the kit's export probe checks it ([app.js:452](project/src/app.js#L452));
+- an eight-sheet Excel report (Summary, one sheet per tab from each object's own `handle.getData`, Plan audit trail, Definitions) ([export.js:30](project/src/export.js#L30), [export.js:56](project/src/export.js#L56)); before reading, it copies `main` into every tab's selection group and waits for the re-queries, so hidden tabs follow the filters too, and the kit's export probe checks it ([app.js:460](project/src/app.js#L460));
 - 17 self-checks the smoke test runs, including real-click checks on five chart types ([app.js:598](project/src/app.js#L598)).
 
 ## Semantic layer
@@ -127,11 +127,11 @@ are the agent's own brief and data brief from the build; [SCORE.md](SCORE.md) is
 
 The judge's main gaps first ([SCORE.md](SCORE.md), 47/52):
 
-- **Dropdown filters need Apply; chart clicks apply at once.** A dropdown pick makes a pending chip with Cancel / Apply, and nothing changes until Apply. The app's selection checks set applied selections through the API ([app.js:517](project/src/app.js#L517)), so they never meet this step.
+- **Dropdown filters need Apply; chart clicks apply at once.** A dropdown pick makes a pending chip with Cancel / Apply, and nothing changes until Apply. The app's selection checks set applied selections through the API ([app.js:526](project/src/app.js#L526)), so they never meet this step.
 - **The plan's resort-split chart labels only half the resorts** (5 of 10) at 1440 and 1280.
 - **Best-tab tables cut a row at 1440, and headers ellipsise at 1280.** The three tables show a partial row, so ten rows need a scroll inside the card; at 1280 the By week and Headroom headers ellipsise.
 - **Filter chips show raw field names** (Season_Stage, Resort Name, Snowfall_Band), because selections are written on the raw columns ([app.js:303](project/src/app.js#L303)); filter controls truncate their value while a selection is held.
-- **"Scenario" differs in colour between the two split charts:** blue by resort, amber (the crowd colour) by stage ([catalogue.js:257](project/src/catalogue.js#L257), [catalogue.js:258](project/src/catalogue.js#L258)).
+- **"Scenario" differs in colour between the two split charts:** blue by resort, amber (the crowd colour) by stage ([catalogue.js:258](project/src/catalogue.js#L258), [catalogue.js:259](project/src/catalogue.js#L259)).
 - **The landing tab reuses the league-table skeleton** of [league-table-planner](../league-table-planner/): masthead with Excel button, dropdowns and filter bar, tabs, headline sentence, KPI row, chart left and table right.
 - **The plan workflow is browser-only**, because the brief forbade creating warehouse tables: plan, decisions and audit trail live in `localStorage` (`snowline-plan-2026-27-v1`, [workflow.js:20](project/src/workflow.js#L20)), and the screen says so.
 - **Cold first load took about 59 s** to landing-ready and failed the kit smoke's 15 s landing budget; warm loads took 6–7 s.

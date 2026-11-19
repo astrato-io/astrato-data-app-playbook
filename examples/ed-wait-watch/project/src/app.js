@@ -592,11 +592,17 @@ const main = async () => {
 
   // ---------------------------------------------------------------- Excel
   // Every sheet queries with filters rebuilt from mainSel at this moment (selFilters), so hidden tabs need no sync.
-  const exportCtx = () => ({ q, selFilters, selTextFor, period: periodNow() });
+  // A chart click still waiting out its 200 ms auto-apply is applied first, so an export straight after a click includes it.
+  const exportCtx = async () => {
+    const waiting = (GROUPS_OF[current] ?? []).filter((g) => !WRITE_ONLY.has(g) && selections.getSelection(g)?.pending?.length);
+    for (const g of waiting) selections.applyPendingSelections(g);
+    if (waiting.length) await new Promise((r) => setTimeout(r, 50));
+    return { q, selFilters, selTextFor, period: periodNow() };
+  };
   exportBtn.addEventListener('click', async () => {
     exportBtn.disabled = true;
     window.__lastExportError = null;
-    try { await downloadWorkbook(exportCtx()); }
+    try { await downloadWorkbook(await exportCtx()); }
     catch (error) { window.__lastExportError = String(error?.message ?? error); exportBtn.title = `Export failed: ${window.__lastExportError}`; console.error('[export]', error); }
     finally { exportBtn.disabled = false; }
   });
@@ -690,7 +696,7 @@ const main = async () => {
   // narrow it, and its banner says so.
   const toLanding = async () => { if (current !== 'board') { go('board'); await settled(); } };
   appState.exportProbe({
-    build: () => buildWorkbook(exportCtx()),
+    build: async () => buildWorkbook(await exportCtx()),
     select: async () => { await toLanding(); await pick('g-board', 'Department Referral', ['Neurology']); },
     clear: async () => { await toLanding(); await clearAll(); },
     exempt: ['Flags', 'Definitions'],

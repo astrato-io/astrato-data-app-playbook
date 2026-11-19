@@ -105,9 +105,8 @@ const printDoc = (title, sheets) => {
 
 export const exportMenu = (ctx) => {
   const S = exportScope(ctx);
-  // Company-level documents: the companies in scope, starting from the one open in the Company workspace.
-  const inScope = M.companies.filter((c) => S.companies.has(c.Company));
-  const list = [...(inScope.length ? inScope : M.companies)].sort((a, b) => a.Company.localeCompare(b.Company));
+  // Company-level documents are not narrowed by scope: every company, starting from the one open in the Company workspace.
+  const list = [...M.companies].sort((a, b) => a.Company.localeCompare(b.Company));
   const onScreen = ctx.selectedValues('g-company', 'Company', 'Companies')[0];
   const pick = (list.find((c) => c.Company === onScreen) ?? list[0])?.Company;
   const coSel = el('select', {}, list.map((c) => el('option', { value: c.Company, text: c.Company, selected: c.Company === pick })));

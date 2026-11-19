@@ -401,11 +401,14 @@ const main = async () => {
     const key = x.field?.fieldKey ?? x.fieldKey;
     return { filter: engineFilter(key, x.operator ?? 'inList', x.values), label: `${fieldName(key)} = ${x.values.join(', ')}` };
   });
-  const exportTab = () => (GROUPS.includes(`g-${current}`) ? current : 'pf');
+  // A tab has a filter bar when its page lists filter controls; the Infographic's client picker is not one.
+  const hasFilterBar = (tab) => (PAGES.find(([k]) => k === tab)?.[3].length ?? 0) > 0;
+  const exportTab = () => (hasFilterBar(current) ? current : 'pf');
   const scopeOf = (client, tab = exportTab()) => {
     if (client) return { filters: [engineFilter(clientKey, 'inList', [client])], text: `Client = ${client} (client report; dashboard filters do not apply)` };
     const fs = filtersOf(`g-${tab}`), label = PAGES.find(([k]) => k === tab)[1];
-    return { filters: fs.map((f) => f.filter), text: fs.length ? `Filters from ${label}: ${fs.map((f) => f.label).join('; ')}` : `No filters on ${label}` };
+    const fell = current && tab !== current && !hasFilterBar(current) ? ` (${PAGES.find(([k]) => k === current)?.[1] ?? current} has no filter bar)` : '';
+    return { filters: fs.map((f) => f.filter), text: (fs.length ? `Filters from ${label}: ${fs.map((f) => f.label).join('; ')}` : `No filters on ${label}`) + fell };
   };
   const buildSheets = async (client, commentary, tab) => {
     const scope = scopeOf(client, tab);

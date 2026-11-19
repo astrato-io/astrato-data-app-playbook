@@ -281,10 +281,10 @@ const main = async () => {
   };
 
   // ---------------------------------------------------------------- selection bar
-  const chipLabel = (key, values) => {
+  const chipLabel = (key, values, all = false) => {
     const name = NAME_BY_KEY[key] ?? fields.nameOf(key);
     const shown = key === keyOf('Period') ? values.map(monthLabel) : values.map(String);
-    return [name === 'Period Year' ? 'Year' : name === 'Period' ? 'Month' : name === 'Sector' ? 'Sector' : name === 'Geography' ? 'Region' : name, shown.slice(0, 3).join(', ') + (shown.length > 3 ? ` +${shown.length - 3}` : '')];
+    return [name === 'Period Year' ? 'Year' : name === 'Period' ? 'Month' : name === 'Sector' ? 'Sector' : name === 'Geography' ? 'Region' : name, all ? shown.join(', ') : shown.slice(0, 3).join(', ') + (shown.length > 3 ? ` +${shown.length - 3}` : '')];
   };
   const renderSelBar = () => {
     const scope = SCOPE[current];
