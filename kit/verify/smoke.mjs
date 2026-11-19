@@ -48,6 +48,18 @@ const SETTLE_MS = Number(opt('--settle-ms', 90000));
 const CHECK_MS = Number(opt('--check-ms', 60000));
 const DEADLINE_MS = Number(opt('--deadline-ms', 40 * 60000));
 const CALL_MS = 60000; // one call into the page (a check gets CHECK_MS + 15 s)
+// In-page wait: no query logged for quietMs (window.__appState.queries), then paintMs to repaint.
+// The smoke test's own copy of appState.quiet, which lives on the app's module, not on the window.
+const QUIET_JS = `async ({ quietMs = 800, paintMs = 1500, timeoutMs = 20000 } = {}) => {
+  const qs = () => window.__appState?.queries?.length ?? 0;
+  const start = performance.now(); let seen = qs(); let since = performance.now();
+  while (performance.now() - start < timeoutMs) {
+    await new Promise((r) => setTimeout(r, 100));
+    if (qs() !== seen) { seen = qs(); since = performance.now(); } else if (performance.now() - since >= quietMs) break;
+  }
+  await new Promise((r) => setTimeout(r, paintMs));
+  return 1;
+}`;
 const scrollOk = args.includes('--scroll-ok');
 const fullPage = args.includes('--full-page');
 const FULL_MAX = 16000; // Chrome refuses captures much taller than this
@@ -256,9 +268,7 @@ else {
   const frames = `new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => r(1))))`;
   const settleLayout = async () => {
     await evaluate(frames);
-    const quiet = await evaluate(`typeof window.__appState?.quiet === 'function'
-      ? window.__appState.quiet({ quietMs: 400, paintMs: 800 }).then(() => 1) : 0`);
-    if (!quiet) await sleep(1200);
+    await evaluate(`(${QUIET_JS})({ quietMs: 400, paintMs: 800 })`);
     await evaluate(frames);
   };
   for (const width of widths) {
@@ -336,24 +346,32 @@ else {
   // classic bug: hidden tabs' selection groups are mirrored only while shown, so their sheets
   // export unfiltered rows under a banner that names the filter.
   const hasProbe = !aborted && (await evaluate(`!!window.__appState.exportProbe`));
-  report.exportProbe = hasProbe ? undefined : 'not registered (appState.exportProbe)';
+  report.exportProbe = hasProbe ? 'did not finish' : 'not registered (appState.exportProbe)';
   if (hasProbe) {
     stage = 'the export probe';
-    console.log('export probe: building the workbook without and with the filter');
+    console.log('export probe: building the workbook without and with the filter, from the landing tab');
+    // Back to the landing tab first: a check that ended on another tab would leave that tab's
+    // group mirrored, and its sheet would pass whether or not the export syncs hidden groups.
+    if (tabs.length) await evaluate(`Promise.resolve(window.__appState.tabs[0].show()).then(() => 1)`);
+    const PROBE_MS = CHECK_MS * 3;
     const r = await evaluate(`(async () => {
       const p = window.__appState.exportProbe;
+      const quiet = ${QUIET_JS};
       const b64 = async (blob) => { const u = new Uint8Array(await blob.arrayBuffer()); let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode(...u.subarray(i, i + 0x8000)); return btoa(s); };
-      const settle = () => window.__appState.quiet ? window.__appState.quiet({ paintMs: 300 }) : new Promise((r) => setTimeout(r, 3000));
-      try {
+      const settle = () => quiet({ quietMs: 800, paintMs: 300 });
+      const timeout = new Promise((resolve) => setTimeout(() => resolve({ error: 'did not finish within ${PROBE_MS / 1000}s' }), ${PROBE_MS}));
+      const run = async () => {
+        await settle();
         await p.clear?.(); await settle();
         const before = await b64(await p.build());
         await p.select(); await settle();
         const after = await b64(await p.build());
         await p.clear?.(); await settle();
         return { before, after, exempt: p.exempt ?? [] };
-      } catch (e) { return { error: String(e?.message ?? e) }; }
-    })()`, CHECK_MS * 3);
-    if (!r || r.error) fail.push(`export probe: ${r?.error ?? 'no result'}`);
+      };
+      try { return await Promise.race([run(), timeout]); } catch (e) { return { error: String(e?.message ?? e) }; }
+    })()`, PROBE_MS + 15000);
+    if (!r || r.error) { report.exportProbe = r?.error ?? 'no result'; fail.push(`export probe: ${r?.error ?? 'no result'}`); }
     else {
       const { diffWorkbooks } = await import('./xlsx-diff.mjs');
       const before = Buffer.from(r.before, 'base64');
