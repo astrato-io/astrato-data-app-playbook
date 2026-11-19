@@ -41,7 +41,7 @@ a connection that can read metadata but not query data will stall step 1.
 
 ## 3. Install the CLI and sign in
 
-Install it into the project you create in step 4, not globally. From that project:
+Install it into the project you create in step 4, as a dev dependency. From that project:
 
 ```sh
 npm install --save-dev @astrato-io/cli@latest
@@ -53,10 +53,13 @@ npx astrato status
 Sign in yourself. An agent should never run the login, handle its code or ask for a token.
 
 Run the CLI as `npx astrato …` from the project, or `node <project>/node_modules/@astrato-io/cli/dist/bin.js …`.
-Some docs and the MCP server's instructions say `npm install -g @astrato-io/cli@latest`; install
-`@astrato-io/cli@latest` into the project instead, so each app records the CLI it was built
-with (0.2.0 or later for the template and `snapshot`). Node itself must
-be on the PATH of the shell your agent uses; check with `node --version` before anything else.
+Node itself must be on the PATH of the shell your agent uses; check with `node --version` before
+anything else.
+
+**The MCP server's instructions say `npm install -g @astrato-io/cli@latest`.** Both get the same
+CLI. This playbook installs it per project so each app records the CLI it was built with
+(0.2.0 or later for `snapshot`); a global install that is already up to date also works. Pick
+one and use it for every command.
 
 ## 4. Create the project
 
@@ -64,28 +67,54 @@ The CLI configures an existing front-end project; it does not scaffold one. Chec
 offers with `npx astrato --version` and `npx astrato init --help`. This page was checked on
 **CLI 0.2.0** (2026-11-18), which added `init --template dashboard` and `astrato snapshot`.
 
-### Choose one start: the template or the examples' vanilla layout
+### Recommended: the examples' layout
 
-Both are valid. Pick one stack per app and do not mix them.
+```sh
+npm create vite@latest my-app -- --template vanilla
+cd my-app
+npm install
+npm install @astrato-io/app-runtime @astrato-io/visualizations
+npm install --save-dev @astrato-io/cli@latest
+npx astrato --host <your-origin> init . --semantic-layer-id <your-layer-id>
+npx astrato --host <your-origin> validate .
+npx astrato --host <your-origin> dev . --no-open
+```
 
-| | Template (`--template dashboard`) | Examples' layout (vanilla JS) |
-| --- | --- | --- |
-| Stack | React + TypeScript, about 3,400 lines | Plain JS modules on Vite |
-| Gives you | A page frame following the docs' design guide (`Masthead`, `KpiRow`, `KpiCard`, `Board`, `Panel`), a selection bar, filters, an object menu (CSV, Excel, image, SQL, pin), stored-question charts and next questions | The techniques the [examples](../catalog.json) show: selection groups per tab, KPI change rows, workflows, Excel packs, what-if, report builder |
-| Techniques from the examples | Port them into the template's `kit.tsx` / `look.tsx` components | Copy them from the examples as they are |
-| The MCP server's `designBrief` | Names the template's helpers (`Masthead`, `KpiCard`, `useFigures`, `chartLook`): use them | Those helpers do not exist; build the same hierarchy from native objects ([KPI cards](4-build.md#3-kpi-cards), [layout](4-build.md#6-layout-and-look)) |
-| Verification | The playbook's [kit](../kit/README.md), wired in by you (below): the template has no app checks of its own | The playbook kit |
+This installs the current packages (visualizations and app-runtime 0.9 as of 2026-11). All 15
+examples are plain JS modules on Vite, so their techniques (selection groups per tab, KPI change
+rows, workflows, Excel packs, what-if, report builder) copy across without translation, and the
+examples judged against the rubric were built this way.
 
-Either way the standard is the [playbook](README.md) and the [rubric](rubric.md), and you read
-the layer over MCP ([step 1](1-read-the-layer.md)). The template does not save time on the
-rubric by itself: in one test run (CLI 0.2.0, 2026-11-18) porting the examples' techniques into
-React took about the time the template saved, and the app scored no higher than runs without it.
+**How this relates to the MCP server's instructions.** They say to start "in a Vite vanilla-ts
+project, not a React one" and to add `--template dashboard` when `astrato init --help` lists it.
+That template writes a React + TypeScript page frame (about 3,400 lines). The playbook's route
+differs in two ways, on purpose:
 
-The MCP server's instructions say to start from "a Vite vanilla-ts project, not a React one"
-and then add `--template dashboard`, which writes React. Read it as: scaffold with Vite's
-`vanilla-ts` template (not Vite's React template) and let `init --template dashboard` add React.
+- **Vite's `vanilla` template, not `vanilla-ts`.** The same Vite starter, in JS, because the
+  examples are JS. If you prefer TypeScript, use `vanilla-ts`, delete its starter files
+  (`src/main.ts`, `src/counter.ts`, `src/style.css`) and port what you copy to TS. Do not mix
+  the two.
+- **No `--template dashboard`.** In one test run (CLI 0.2.0, 2026-11-18) porting the examples'
+  techniques into the template's React components took about the time the template saved, the
+  app scored no higher, and the template needed two bug fixes first. The MCP server's
+  `designBrief` names the template's helpers (`Masthead`, `KpiCard`, `useFigures`, `chartLook`):
+  without the template they do not exist, so build the same page hierarchy from native objects
+  ([KPI cards](4-build.md#3-kpi-cards), [layout](4-build.md#6-layout-and-look)).
+
+What the MCP server's instructions require still holds: a Vite project that is not a React
+starter, the CLI's `init` and `dev`, and every chart drawn with `@astrato-io/visualizations`
+(never SVG, canvas or CSS). Use the
+template only when the user asks for it; then follow the next section.
+
+- **`semantic-layers list` and `semantic-layers describe <id>`** are in CLI 0.2.0 (0.1.3 had
+  only `visibility`): `describe` prints the stored measures and dimensions with their
+  descriptions. It does not profile data, so [step 1](1-read-the-layer.md) still reads and
+  queries the layer over MCP.
 
 ### With the template
+
+Only when the user asks for CLI 0.2.0's `--template dashboard`. The standard is the same: the [playbook](README.md), the [rubric](rubric.md) and the
+[kit](../kit/README.md), which the template does not include.
 
 ```sh
 npm create vite@latest my-app -- --template vanilla-ts
@@ -138,32 +167,8 @@ What the template does not give you, and the rubric still asks for:
 - **An Excel pack and a query scheduler**: see [build](4-build.md#5-tabs-groups-and-mount-order)
   and [deliverables](4-build.md#7-deliverables-that-make-it-a-product).
 
-### Without the template: the examples' vanilla layout
-
-```sh
-npm create vite@latest my-app -- --template vanilla
-cd my-app
-npm install
-npm install @astrato-io/app-runtime @astrato-io/visualizations
-npm install --save-dev @astrato-io/cli@latest
-npx astrato --host <your-origin> init . --semantic-layer-id <your-layer-id>
-npx astrato --host <your-origin> validate .
-npx astrato --host <your-origin> dev . --no-open
-```
-
-- **Starting from `--template vanilla-ts` without the dashboard template?** That scaffold is
-  TypeScript (`src/main.ts`, `tsconfig.json`); the examples and their helpers are `.js`.
-  Either replace its entry with the examples' JS layout (`src/main.js`, and point `index.html`'s
-  script at it; delete the `.ts` starter files) or keep TypeScript throughout and port what you
-  copy. Do not mix the two.
-- **`semantic-layers list` and `semantic-layers describe <id>`** are in CLI 0.2.0 (0.1.3 had
-  only `visibility`): `describe` prints the stored measures and dimensions with their
-  descriptions, a quick way to fill the template's `TODO`s. It does not profile data, so
-  [step 1](1-read-the-layer.md) still reads and queries the layer over MCP.
-
 ### Either way
 
-- **Install the CLI in the project** and run it as `npx astrato …`, not a global install.
 - **`--host` on every command** unless your tenant is on `app.astrato.io`, the default.
   `astrato.json` does not record the host, so a command without it silently talks to the default
   and looks like "not signed in".
@@ -194,7 +199,8 @@ from the MCP server (`astrato_semantic_layer_list`); never invent one.
 
 ## 5. Point the agent at this playbook
 
-Clone this repository beside your project (or into a subfolder of it, such as `_ref/`, when the
+The repository is public: cloning or downloading it needs no access request or token.
+Clone it beside your project (or into a subfolder of it, such as `_ref/`, when the
 agent must stay inside one folder; keep it out of the build). On Windows a full clone into a
 deep folder can fail with *"'$GIT_DIR' too big"*: clone shallow into a short path
 (`git clone --depth 1 -c core.longpaths=true https://github.com/astrato-io/astrato-data-app-playbook C:\src\playbook`),
@@ -208,10 +214,11 @@ Naming the person and the decision matters: it is the first thing [step 2](2-bri
 ## Versions: read this before copying from an example
 
 The examples in this repo run on the public `@astrato-io/…` packages and pin the visualizations
-version they were tested on (`^0.9.0` for most, `^0.8.0` for three). They were first built on older versions, and npm now
+version they were tested on: 12 pin `^0.9.0`, three (lending-affordability, portfolio-os,
+revenue-war-room) still pin `^0.8.0`. They were first built on older versions, and npm now
 serves 0.9. So:
 
-- **Install the version you will build on**, and say which in your app. An example's
+- **Build a new app on the current packages** (0.9 in 2026-11), and say which version in your app. An example's
   `package.json` is a record of what it was tested on, not a recommendation.
 - **Treat workarounds as dated.** Every [knowledge](../knowledge/README.md) entry and every
   example caveat names the version it was verified on. Before copying a workaround, check

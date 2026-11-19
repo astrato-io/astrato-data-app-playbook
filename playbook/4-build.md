@@ -28,6 +28,12 @@ by every surface and testable over MCP.
   new views when the brief needs shared workflow state
   ([pattern](../patterns/writeback-workflow.md)); never mock rows or presentation columns, which
   hide the layer's job and add reload churn. Heavy pre-aggregation is the data owner's change.
+- **A Custom SQL view costs its full scan on every query.** The layer does not store it: each
+  object, selection and export re-runs it. Keep a view to the window the app shows and aggregate
+  early; time one query on it over MCP before building on it (a dense grid view took 51 s per
+  query in one test run, the same view cut to 30 weeks 5 s). If it is still slow, tell the data
+  owner a materialised table would fix it, and say so in the brief
+  ([knowledge](../knowledge/performance.md#slow-custom-sql-views)).
 - **Types come from the warehouse.** Never hand-declare a field's data type. Omit it, then run
   `astrato_semantic_layer_check_source_schema` (and `apply_source_schema_fix`) until drift is 0
   before authoring measures. If a column needs another type (a year as a label), cast it in a

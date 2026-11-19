@@ -23,10 +23,14 @@ not yet meet, and anything you could not verify.
 | proving an app works | [kit/](kit/README.md): the smoke test and release gate, ready to copy |
 | stuck on something that should work | [knowledge/](knowledge/README.md): symptom-first entries, each tagged with the versions it was verified on. Grep it before debugging |
 
-Two starts are valid, one stack per app: CLI 0.2.0's `astrato init --template dashboard` (React + TS
-page frame, selection bar, filters, object menu) with the examples' techniques ported into it, or
-the examples' vanilla JS layout. Either way, wire in the [kit](kit/README.md) and run its smoke
-test; `astrato snapshot` is only a quick look. See [getting started](playbook/0-getting-started.md#choose-one-start-the-template-or-the-examples-vanilla-layout).
+**One recommended start:** a Vite `vanilla` (plain JS) project, the CLI installed in it as a dev
+dependency, `astrato init` without a template, and the examples' JS layout, so their techniques
+copy across unchanged. The Astrato MCP server's instructions say something slightly different (a
+`vanilla-ts` project, a global CLI install, and `init --template dashboard`, which writes a React
++ TypeScript page frame): [getting started](playbook/0-getting-started.md#recommended-the-examples-layout)
+says why this playbook differs and what stays the same. Use the template only when the user asks
+for it. Either way, wire in the [kit](kit/README.md) and run its smoke test; `astrato snapshot` is
+only a quick look.
 
 The usual order: playbook step 1 (read the layer) → step 2 (brief) → step 3 sends you to the
 catalog below → build with the patterns open → verify and score with the rubric.
@@ -41,7 +45,7 @@ Several sources overlap. Read them for different things, and do not read all of 
 | The Astrato skills | Routing: when to use which tool, and security rules. They send you to the docs | Content; they hold little |
 | [playbook/](playbook/README.md) | **The standard and the order of work** | API shapes |
 | [patterns/](patterns/) | The shape of a technique and where an example does it | Exact code for your version: the examples run on older packages |
-| [knowledge/](knowledge/README.md) | Symptoms and their causes, each dated by version; start with its [status on 0.8](knowledge/README.md#status-on-08) | Anything where the docs for your version say otherwise: test, then believe the test |
+| [knowledge/](knowledge/README.md) | Symptoms and their causes, each dated by version; start with its [status on 0.8 and 0.9](knowledge/README.md#status-on-08) | Anything where the docs for your version say otherwise: test, then believe the test |
 
 When the playbook and the docs disagree about **what to build** (how many stored questions,
 preloading tabs), follow the playbook. When anything here and the docs disagree about **how an
@@ -50,8 +54,9 @@ it the docs' way, test that one behaviour, and keep the result.
 
 Docs pages worth reading in full, by step: *Period axes and comparisons* (steps 1 and 4);
 *Mounting objects*, *Filters and selections*, *KPI card* and *Query performance* (step 4).
-For operations, do not read the references end to end: `node kit/verify/ops.mjs <type>` lists
-every operation for a chart type and prints the ones you name.
+For operations, do not read the references end to end: `node <path-to-playbook>/kit/verify/ops.mjs <type>`,
+run from your app folder (it reads the docs inside the installed `@astrato-io/visualizations`),
+lists every operation for a chart type and prints the ones you name.
 
 ## Find the right examples (read 1 file, not 100)
 
@@ -122,5 +127,6 @@ its `project/`, then follow its README. To run your own app, follow
 ## Versions
 
 Each example pins the visualizations version it was tested on in `project/package.json`: 12 pin
-`^0.9.0` and 3 still pin `^0.8.0`. See [status on 0.8](knowledge/README.md#status-on-08) for what has and has
-not been re-checked before copying a workaround.
+`^0.9.0` and 3 still pin `^0.8.0`. Build a new app on the current packages (0.9 in 2026-11). See
+[status on 0.8 and 0.9](knowledge/README.md#status-on-08) for what has and has not been re-checked
+before copying a workaround.

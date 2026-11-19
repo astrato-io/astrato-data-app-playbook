@@ -94,15 +94,54 @@ in [../patterns/query-scheduler.md](../patterns/query-scheduler.md) and
 
 ## Slow Custom SQL views
 
+- **Symptom:** every object over one view is slow, or times out, while objects over plain tables
+  are fast.
+- **Cause:** a Custom SQL view is not stored. The engine wraps its SQL into every query, so each
+  object, each selection and each export pays the view's full scan again. A dense grid view
+  (customer × week since the start of the data) took 51 s per query, and every object on it timed
+  out (a test run, 2026-11-18).
 - **Fix:** materialise heavy views in the warehouse (tables or dynamic tables refreshed on a lag):
-  one view went from 6–14 s to 0.3 s per query.
-- **Verified on:** 2026-11.
+  one view went from 6–14 s to 0.3 s per query. That is the data owner's change; when you may not
+  make it, keep the view's scan small (limit it to the window the app shows and aggregate early:
+  the same grid cut to 30 weeks went from 51 s to 5 s per query), and say in the brief that a
+  materialised table would make the app fast.
+- **Verified on:** 2026-11; the per-query re-run and the 51 s → 5 s rewrite on Snowflake,
+  2026-11-18 (a test run).
+
+## Every query takes several seconds, the layer's own measures included
+
+- **Symptom:** over MCP, before any app exists, a single measure takes 3–10 s; the app's landing
+  takes longer than the kit's 15 s budget, and a selection settles in 10–30 s however few objects
+  are visible. Caching makes repeats fast; first clicks stay slow.
+- **Cause:** the warehouse, not the app: a slow connection, a large table scanned on every query,
+  or a Custom SQL view re-run per object ([above](#slow-custom-sql-views)). The app's scheduler,
+  cache and visible-only queries cannot go below the time of one query.
+- **Fix:**
+  - **Measure early.** Time a headline measure and a stored question over MCP in
+    [step 1](../playbook/1-read-the-layer.md#5-profile), and note it in the data brief's caveats.
+    If the layer's existing measures are slow too, no app on this layer meets rubric E2's 3 s.
+  - **Do what the app can:** visible-only queries, a scheduler with a session cache and idle
+    prefetch ([query scheduler](../patterns/query-scheduler.md)), fewer objects on the landing tab,
+    and small, early-aggregating SQL views.
+  - **Recommend the real fix to the data owner:** a materialised (pre-aggregated) table at the
+    grain the app reads, refreshed on a schedule. Do not create it yourself unless the brief
+    allows warehouse changes.
+  - **Run the smoke test with longer limits and say so:** `--landing-ms 60000` (default 15000) and
+    `--check-ms 240000` (default 60000) for checks that select, wait and export; give the app's
+    own waits inside checks the same headroom. Record the flags you used next to the score.
+  - **Score E2 honestly**: time three selections as the rubric says and report the settle time
+    you measured, with the per-query time as the reason. Do not hide it behind the cache.
+- **Verified on:** Snowflake, app-runtime and visualizations 0.9.0, 2026-11-18 (a test run:
+  existing measures took 3.3 s and 10.4 s over MCP; selections settled in 11–33 s).
+- **See also:** [Each query takes about a second](#each-query-takes-about-a-second-however-small-the-data),
+  [../kit/README.md](../kit/README.md#2-run-the-smoke-test).
 
 ## MCP calls fill the agent's context
 
 - **Symptom:** a one-row profiling query returns about 25 KB; `astrato_get_context` about 58–60 KB,
-  which can overflow the agent's tool output (save it to a file and parse out `auth.scopes` and
-  the `designBrief` with a script);
+  which can overflow the agent's tool output (an agent cannot save an MCP result to a file: call
+  it with `detail: "identity"`, about 1 KB, for `auth.scopes`, and once in full for the
+  `designBrief`, taking notes as you read);
   `get_summary` with `includeDetails` on a 358-measure layer about 60 KB, over the agent's
   tool-output limit; every `commit_authoring_batch` about 60 KB.
 - **Cause:** `astrato_data_execute_query` returns the executed SQL (`statement`), `sourceContext`
@@ -112,8 +151,10 @@ in [../patterns/query-scheduler.md](../patterns/query-scheduler.md) and
 - **Fix:** pass `responseBudgetBytes: 4096`, the minimum, on profiling queries. Rows are never
   cut; `omittedMetadata` names what was left out, and a page the budget cuts short has
   `pageLimitedBy: "responseBudget"` and a `nextOffset` to continue from. Leave the budget off for
-  a query whose SQL you need. Above about 100 measures, read the layer with `get_summary`
-  `includeSnapshot: true` saved to a file, not `includeDetails`. Put all layer changes in one
+  a query whose SQL you need. Above about 100 measures, read the layer in pages (`get_details` one section at
+  a time, or the catalogue through `astrato_data_prepare_query` page by page) and write what you
+  need into the data brief as you go, not `includeDetails`. The snapshot that
+  `includeSnapshot: true` links is a resource read into context, not a file. Put all layer changes in one
   commit.
 - **Verified on:** the parameter, its limits and `omittedMetadata` from the tool schema, 2026-11.
   That 4096 drops `statement`, `sourceContext` and `queryAnalysis` and keeps the rows was observed

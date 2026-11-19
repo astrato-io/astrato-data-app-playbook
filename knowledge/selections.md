@@ -163,6 +163,22 @@ and [preload-tabs](../patterns/preload-tabs.md) hold the working code.
 - **Verified on:** version not recorded, 2026-11.
 - **See also:** [semantic-layer.md](semantic-layer.md#custom-sql-view-fields-disappear-or-misbehave).
 
+## A filter-bar chip shows a generated name such as `Group_Name`
+
+- **Symptom:** after a dimension is turned into a mapping dimension (to label blanks or group
+  values), its chip in the library filter bar (`astrato-app-filter-bar`) reads the generated
+  field name with underscores (`Customer_Region`) instead of the dimension's name.
+- **Cause:** a mapping dimension exposes a generated column key (`[View].[Group_Name]`, spaces
+  replaced by `_`), and selections made on it carry that key; the filter bar labels the chip from
+  it ([semantic-layer.md](semantic-layer.md#mapping-dimensions-sort-alphabetically-and-expose-a-phantom-key)).
+- **Fix:** the 0.9.0 filter bar has no operation for chip labels (none of its eight operations
+  touches them). Keep plain (non-mapping) dimensions for the fields
+  people filter by when the bar's labels matter, or draw your own selection chips
+  ([selection bar](../patterns/selection-bar.md)) and name them yourself. Record it as a known
+  defect if you keep the mapping.
+- **Verified on:** visualizations 0.9.0, 2026-11-18 (a test run; the operation list from the 0.9.0
+  operations reference).
+
 ## Sharing one selection across Astrato and non-Astrato data
 
 - **Fix:** give the other source's charts the app's real `hostServices.selections` and the same
