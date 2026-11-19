@@ -10,6 +10,8 @@
  *
  * A sheet's "figures" are its numeric cells in order plus its row count. Text cells are left out
  * on purpose: banners name the active filter, so they always change, even when the rows do not.
+ * So write figures as numbers with a number format, not preformatted text ('£1.2m', '12%'): a
+ * sheet of text figures is reported as "no figures" and is not compared. No ZIP64 (>65k entries).
  */
 import { readFileSync } from 'node:fs';
 import { inflateRawSync } from 'node:zlib';
@@ -60,7 +62,8 @@ export function readSheets(buf) {
       if (v != null && v !== '') numbers.push(Number(v));
     }
     const rows = (xml.match(/<row\b/g) ?? []).length;
-    return { name: attr(t, 'name').replace(/&amp;/g, '&'), rows, numbers, sharedStrings: shared.length };
+    const name = attr(t, 'name').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+    return { name, rows, numbers, sharedStrings: shared.length };
   });
 }
 
@@ -86,7 +89,9 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const args = process.argv.slice(2);
   const files = args.filter((x) => !x.startsWith('--') && args[args.indexOf(x) - 1] !== '--exempt');
   if (files.length !== 2) { console.error('usage: node xlsx-diff.mjs unfiltered.xlsx filtered.xlsx [--exempt "Sheet A,Sheet B"]'); process.exit(2); }
-  const exempt = args.includes('--exempt') ? args[args.indexOf('--exempt') + 1].split(',').map((s) => s.trim()) : [];
+  const exemptArg = args.includes('--exempt') ? args[args.indexOf('--exempt') + 1] : '';
+  if (args.includes('--exempt') && !exemptArg) { console.error('--exempt needs a comma-separated list of sheet names'); process.exit(2); }
+  const exempt = exemptArg ? exemptArg.split(',').map((s) => s.trim()) : [];
   const { sheets, ignoring } = diffWorkbooks(readFileSync(files[0]), readFileSync(files[1]), exempt);
   for (const s of sheets) console.log(`${s.status.padEnd(15)} ${s.name}${s.detail ? `  (${s.detail})` : ''}`);
   if (ignoring.length) { console.log(`FAIL: ${ignoring.length} sheet(s) do not follow the filter`); process.exit(1); }
