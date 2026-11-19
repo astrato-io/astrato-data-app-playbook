@@ -190,6 +190,35 @@ MCP server, and how layer revisions reach apps. Tool contract versions are noted
   every base period, base period chosen by filter). Not yet tried in a chart.
 - **Verified on:** 2026-09/11.
 
+## A share of total in a stored question is too high when the question has a top N
+
+- **Symptom:** a stored question with `defaults.topN` and a share column
+  (`compareToTotal: { comparison: 'ratio', … }`) shows shares that sum to 100% over the kept rows:
+  the leader's share read 23.4% of the top-12 total instead of 22.8% of all rows.
+- **Cause:** the top N is applied before the share is computed, so the total is the kept rows'
+  total. The tool description says result filters run before advanced calculations; it says
+  nothing about `topN`.
+- **Fix:** leave `topN` off a question that carries a share (or any other total-based)
+  calculation, and limit the rows in the chart or table instead. Or compute the share as a layer
+  measure with input option `scope: 'total'` ([above](#share-of-total-100-stacks-and-indexes)).
+  Check one share against a direct query of the total.
+- **Verified on:** MCP, 2026-11-18 (a test run).
+
+## Publish or edit-session results list joins you did not change
+
+- **Symptom:** after adding one join, `astrato_semantic_layer_publish` reports
+  `joinQuality.changedJoins: 5`, and later publishes that touched no join report 3;
+  `preview_edit_session` / `commit_edit_session` list every join in the layer as a changed entity
+  (27 for one new join), each with the same hash before and after. The join-quality check inside
+  publish can time out.
+- **Cause:** not root-caused; the counts do not match the change. Alarming when the rule is
+  "change nothing that exists".
+- **Fix:** trust `astrato_semantic_layer_preview_publish`, which listed one join *added* and
+  nothing else, and compare before and after hashes: an entry whose hashes match did not change.
+  Verify the new join yourself with a cross-fact query whose breakdown sums to the total, and run
+  the existing stored questions again.
+- **Verified on:** MCP, 2026-11-18 (a test run, an `upsert_join` in an edit session).
+
 ## Mapping dimensions sort alphabetically and expose a phantom key
 
 - Mapping values sort alphabetically, never in group order; prefix labels to order them.
@@ -339,17 +368,22 @@ MCP server, and how layer revisions reach apps. Tool contract versions are noted
   questions with `preparedTarget: null` and no prior `plan_authoring_batch` call.
 - A **patch** needs `preparedTarget` set to the item's exact name. With `null` it fails:
   *"Change target must exactly match preparedTarget: null"*. This holds for stored questions
-  too: patch one with `preparedTarget: '<its name>'`; create one with `null`.
+  too: patch one with `preparedTarget: '<its name>'`; create one with `null`. A **delete** is the
+  same: `preparedTarget: null` is refused with *"Change target must exactly match preparedTarget
+  … pass the preparedTarget returned by the prepare call"*; the question's own name works, with
+  no prepare call.
 - Put everything in **one commit**. Each commit response carries about 12 KB of entity hashes for
   the whole layer.
-- **Verified on:** MCP contract 10.37.0, 2026-11; the question patch 2026-11-18 (a test run).
+- **Verified on:** MCP contract 10.37.0, 2026-11; the question patch and the question delete
+  2026-11-18 (a test run).
 
 ## MCP responses fill the context
 
 - **Symptom:** a few layer calls use hundreds of kilobytes of context.
 - **Fix:** on a small layer (under about 100 measures), one `astrato_semantic_layer_get_summary` with
   `includeDetails: true` returns every view, field and item; above that (358 measures came to
-  about 60 KB) use `includeSnapshot: true` or page `get_details`. For queries, budget the work rather than the response: profile with few, small queries
+  about 60 KB) page `get_details` one section at a time, writing what you need into your notes as
+  you go; `includeSnapshot: true` links a resource you can only read whole into context, not save. For queries, budget the work rather than the response: profile with few, small queries
   and keep row limits low.
 - **`responseBudgetBytes` does less than it sounds.** On 10.37 it seemed to trim analysis metadata;
   on 10.38 the full `queryAnalysis` (5–15 KB) still came back at budgets of 6–12 KB, and only the

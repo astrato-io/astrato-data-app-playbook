@@ -9,7 +9,7 @@ meant to be copied unchanged. Each was verified on the versions noted in its hea
 | --- | --- |
 | [verify/app-state.js](verify/app-state.js) | The contract: a 60-line module your app imports to report its tabs, objects, queries, timings and its own checks on `window.__appState` |
 | [verify/compile-check.mjs](verify/compile-check.mjs) | The offline check: compiles every tile and applies its operations against the installed library, with no session or browser |
-| [verify/ops.mjs](verify/ops.mjs) | Operation lookup: lists every operation for a chart type, or prints the ones you name |
+| [verify/ops.mjs](verify/ops.mjs) | Operation lookup: lists every operation for a chart type, or prints the ones you name. Run it from the app folder (it reads the docs inside the installed `@astrato-io/visualizations`), or pass `--root <app>` |
 | [verify/smoke.mjs](verify/smoke.mjs) | The smoke test: opens the app in Chrome and fails on anything a viewer would see |
 | [verify/release.mjs](verify/release.mjs) | The release gate: build → smoke locally → publish → smoke the live copy |
 | [verify/fixture/](verify/fixture/index.html) | A stand-in page for trying the smoke test; `?fail=1` breaks it in every way the test checks |
@@ -241,6 +241,11 @@ pass `--profile <dir>` to share one (for example, to reuse a hosted sign-in acro
 - If `--out` is inside the project, tell Vite not to watch it, or every screenshot and profile
   write can reload the page mid-run: `server: { watch: { ignored: ['**/shots/**'] } }` in
   `vite.config.js`.
+- **On a slow warehouse** (several seconds per query, see
+  [performance](../knowledge/performance.md#every-query-takes-several-seconds-the-layers-own-measures-included)),
+  the defaults fail a working app: raise `--landing-ms` (default 15000; 60000 in one test run)
+  and `--check-ms` (default 60000; 240000 for checks that select, wait and export), give the
+  app's own waits inside checks the same headroom, and report the flags with the result.
 - Each check has `--check-ms` (60 s by default) to finish. If the page's main thread is stuck,
   the check's own timer cannot fire, so the test gives up on any call into the page after 60 s
   (a check after `--check-ms` + 15 s) and stops with "the page stopped responding". A reload of

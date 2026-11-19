@@ -11,7 +11,7 @@ to copy techniques from.
 - An Astrato account with MCP and Data App publishing enabled
 - A **published** semantic layer over your own data (no layer yet? the agent can
   [build one](playbook/build-the-layer.md) from your warehouse tables)
-- The Astrato CLI (`@astrato-io/cli`), Node 24.18+ and Chrome
+- The Astrato CLI (`@astrato-io/cli` 0.2.0 or later, installed in your app project), Node 24.18+ and Chrome
 - Your agent connected to the Astrato MCP server, with the
   [Astrato skills](https://github.com/astrato-io/astrato-skills) installed
 
