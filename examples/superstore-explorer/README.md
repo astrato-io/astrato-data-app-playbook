@@ -36,19 +36,19 @@ picked item are `inList` selections, all written as applied into the same group
 own queries turn the same applied selections into filters, swapping in another date range when
 asked ([app.js:248](project/src/app.js#L248)). Pending selections from a chart click are applied
 after 250 ms, and a click on the trend, which would replace the period with one date, is dropped
-([app.js:842](project/src/app.js#L842)). The chips and Clear all are the app's own; Clear all keeps
-the period and the pick ([app.js:404](project/src/app.js#L404)).
+([app.js:861](project/src/app.js#L861)). The chips and Clear all are the app's own; Clear all keeps
+the period and the pick ([app.js:415](project/src/app.js#L415)).
 
 **Period comparison without comparison measures.** Presets count back from the last order date
 ([app.js:74](project/src/app.js#L74)), and the comparison range is the same span one period or one
 year earlier ([app.js:222](project/src/app.js#L222)). Each KPI card runs the layer's Sales, Profit,
 Orders and Profit Ratio calculations twice with the same filters, once per range, and shows the
-change as a percentage, or in points for the ratio ([app.js:605](project/src/app.js#L605)).
+change as a percentage, or in points for the ratio ([app.js:627](project/src/app.js#L627)).
 
 **A mirror group for "all items".** On the overview the drill bar, trend and order lines follow the
 picked customer, but the KPIs describe all of them. The KPI queries leave the item fields out, and
 the native mini charts sit in a second group that copies every selection except the pick
-([app.js:596](project/src/app.js#L596), mounted at [app.js:594](project/src/app.js#L594)). On the
+([app.js:607](project/src/app.js#L607), mounted at [app.js:605](project/src/app.js#L605)). On the
 detail page the same cards read the main group, pick included.
 
 **The operator fix.** A selection written without an operator reaches the engine as a filter
@@ -62,7 +62,7 @@ with a native `movingCalculation` (AVG over the current and two previous rows), 
 "…, 3-month average" ([charts.js:172](project/src/charts.js#L172)). The order-lines table gives each
 column a pixel width and the item column the rest of the slot, dropping Ship mode and then Order ID
 when the slot is narrow ([charts.js:227](project/src/charts.js#L227)); on resize the app refits the
-columns with `updateInstance`, without a remount ([app.js:726](project/src/app.js#L726)).
+columns with `updateInstance`, without a remount ([app.js:745](project/src/app.js#L745)).
 
 **Four visualizations 0.9 fixes** in [charts.js](project/src/charts.js): `setBarChartLayout 'stacked'`
 is refused for one dimension and one measure, so the bars set no layout ([charts.js:125](project/src/charts.js#L125));
@@ -73,12 +73,12 @@ needs `setColumnFormatType` `yyyymmdd`, addressed by column name, or it prints e
 one is reported, never thrown ([charts.js:66](project/src/charts.js#L66)).
 
 Also useful:
-- the master list: one query of the metric by customer or product, filtered like the page but not by the pick, rendered as buttons with value bars and searched in the browser ([app.js:637](project/src/app.js#L637), [app.js:661](project/src/app.js#L661)). It is the A2 exception: navigation, not a data visual;
-- the narrative: the period's sales, orders, change and profit ratio from the KPI answers, the worst sub-category by profit, and the top item's share of sales ([app.js:743](project/src/app.js#L743));
-- drill-through with Previous / Next through the list as filtered and searched ([app.js:765](project/src/app.js#L765), [app.js:696](project/src/app.js#L696));
-- an object menu on every object whose Show as table, CSV and Excel re-run that object's query ([app.js:980](project/src/app.js#L980)), with a dependency-free CSV and single-sheet `.xlsx` writer ([exports.js:22](project/src/exports.js#L22), [exports.js:96](project/src/exports.js#L96));
+- the master list: one query of the metric by customer or product, filtered like the page but not by the pick, rendered as buttons with value bars and searched in the browser ([app.js:656](project/src/app.js#L656), [app.js:680](project/src/app.js#L680)). It is the A2 exception: navigation, not a data visual;
+- the narrative: the period's sales, orders, change and profit ratio from the KPI answers, the worst sub-category by profit, and the top item's share of sales ([app.js:762](project/src/app.js#L762));
+- drill-through with Previous / Next through the list as filtered and searched ([app.js:784](project/src/app.js#L784), [app.js:715](project/src/app.js#L715));
+- an object menu on every object whose Show as table, CSV and Excel re-run that object's query with the selections applied at that moment, after any refresh still on its way, so an export never carries an earlier selection's rows ([app.js:918](project/src/app.js#L918), [app.js:1042](project/src/app.js#L1042)). Each Excel sheet opens with its title and a line naming the period and filters its rows follow, written from the same applied selections as the query's filters ([app.js:260](project/src/app.js#L260)); the overview KPIs, narrative and list say that they cover all customers and products. A dependency-free CSV and `.xlsx` writer ([exports.js:23](project/src/exports.js#L23), [exports.js:107](project/src/exports.js#L107)); `buildWorkbook` returns a workbook Blob from the same tables and writer the menu downloads ([app.js:994](project/src/app.js#L994));
 - a start-up check that every field the page needs exists in the layer, by key ([app.js:101](project/src/app.js#L101));
-- five smoke checks the app registers: a Region filter from the drawer moves the KPI, drill bar and order lines and Clear all restores them; a Category drill click does the same and the breadcrumb restores it; Quarter to date reaches the trend's query; Next / Previous on the detail page; and the Excel export of the order lines ([app.js:1035](project/src/app.js#L1035)).
+- five smoke checks the app registers: a Region filter from the drawer moves the KPI, drill bar and order lines and Clear all restores them; a Category drill click does the same and the breadcrumb restores it; Quarter to date reaches the trend's query; Next / Previous on the detail page; and the Excel export of the order lines ([app.js:1097](project/src/app.js#L1097)). An `appState.exportProbe` builds every object's export into one workbook, a sheet per object (the hidden detail page's included), without and with Region = West from the drawer, and the smoke test fails any sheet whose figures did not move ([app.js:1181](project/src/app.js#L1181)).
 
 ## Semantic layer
 
@@ -117,14 +117,14 @@ Needs Node 24.18 or later. Fonts are bundled from npm; nothing loads from a CDN.
 - **No stored business questions.** Every object reads the layer's calculations over raw columns; the governed dimensions and the hierarchy go unused, and the drill is the app's own. The playbook asks for stored questions.
 - KPI values are text from governed queries, not native number objects; their mini charts are native.
 - No period comparison on the drill bar or the trend: the layer has no time axis or comparison measures. The trend's moving average skips months with no orders, because it averages rows, not calendar months.
-- The master list is an HTML list with value bars (the A2 exception, as navigation). It renders the first 300 rows of a query limited to 2,500 ([app.js:642](project/src/app.js#L642), [app.js:672](project/src/app.js#L672)); the search reaches the rest. The Show as table dialog draws an HTML table too ([app.js:958](project/src/app.js#L958)).
+- The master list is an HTML list with value bars (the A2 exception, as navigation). It renders the first 300 rows of a query limited to 2,500 ([app.js:655](project/src/app.js#L655), [app.js:692](project/src/app.js#L692)); the search reaches the rest. The Show as table dialog draws an HTML table too ([app.js:1019](project/src/app.js#L1019)).
 - Detail KPI changes run to figures like "9901.7%" when the item's previous period was tiny (see the detail screenshot).
 - Money axes label zero as "0.00"; product names are cut to an ellipsis in narrow slots.
-- When a filter change drops the picked customer from the list, the top one is picked instead and the original is not restored ([app.js:648](project/src/app.js#L648)).
-- With the Customers list open, a product bar click at the drill's third level filters the drill bar, trend and order lines, but not the KPIs, mini charts, list or narrative, which leave both item fields out ([app.js:814](project/src/app.js#L814)). A click on the trend does nothing ([app.js:844](project/src/app.js#L844)).
-- Pages are not preloaded: switching page releases every object and mounts the other page's ([app.js:884](project/src/app.js#L884)).
-- Excel is one unformatted sheet per object. There is no multi-sheet management report, no what-if and no workflow: it is an explorer. The order-lines export stops at 5,000 rows ([app.js:932](project/src/app.js#L932)).
-- Inert leftovers: [theme.js](project/src/theme.js) reads a saved dark-mode choice, but `styles.css` defines no dark theme; a smoke check calls the quarter-to-date start `ytdStart` ([app.js:1074](project/src/app.js#L1074)).
+- When a filter change drops the picked customer from the list, the top one is picked instead and the original is not restored ([app.js:667](project/src/app.js#L667)).
+- With the Customers list open, a product bar click at the drill's third level filters the drill bar, trend and order lines, but not the KPIs, mini charts, list or narrative, which leave both item fields out ([app.js:833](project/src/app.js#L833)). A click on the trend does nothing ([app.js:863](project/src/app.js#L863)).
+- Pages are not preloaded: switching page releases every object and mounts the other page's ([app.js:903](project/src/app.js#L903)).
+- Excel is one unformatted sheet per object: ratios are fractions without a % format, and dates and months are text. There is no multi-sheet management report, no what-if and no workflow: it is an explorer. The order-lines export stops at 5,000 rows and says so in the sheet and the toast ([app.js:967](project/src/app.js#L967)); its rows are one per order, item and ship mode, not single lines.
+- Inert leftovers: [theme.js](project/src/theme.js) reads a saved dark-mode choice, but `styles.css` defines no dark theme; a smoke check calls the quarter-to-date start `ytdStart` ([app.js:1136](project/src/app.js#L1136)).
 - Checked in staging with the kit smoke test at 1440, 1280 and 1024: PASS with no page scroll, landing in about 3 s, 5/5 app checks; `npm run compile-check` 30/30 and `vite build`.
 - `tools/available-fields.json` is the field catalogue a smoke run saved; the compile check falls back to `layer.json` without it.
 - `astrato.json` carries a zero placeholder `semanticLayerId`; `layer.json`'s datasource is a placeholder too.

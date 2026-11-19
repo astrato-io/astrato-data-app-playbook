@@ -27,7 +27,7 @@ import { createFieldIndex } from './fields.js';
 import { TABS, TILES, FILTERS, C, DAY, plainDay } from './catalogue.js';
 import { prepare, columnWidths } from './tiles.js';
 import { mountWorkflow } from './workflow.js';
-import { exportWorkbook } from './export.js';
+import { buildWorkbook, downloadWorkbook } from './export.js';
 
 export const el = (tag, attrs = {}, kids = []) => {
   const n = document.createElement(tag);
@@ -398,11 +398,14 @@ const main = async () => {
   };
 
   // ---------------------------------------------------------------- selection bar
-  const chipLabel = (key, values) => {
+  /** [label, values as text]; the chip shows three values and "+N", the Excel banners (all = true) every value. */
+  const chipLabel = (key, values, all = false) => {
     const name = NAME_BY_KEY[key] ?? fields.nameOf(key);
     const shown = name === 'Arrival Month' ? values.map(monthLabel) : values.map((v) => (typeof v === 'string' ? plainDay(v) : String(v)));
-    return [LABEL[name] ?? name, shown.slice(0, 3).join(', ') + (shown.length > 3 ? ` +${shown.length - 3}` : '')];
+    return [LABEL[name] ?? name, all ? shown.join(', ') : shown.slice(0, 3).join(', ') + (shown.length > 3 ? ` +${shown.length - 3}` : '')];
   };
+  /** The selections a group's scope applies, every value named: the Excel banner for the sheets that query with that scope. */
+  const selTextFor = (group) => [...mainSel].filter(([k]) => allowedIn(group).has(k)).map(([k, v]) => chipLabel(k, v, true).join(': ')).join('; ') || 'None';
   const appliesHere = (key) => (GROUPS_OF[current] ?? []).some((g) => allowedIn(g).has(key));
   const renderSelBar = () => {
     const chips = [...mainSel].map(([key, values]) => {
@@ -588,10 +591,18 @@ const main = async () => {
   workflow.ready();
 
   // ---------------------------------------------------------------- Excel
+  // Every sheet queries with filters rebuilt from mainSel at this moment (selFilters), so hidden tabs need no sync.
+  // A chart click still waiting out its 200 ms auto-apply is applied first, so an export straight after a click includes it.
+  const exportCtx = async () => {
+    const waiting = (GROUPS_OF[current] ?? []).filter((g) => !WRITE_ONLY.has(g) && selections.getSelection(g)?.pending?.length);
+    for (const g of waiting) selections.applyPendingSelections(g);
+    if (waiting.length) await new Promise((r) => setTimeout(r, 50));
+    return { q, selFilters, selTextFor, period: periodNow() };
+  };
   exportBtn.addEventListener('click', async () => {
     exportBtn.disabled = true;
     window.__lastExportError = null;
-    try { await exportWorkbook({ q, keyOf, mainSel, chipLabel, selFilters, period: periodNow() }); }
+    try { await downloadWorkbook(await exportCtx()); }
     catch (error) { window.__lastExportError = String(error?.message ?? error); exportBtn.title = `Export failed: ${window.__lastExportError}`; console.error('[export]', error); }
     finally { exportBtn.disabled = false; }
   });
@@ -676,6 +687,19 @@ const main = async () => {
     const info = window.__lastExport;
     await clearAll();
     return { pass: info?.sheets?.length === 7 && /Neurology/.test(info.selections), detail: JSON.stringify({ error: window.__lastExportError, sheets: info?.sheets, selections: info?.selections, kpis: info?.kpis }) };
+  });
+  // The smoke test builds the workbook without and with Department = Neurology (the reader's click path) and fails
+  // any sheet whose figures did not change. The kit calls clear/build/select on whatever tab the last check left
+  // open, and the subscription above reads only the CURRENT tab's groups, so clear and select open the landing tab
+  // themselves first: the pick lands in g-board, and every other tab (and its sheet) stays hidden for the probe.
+  // Flags is exempt: its own scope takes flag fields only (flags do not join to visits), so no visit filter can
+  // narrow it, and its banner says so.
+  const toLanding = async () => { if (current !== 'board') { go('board'); await settled(); } };
+  appState.exportProbe({
+    build: async () => buildWorkbook(await exportCtx()),
+    select: async () => { await toLanding(); await pick('g-board', 'Department Referral', ['Neurology']); },
+    clear: async () => { await toLanding(); await clearAll(); },
+    exempt: ['Flags', 'Definitions'],
   });
   // ---------------------------------------------------------------- text figures follow the numbers (F3)
   const cap = (id) => document.querySelector(`[data-cmp="${id}"]`)?.textContent ?? '';

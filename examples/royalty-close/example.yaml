@@ -44,31 +44,31 @@ start_here:
   - project/src/questions.js — the 21 stored questions and the tile that runs one as a native table
   - project/tools/layer.mjs — views, measures, questions and the Data Actions with role and branch guards in SQL
 capabilities:
-  - writeback-workflow — project/src/app.js:342
-  - role-switcher — project/src/app.js:285
-  - what-if — project/src/app.js:481
-  - excel-export — project/src/app.js:639
-  - narrative-headline — project/src/app.js:300
-  - drill-down — project/src/app.js:370
+  - writeback-workflow — project/src/app.js:344
+  - role-switcher — project/src/app.js:287
+  - what-if — project/src/app.js:482
+  - excel-export — project/src/app.js:655
+  - narrative-headline — project/src/app.js:302
+  - drill-down — project/src/app.js:368
 stealable:
-  - "Case workflow on two governed views (cases + action history) through app.writeback, with a role, branch-scope and maker–checker guard before every write and a labelled browser-storage fallback — project/src/app.js:342"
-  - "Copy-to-clipboard for a native table: re-runs the table's own governed query (its columns, static filters and the group's applied selections) and writes every row as tab-separated text — project/src/app.js:108"
-  - "Banner sentence built from two governed queries of stored measures, following the header filters — project/src/app.js:300"
+  - "Case workflow on two governed views (cases + action history) through app.writeback, with a role, branch-scope and maker–checker guard before every write and a labelled browser-storage fallback — project/src/app.js:344"
+  - "Copy-to-clipboard for a native table: re-runs the table's own governed query (its columns, static filters and the group's applied selections) and writes every row as tab-separated text — project/src/app.js:110"
+  - "Banner sentence built from two governed queries of stored measures, following the header filters — project/src/app.js:302"
   - "KPI card = number + bar or line sparkline by processing run + header-less one-row comparison table coloured by whether it moved the right way — project/src/catalogue.js:28"
-  - "Pivot with branch subtotals from three governed queries (leaf rows, branch totals, grand total), so totals stay right for non-additive measures — project/src/app.js:567"
+  - "Pivot with branch subtotals from three governed queries (leaf rows, branch totals, grand total), so totals stay right for non-additive measures — project/src/app.js:574"
   - "English/Spanish switch with a MutationObserver that translates page text, including native objects' rendered labels, while selections and writes keep the English values — project/src/i18n.js:302"
   - "Data Actions whose SQL repeats the app's guards (role, branch scope, maker–checker) and appends the audit row — project/tools/layer.mjs:193"
 caveats:
-  - The app writes ROYALTY_CLOSE_CASES and ROYALTY_CLOSE_EVENTS with app.writeback inserts and updates; it does not call the layer's Data Actions. The role, branch-scope and maker–checker guard therefore runs only in the browser (src/app.js:341). The Data Actions enforce the same rules in SQL, but nothing in the app calls them.
+  - The app writes ROYALTY_CLOSE_CASES and ROYALTY_CLOSE_EVENTS with app.writeback inserts and updates; it does not call the layer's Data Actions. The role, branch-scope and maker–checker guard therefore runs only in the browser (src/app.js:343). The Data Actions enforce the same rules in SQL, but nothing in the app calls them.
   - If a write fails or writeback is unavailable, the change is kept in localStorage (key royalty-close-local-v1) and the toast says so. Reset demo clears only that copy; the warehouse reset copies the *_SEED tables back (README, Rebuild from nothing).
   - The smoke checks are read-only; no write was exercised by the smoke test.
   - "Visualizations 0.9: the Unreconciled statements comparison row shows the change as \"-13.1 pts\" with a decimal pts format, while the measure is +13.125 through MCP."
   - At 1440 wide with six KPI cards per row, the calc-error comparison is truncated ("impact $33,…"). "Acting as" is clipped at 1280, and the header stacks below 1100px. Summary stays a narrow column even at 1440.
-  - The Exception pivot is an HTML table drawn from governed queries (the native table here has a grand total only); the close simulator's bars are hand-drawn SVG and its projection is browser arithmetic, including a fixed 0.6 factor on residual exposure (src/app.js:498).
+  - The Exception pivot is an HTML table drawn from governed queries (the native table here has a grand total only); the close simulator's bars are hand-drawn SVG and its projection is browser arithmetic, including a fixed 0.6 factor on residual exposure (src/app.js:501).
   - Native tiles query layer measures directly, not stored questions; the "BQ · …" caption on each card is generated from the tile title (src/catalogue.js:172). Only the Business questions tab runs stored questions, and it hides the 7 that belong to the layer's sibling recovery app.
-  - The header Branch, Run and Currency dropdowns write the same selection into all four groups (src/app.js:292), so one change re-queries about 150 objects on every tab.
+  - The header Branch, Run and Currency dropdowns write the same selection into all four groups (src/app.js:295), so one change re-queries about 150 objects on every tab.
   - "No analyst in ROYALTY_USERS covers DE, ES or JP: nobody can open or submit a case on those branches, and seeded cases there are owned by an analyst scoped to US only."
-  - Dates are fixed: demo date 2026-11-11, current run R-2026-10, close deadline 14 Nov. The banner hard-codes "across 8 branches" (src/app.js:308).
+  - Dates are fixed: demo date 2026-11-11, current run R-2026-10, close deadline 14 Nov. The banner hard-codes "across 8 branches" (src/app.js:310).
   - tools/layer.mjs imports tools/mcp.mjs and reads tools/types.txt, and neither is shipped; it creates the layer with a zero datasource id. ASTRATO_GALLERY.MOCK_DATA is hard-coded in layer.mjs and the Data Action SQL.
   - The layer is shared with a recovery app that is not in this repo. Its Paid vs Collectable and Recovery views, 7 of the 21 questions and 5 of the 8 Data Actions are unused here.
   - Some code comments and dictionary strings still name the original source tables; the dashboard.js header comment describes another app's selection groups.

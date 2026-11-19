@@ -34,7 +34,7 @@ the public `@astrato-io` packages (visualizations 0.9, app-runtime 0.9) plus `@d
 ## Tabs
 
 Above every tab: the source key (Governed, API, Blended), the Open-Meteo credit, a headline
-sentence that follows the selection ([app.js:395](project/src/app.js#L395)), and one bar with the
+sentence that follows the selection ([app.js:370](project/src/app.js#L370)), and one bar with the
 tabs, the City filter, chips with ×, **Clear all** and **Excel report**.
 
 - **Weather & demand** — five KPIs against Aug–Oct 2025, each with a native mini chart: occupancy and room revenue (governed), average high and wet city-days (API), wet vs dry nights (blended); revenue by city; occupancy night by night (drag along the date axis to pick nights); the city table with occupancy, room revenue, both changes, share and a by-month sparkline column; the daily high with its 7-night average; occupancy on dry and wet nights by city; occupancy by temperature band (click a band).
@@ -72,18 +72,18 @@ an empty range list is dropped before it reaches the engine ([app.js:245](projec
 **A governed what-if fed by the API.** Four measures in the layer carry `wet_share`,
 `occ_uplift_pts` and `rate_discount_pct`; the levers ([tiles.js:34](project/src/tiles.js#L34)) set
 them on the mounted offer tiles with `setMeasureDefinedParameter` through `applyRuntimeOperations`,
-no remount, and only while the tab shows ([app.js:420](project/src/app.js#L420)). The wet share
+no remount, and only while the tab shows ([app.js:424](project/src/app.js#L424)). The wet share
 starts at what the weather shows for the selection. At zero uplift and zero discount the scenario
 equals the governed baseline, and a self-check proves it.
 
 Also useful:
-- the offer tab's objects in their own group, mirrored from the main group's governed selections only while the tab is on screen ([app.js:462](project/src/app.js#L462));
-- right-click any card for its SQL ([app.js:593](project/src/app.js#L593)): governed SQL from an MCP dry run of each stored question, written by [tools/governed-sql.mjs](project/tools/governed-sql.mjs), and browser SQL from the last statement each chart ran;
+- the offer tab's objects in their own group, mirrored from the main group's governed selections only while the tab is on screen ([app.js:468](project/src/app.js#L468));
+- right-click any card for its SQL ([app.js:619](project/src/app.js#L619)): governed SQL from an MCP dry run of each stored question, written by [tools/governed-sql.mjs](project/tools/governed-sql.mjs), and browser SQL from the last statement each chart ran;
 - an independent check of the blend outside the browser: the same stored question over MCP and the same Open-Meteo request, joined in plain JavaScript ([tools/verify-blend.mjs](project/tools/verify-blend.mjs));
 - query lanes with 429 retry and a session cache keyed by the exact request ([throttle.js:32](project/src/throttle.js#L32));
 - the maker–checker flag store with "Acting as" ([offers.js:45](project/src/offers.js#L45), the four-eyes refusal at [offers.js:88](project/src/offers.js#L88), the selector at [app.js:130](project/src/app.js#L130));
-- an eight-sheet Excel report built from fresh queries, not from the screen (Summary, Cities, Weather, Blend, Nights, What-if, Offers, Notes) ([export.js:22](project/src/export.js#L22)), on a dependency-free styled xlsx writer ([xlsx.js](project/src/xlsx.js));
-- 12 self-checks the smoke test runs, including the blended KPI against an independent JavaScript join ([app.js:702](project/src/app.js#L702)).
+- an eight-sheet Excel report built from fresh queries under one reading of the selections, hidden offer tab included (Summary, Cities, Weather, Blend, Nights, What-if, Offers, Notes) ([export.js:26](project/src/export.js#L26)), checked by `appState.exportProbe`, on a dependency-free styled xlsx writer ([xlsx.js](project/src/xlsx.js));
+- 12 self-checks the smoke test runs, including the blended KPI against an independent JavaScript join ([app.js:728](project/src/app.js#L728)).
 
 ## Semantic layer
 

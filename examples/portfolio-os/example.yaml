@@ -43,7 +43,7 @@ capabilities:
   - writeback-workflow — project/src/core.js:176
   - what-if — project/src/pages/scenario.js:56
   - excel-export — project/src/xlsx.js:207
-  - pdf-export — project/src/export.js:48
+  - pdf-export — project/src/export.js:95
   - assistant — project/src/pages/nash.js:18
   - role-switcher — project/src/core.js:46
   - record-drawer — project/src/core.js:94

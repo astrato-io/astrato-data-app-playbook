@@ -117,6 +117,18 @@ and [preload-tabs](../patterns/preload-tabs.md) hold the working code.
 - **Verified on:** visualizations 0.5.2, 2026-10 (56 → 25 queries per click on one app).
 - **See also:** [../patterns/preload-tabs.md](../patterns/preload-tabs.md), [performance.md](performance.md#one-click-fires-dozens-of-queries).
 
+## The Excel export ignores the filters on hidden tabs
+
+- **Symptom:** the sheet for the tab on screen follows the filter; the sheets for the other tabs
+  show unfiltered figures, under a banner that names the filter.
+- **Cause:** the fix above. Hidden tabs' groups are mirrored from `main` only while shown, and
+  `handle.getData()` runs an object's query with its own group's selections.
+- **Fix:** before reading, copy `main` into every tab group and wait for the queries to go quiet;
+  or build the export with `engine.getData` and the `main` selections. Register
+  `appState.exportProbe` so the smoke test fails any sheet that does not move under a filter.
+- **Verified on:** visualizations 0.9.0, 2026-11 (two clean test runs; four of five tab sheets wrong).
+- **See also:** [../patterns/xlsx-export.md](../patterns/xlsx-export.md#sync-every-group-before-reading).
+
 ## A discarded pending selection keeps coming back
 
 - **Symptom:** filters never apply and clicks toggle themselves off every ~250 ms.

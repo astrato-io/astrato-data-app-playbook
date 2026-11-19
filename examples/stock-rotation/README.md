@@ -69,8 +69,8 @@ Also useful:
 - KPI card = `number` + monthly bar or line mini-chart + header-less one-row prior-period table with red/green bands ([dashboard.js:64](project/src/dashboard.js#L64));
 - table column widths as pixel shares of the slot, refitted on resize without a remount ([app.js:151](project/src/app.js#L151));
 - query lanes with 429 backoff and a session cache around `engine.getData` ([throttle.js:110](project/src/throttle.js#L110));
-- a five-sheet styled Excel report (summary vs prior 30 days, products, expiry, the Plan scenario, requests and audit) from governed queries ([app.js:272](project/src/app.js#L274)), written by a dependency-free OOXML writer ([xlsx.js:204](project/src/xlsx.js#L204));
-- six smoke checks the app registers itself: warehouse and category selections move the KPIs and tables and restore, the ledger narrows, the queues load (read only), a Plan lever moves the outcome, and the Excel report downloads ([app.js:314](project/src/app.js#L316)).
+- a five-sheet styled Excel report (summary vs prior 30 days, products, expiry, the Plan scenario, requests and audit) built by `buildWorkbook()` ([app.js:290](project/src/app.js#L290)) and written by a dependency-free OOXML writer ([xlsx.js:204](project/src/xlsx.js#L204)). Summary, Products and Expiry are governed queries that carry the Stock tab's selections as engine filters, whichever tab is showing, and their banner names them; the Ledger tab's own selections have no sheet. Options (the Plan tab's unfiltered baseline) and Workflows (this browser's request log) say on their banner that they are not filtered. A sheet that reaches the 5,000-row query limit says so;
+- six smoke checks the app registers itself: warehouse and category selections move the KPIs and tables and restore, the ledger narrows, the queues load (read only), a Plan lever moves the outcome, and the Excel report downloads ([app.js:345](project/src/app.js#L345)); plus `appState.exportProbe`, which builds the report with and without a Stock-tab Warehouse selection so the smoke test fails any sheet that ignores it (Options and Workflows exempt).
 
 ## Semantic layer
 
@@ -116,5 +116,5 @@ Needs Node 24.18 or later. Writes need a runtime and layer that accept writeback
 - None of the layer's stored business questions is used; native objects query measures directly.
 - Transfers assume exactly two warehouses, WH-UK and WH-US. The Plan tab is browser arithmetic over a governed baseline ([app.js:187](project/src/app.js#L187)). The Value at risk card's mini-chart plots units expired by month.
 - `styles.css`, `objects.css` and `ops.css` carry rules for screens this app does not have.
-- Verified with `npm run compile-check` (21/21) and `vite build`. The app registers six smoke checks, but no smoke-test run is recorded for this export.
+- Verified with `npm run compile-check` (21/21) and `vite build`. The app registers six smoke checks and an export probe, but no smoke-test run is recorded for this export.
 - No screenshots are shipped yet.

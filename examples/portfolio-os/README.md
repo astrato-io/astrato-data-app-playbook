@@ -1,6 +1,6 @@
 # Private Markets Portfolio OS — Northstar Capital Partners
 
-A hand-written Astrato App on Vite and the public `@astrato-io` packages (0.8) for a fictional private-equity firm with 36 portfolio companies across four funds. Users monitor, value, model and decide in it, and it writes those decisions back. Every module serves one question the synthetic data it was built on told: **should the Investment Committee accept a ~$180m cut to the value of Northstar's stake in Meridian Cloud Systems?** In that data Meridian deteriorates from 2025 (falling gross margin, rising churn and DSO, two revolver-funded draws) and is marked High risk and "Review required", and its Downside Case sits about $180m below the base case. Neither the data nor its generator is in this repository. In the app, Meridian is the default company on Companies, Valuations, Scenario Lab, Investment Committee and exports. The gap appears in the Scenario Lab "Downside vs base" waterfall ([scenario.js:86](project/src/pages/scenario.js#L86)), in Nash's company explanation ([nash.js:106](project/src/pages/nash.js#L106)) and in the IC package's alternative scenarios ([ic.js:44](project/src/pages/ic.js#L44)). The figure is computed live from the governed Plans rows, not stored.
+A hand-written Astrato App on Vite and the public `@astrato-io` packages (0.8) for a fictional private-equity firm with 36 portfolio companies across four funds. Users monitor, value, model and decide in it, and it writes those decisions back. Every module serves one question the synthetic data it was built on told: **should the Investment Committee accept a ~$180m cut to the value of Northstar's stake in Meridian Cloud Systems?** In that data Meridian deteriorates from 2025 (falling gross margin, rising churn and DSO, two revolver-funded draws) and is marked High risk and "Review required", and its Downside Case sits about $180m below the base case. Neither the data nor its generator is in this repository. In the app, Meridian is the default company on Companies, Valuations, Scenario Lab and Investment Committee, and so on the company-level exports, which start from the company open on Companies. The gap appears in the Scenario Lab "Downside vs base" waterfall ([scenario.js:86](project/src/pages/scenario.js#L86)), in Nash's company explanation ([nash.js:106](project/src/pages/nash.js#L106)) and in the IC package's alternative scenarios ([ic.js:44](project/src/pages/ic.js#L44)). The figure is computed live from the governed Plans rows, not stored.
 
 This repository has no screenshots of it and none of its data.
 
@@ -21,16 +21,16 @@ One file per page in `project/src/pages/`. All ten panes mount at start-up.
 
 ## Worth copying
 
-**Workflow store on governed views, with an honest fallback.** [core.js:176](project/src/core.js#L176) `saveRecord` inserts or updates a row in the `Workflow Records` view and appends an `Audit Events` row (actor, role, previous and new value, reason, approval ref) through `app.writeback` ([app.js:78](project/src/app.js#L77)). If writeback is missing or fails, [core.js:161](project/src/core.js#L161) keeps the change in `localStorage`, and the toast says "simulated persistence". `writeTable` ([core.js:205](project/src/core.js#L205)) applies the same pairing to analytical tables (Valuations, Plans, Initiatives, Companies). Permissions are a plain map ([core.js:55](project/src/core.js#L55)) checked before every write. Maker–checker checks block self-approval, for example [scenario.js:124](project/src/pages/scenario.js#L124).
+**Workflow store on governed views, with an honest fallback.** [core.js:176](project/src/core.js#L176) `saveRecord` inserts or updates a row in the `Workflow Records` view and appends an `Audit Events` row (actor, role, previous and new value, reason, approval ref) through `app.writeback` ([app.js:77](project/src/app.js#L77)). If writeback is missing or fails, [core.js:161](project/src/core.js#L161) keeps the change in `localStorage`, and the toast says "simulated persistence". `writeTable` ([core.js:205](project/src/core.js#L205)) applies the same pairing to analytical tables (Valuations, Plans, Initiatives, Companies). Permissions are a plain map ([core.js:55](project/src/core.js#L55)) checked before every write. Maker–checker checks block self-approval, for example [scenario.js:124](project/src/pages/scenario.js#L124).
 
 **KPI card with a sparkline and a prior-period comparison, all native.** [catalogue.js:63](project/src/catalogue.js#L63) builds three objects per KPI:
 - a `number`;
 - a line or bar sparkline over `Quarter`;
 - a header-less one-row `table` holding the prior value and the delta.
 
-The delta column uses indicator segments ([catalogue.js:14](project/src/catalogue.js#L14)) to turn red or green depending on which direction counts as good. [app.js:154](project/src/app.js#L153) lays out the three.
+The delta column uses indicator segments ([catalogue.js:14](project/src/catalogue.js#L14)) to turn red or green depending on which direction counts as good. [app.js:153](project/src/app.js#L153) lays out the three.
 
-**Selections reach measure-only objects.** Numbers and one-row tables have no dimension to receive a selection. [app.js:219](project/src/app.js#L218) subscribes to each page's group and rebuilds those objects' vSpecs with `setStaticFilterGroup`. It only uses selections on views the KPI can join (`Companies`, `Funds` or the KPI's own view) and drops stale runs. Pending selections are auto-applied after 250 ms ([app.js:57](project/src/app.js#L56)).
+**Selections reach measure-only objects.** Numbers and one-row tables have no dimension to receive a selection. [app.js:218](project/src/app.js#L218) subscribes to each page's group and rebuilds those objects' vSpecs with `setStaticFilterGroup`. It only uses selections on views the KPI can join (`Companies`, `Funds` or the KPI's own view) and drops stale runs. Pending selections are auto-applied after 250 ms ([app.js:58](project/src/app.js#L58)).
 
 **One deterministic engine for the data and the app.** [engine.js:70](project/src/engine.js#L70) `projectScenario` (with XIRR, multiple valuation and DCF in the same file) produced the stored plans and valuations, and the app imports the same code for Scenario Lab, Valuations and IC, so stored figures such as the $180m downside reproduce exactly in the UI. Validation rules live in the same file ([engine.js:119](project/src/engine.js#L119)).
 
@@ -40,13 +40,13 @@ The delta column uses indicator segments ([catalogue.js:14](project/src/catalogu
 - answers cached for the session, keyed by the exact request;
 - a guard against tables that re-query in a loop.
 
-`clearQueryCache` runs after every write ([app.js:81](project/src/app.js#L80)).
+`clearQueryCache` runs after every write ([app.js:80](project/src/app.js#L80)).
 
-**Styled Excel without a library.** [xlsx.js:207](project/src/xlsx.js#L207) writes OOXML with fills, fonts, borders, custom number formats, merges and frozen panes, zipped uncompressed. The six reports in [export.js:15](project/src/export.js#L15) reuse the governed rows and the engine. Each export is audited, and a print-to-PDF variant shares the same sheets.
+**Styled Excel without a library.** [xlsx.js:207](project/src/xlsx.js#L207) writes OOXML with fills, fonts, borders, custom number formats, merges and frozen panes, zipped uncompressed. The seven reports in [export.js](project/src/export.js) reuse the governed rows and the engine. Portfolio-level reports list only the investments the filters on screen keep (the top-bar Fund, and the current page's selections on company attributes such as Sector or Company); every banner states that scope, and names any page selection it could not apply. Company-level reports cover the company picked in the export drawer. Amounts are USD m throughout. `buildWorkbook()` returns the Blob the button downloads, and `appState.exportProbe` lets the smoke test prove that one Fund selection narrows every portfolio sheet. Each export is audited, and a print-to-PDF variant shares the same sheets.
 
 Also useful:
-- hidden panes laid out off-screen at the active pane's width, so preloaded charts keep their size ([styles.css:59](project/src/styles.css#L59), [app.js:246](project/src/app.js#L245));
-- table column widths fitted with a ResizeObserver ([app.js:353](project/src/app.js#L352)).
+- hidden panes laid out off-screen at the active pane's width, so preloaded charts keep their size ([styles.css:59](project/src/styles.css#L59), [app.js:245](project/src/app.js#L245));
+- table column widths fitted with a ResizeObserver ([app.js:369](project/src/app.js#L369)).
 
 ## Semantic layer
 
@@ -100,6 +100,6 @@ Point `astrato.json` → `semanticLayerId` at your copy of the layer; `app.write
 - `prefetchSelections` ([throttle.js:68](project/src/throttle.js#L68)) is never called.
 - The waterfalls (valuation, EBITDA, scenario) and small sparks in HTML sheets are hand-drawn SVG ([ui.js:32](project/src/ui.js#L32)), not native objects.
 - Ported from visualizations 0.5 to 0.8 (2026-11) and checked in headless Chrome with the kit smoke test: 71 objects across ten modules rendered with no errors. Changes for 0.8: the table column-format operations, table width refits through `applyRuntimeOperations` instead of `updateInstance`, and the cross-filter wrapper removed. The entry file is now `src/app.js`; `src/main.js` is the Vite entry.
-- The static-filter mirror for KPI objects ([app.js:219](project/src/app.js#L218)) is no longer needed for `number` objects: with it switched off, the Revenue KPI still followed a fund selection. It is kept because the one-row delta tables were not tested without it.
+- The static-filter mirror for KPI objects ([app.js:218](project/src/app.js#L218)) is no longer needed for `number` objects: with it switched off, the Revenue KPI still followed a fund selection. It is kept because the one-row delta tables were not tested without it.
 - Some KPI comparison labels are cut off (`PY $17…`), and the table sparkline column shows dots rather than lines, probably because the table is filtered to one quarter ([why](../../knowledge/tables.md#a-sparkline-column-draws-a-single-dot)).
 - One selection re-queries objects on every tab (about 140 queries).

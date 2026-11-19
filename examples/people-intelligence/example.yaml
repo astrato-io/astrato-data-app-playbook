@@ -63,26 +63,26 @@ capabilities:
   - assistant — project/src/assistant.js:32
   - writeback-workflow — project/src/actions.js:51
   - what-if — project/src/simulator.js:37
-  - excel-export — project/src/export.js:9
+  - excel-export — project/src/export.js:18
   - saved-views — project/src/builder.js:222
-  - role-switcher — project/src/app.js:680
-  - drill-down — project/src/app.js:488
+  - role-switcher — project/src/app.js:687
+  - drill-down — project/src/app.js:495
   - narrative-headline — project/src/home.js:16
   - map — project/src/basemap.js:37
 stealable:
   - "Custom report builder: a pure function turns the report state (visual, ordered fields, sort, filters, row limit) into an ad-hoc tile spec for a table, bar, scatter, heat map or pivot, so the offline compile check runs it too — project/src/builder.js:59"
   - "Ad-hoc native objects at run time: a small spec becomes a tile definition with the persona scope merged into its filters, then is compiled, themed and mounted in its own selection group; the assistant, investigation, question library, simulators and report builder all use it — project/src/adhoc.js:14"
-  - "One link, four data scopes: each persona's row scope is a static filter on every native object and every governed query, and objects a role is not cleared for are never mounted, so never queried — project/src/app.js:374"
+  - "One link, four data scopes: each persona's row scope is a static filter on every native object and every governed query, and objects a role is not cleared for are never mounted, so never queried — project/src/app.js:381"
   - "KPI card = native number + native sparkline in a time-series twin group (a month click never narrows the page) + one-row comparison table — project/src/catalogue.js:98"
   - "Lazy per-page compile against only the fields each object references, with the compiled and themed vSpec cached per device under a hash of its definition — project/src/app.js:178"
-  - "Workflow steps written back as audit events through app.writeback, with a labelled browser fallback where the runtime cannot write — project/src/app.js:598"
+  - "Workflow steps written back as audit events through app.writeback, with a labelled browser fallback where the runtime cannot write — project/src/app.js:605"
   - "Query lanes with 429 backoff, a session cache, and no caching for the views the app writes to — project/src/throttle.js:134"
   - "A raster basemap laid under a scatter whose axes are pinned to a lon/lat extent, so the bubbles land on their countries — project/src/basemap.js:37"
 caveats:
   - "Mock data: 20 views over MOCK_DATA PEOPLE_* tables, fixed at 30 Sep 2026. The source systems shown on the Data & governance and Data operations tabs are part of the mock architecture. The app names no company on screen; it is branded \"People Intelligence · Group HR\"."
   - "Persona scope is an app-side static filter, not row-level security: anyone who can open the layer can query outside their scope. Enforce access in the semantic layer before copying this for real data."
   - "Writeback inserts events only: People Actions steps and data-issue triage insert rows into Action Events, saved scenarios into Saved Scenarios. The action records and issue states themselves live in localStorage (people-actions-v2, people-issues-v1) over the governed seed. No smoke check exercises writeback (src/checks.js:9)."
-  - "The custom report's table splits its width equally between columns (src/app.js:585), so long values truncate. Its Excel export always asks for at least 2,000 rows whatever the Rows setting, and writes a pivot as a flat table."
+  - "The custom report's table splits its width equally between columns (src/app.js:592), so long values truncate. Its Excel export always asks for at least 2,000 rows whatever the Rows setting, and writes a pivot as a flat table."
   - "Currency comparison rows in KPI cards clip to a red \"+\"."
   - "On visualizations 0.9 a combo's secondary-axis layer does not move when the card narrows; objects are clipped to their card in CSS (src/pi.css:658) rather than fixed."
   - "The simulators' elasticities and costs are illustrative constants listed on screen (src/simulator.js:27, src/plan.js:27), not fitted. The assistant matches stored questions by keyword overlap, not a language model."

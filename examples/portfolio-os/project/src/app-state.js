@@ -55,6 +55,17 @@ export const appState = {
   /** An assertion only this app can make (a selection moves a KPI, an export downloads). */
   check(name, run) { state.checks.push({ name, run }); },
 
+  /** Prove the Excel export follows the filters on EVERY sheet, hidden tabs included.
+   *   appState.exportProbe({
+   *     build: () => buildWorkbookBlob(),               // the workbook the button downloads, as a Blob
+   *     select: () => applyFilter('Region', ['West']),  // a filter that should narrow every tab
+   *     clear: () => clearAll(),
+   *     exempt: ['Definitions', 'Audit trail'],         // sheets that rightly do not change
+   *   });
+   *  The smoke test builds the workbook without and with the filter (from the landing tab, so the
+   *  other tabs are hidden) and fails any sheet whose figures did not change. */
+  exportProbe(probe) { state.exportProbe = probe; },
+
   /** Call from your boot catch block so a failed start is reported, not timed out. */
   bootFailed(error) { state.bootError = String(error?.message ?? error).slice(0, 300); },
 };

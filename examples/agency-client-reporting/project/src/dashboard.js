@@ -411,8 +411,8 @@ export const buildTiles = (fields) => {
     if (out.failure) failures.push(out.failure);
     else tiles.push(out.tile);
   }
-  // Each chapter listens to its own selection group, mirrored from the filter bar (MAIN) by the
-  // app: a click re-queries the chapter on screen now and the others when they are scrolled to.
+  // Each tab listens to its own selection group with its own filter bar; nothing mirrors one group
+  // into another (MAIN is only the default group of the bar and donut helpers).
     return { tiles, failures };
 };
 export const buildTile = (tile, fields) => build(tile, fields);

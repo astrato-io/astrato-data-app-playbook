@@ -17,6 +17,7 @@ Any multi-tab app. At about a second per query, a tab that starts querying on cl
 
 - Charts mounted at 0×0 (`display:none`) freeze the page and come back magnified.
 - Charts never paint while the document is hidden (background tab, a hidden browser pane). Check rendering in a visible window, or with the kit's smoke test, whose headless Chrome does paint.
+- Anything that reads hidden objects (an Excel export, a print view) gets their pre-filter rows: sync every tab group first. See [xlsx-export](xlsx-export.md#sync-every-group-before-reading).
 - A mount queue that waits for each object's `ready` before the next starves in exactly that case; see [query scheduler](query-scheduler.md).
 
 ## Per-tab groups in a template app

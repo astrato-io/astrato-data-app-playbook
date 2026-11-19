@@ -110,9 +110,16 @@ figure, comes from the layer.
 
 ## Excel report
 
-Eight formatted sheets that follow the selections on screen: Summary, Cities, Weather, Blend, Nights,
-What-if (baseline against scenario at the current levers, and the gain by city), Offers (flags and
-audit trail) and Notes.
+Eight formatted sheets: Summary, Cities, Weather, Blend, Nights, What-if (baseline against scenario
+at the current levers, and the gain by city), Offers (flags and audit trail) and Notes. The export
+reads the applied selections once and queries every sheet under them, whichever tab is on screen:
+the offer tab's group is synced from the main group and its levers applied before its objects are
+read. City and Stay Date filter every sheet but Offers (the browser-only flag store) and Notes.
+Weather-band selections filter the Weather, Blend and Nights sheets and the API and blended Summary
+rows only; the governed sheets ignore them, and the Summary and What-if banners say so.
+`buildReport()` in `src/app.js` returns the workbook and the button downloads it; it is registered
+with `appState.exportProbe` (City = Boston, Offers and Notes exempt) so the kit smoke test checks
+that every other sheet changes under a filter.
 
 ## Run it
 

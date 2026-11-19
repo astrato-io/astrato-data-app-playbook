@@ -31,6 +31,19 @@ export const registerChecks = ({ builder, cat, answers, live, q }) => {
   const keys = [region, category, sales];
   const waitFor = async (test, ms = 15000) => { const t = performance.now(); while (!test() && performance.now() - t < ms) await new Promise((r) => setTimeout(r, 100)); return test(); };
 
+  // The export probe: a Region = West filter through the same path as the filter picker's Apply.
+  // It narrows the Report sheet's figures; Definitions holds no data and rightly does not change.
+  appState.exportProbe({
+    build: async () => (await builder.buildWorkbook())?.blob,
+    select: async () => {
+      const key = region ?? cat.rows.find((r) => !r.date)?.key;
+      const value = region ? 'West' : (await q({ dimensions: [{ fieldKey: key, name: 'v' }], orders: [{ columnIdx: 0, direction: 'asc' }], limit: 1 }))[0]?.[0];
+      builder.setSelection(key, [String(value)]);
+    },
+    clear: () => builder.clearFilters(),
+    exempt: ['Definitions'],
+  });
+
   appState.check('Build: New, then Region and Category as rows and Sales as a figure from the panel; the native table renders their rows', async () => {
     E.newBtn.click();
     await settle();

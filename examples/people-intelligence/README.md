@@ -54,7 +54,7 @@ Custom Report object, in two files and a block of CSS. To copy one into your own
 - *The ad-hoc object.* `adhocTile` turns the spec into a tile definition with the persona's scope
   added to its filters, table formats from the layer's display patterns, right-aligned measures and
   fixed row heights ([adhoc.js:14](project/src/adhoc.js#L14)); `ctx.renderTile` builds, compiles,
-  themes and mounts it in its own `g-rb` selection group ([app.js:574](project/src/app.js#L574));
+  themes and mounts it in its own `g-rb` selection group ([app.js:581](project/src/app.js#L581));
   tables get pixel column widths from `fitColumnOps` ([adhoc.js:39](project/src/adhoc.js#L39)).
   Every change re-renders after 350 ms; a run counter drops results that arrive after a newer
   change, and the previous object is removed first ([builder.js:246](project/src/builder.js#L246)).
@@ -73,16 +73,16 @@ Custom Report object, in two files and a block of CSS. To copy one into your own
   thin tab ([builder.js:194](project/src/builder.js#L194)). Only fields that exist in the layer are
   offered, and pay-by-gender, ethnicity and disability fields only to the cleared roles
   ([builder.js:83](project/src/builder.js#L83)); switching persona drops the fields the new role may
-  not see ([builder.js:302](project/src/builder.js#L302)). Tooltips carry each field's description
+  not see ([builder.js:303](project/src/builder.js#L303)). Tooltips carry each field's description
   from the layer.
 - *Bookmarks.* Up to 20 named reports in `localStorage` (`people-reports-v1`), stamped with who and
   when, plus seven starter reports filtered to what the role may see
   ([builder.js:222](project/src/builder.js#L222)).
 - *Share link.* The state is base64 JSON in `#rb=` ([builder.js:267](project/src/builder.js#L267));
   the URL is kept up to date while the tab is open, copied to the clipboard by the rail button, and a
-  page opened with `#rb=` goes straight to the report ([app.js:509](project/src/app.js#L509)). It
+  page opened with `#rb=` goes straight to the report ([app.js:516](project/src/app.js#L516)). It
   opens in the recipient's own scope, but see Caveats for the role check it skips.
-- *Excel.* The rail's export runs the same dimensions, measures and filters through `ctx.q` and
+- *Excel.* The rail's export runs the same dimensions, measures, filters and report selections through `ctx.q` and
   writes one sheet with a title, a scope note, a frozen header and number formats mapped from the
   layer's display patterns, through the app's dependency-free `workbookBlob`
   ([builder.js:272](project/src/builder.js#L272)).
@@ -93,15 +93,15 @@ Custom Report object, in two files and a block of CSS. To copy one into your own
   description, generated from the layer, [formats.js](project/src/formats.js)), `workbookBlob`
   ([xlsx.js:210](project/src/xlsx.js#L210)), and from `ctx` in app.js: `q`, `renderTile`,
   `dropTile`, `fields`, `persona`, `current`, `toast`, `el`, `esc`, `icon`, `onPageMount`, `onPersona` and
-  `onPersonaNow` ([app.js:616](project/src/app.js#L616)).
+  `onPersonaNow` ([app.js:623](project/src/app.js#L623)).
 
 **One link, four scopes.** Each persona carries a row scope as `[field, view, values]`
 ([app.js:84](project/src/app.js#L84)). It is added to every governed query
-([app.js:219](project/src/app.js#L219)) and set as a static filter group on every native object
-([app.js:374](project/src/app.js#L374)); switching persona re-filters the page on screen first, then
-every other page, without remounting ([app.js:680](project/src/app.js#L680)). Objects a role is not
+([app.js:226](project/src/app.js#L226)) and set as a static filter group on every native object
+([app.js:381](project/src/app.js#L381)); switching persona re-filters the page on screen first, then
+every other page, without remounting ([app.js:687](project/src/app.js#L687)). Objects a role is not
 cleared for show a lock and are never mounted, so never queried
-([app.js:531](project/src/app.js#L531)). The Data & governance tab shows the matrix of what each role
+([app.js:538](project/src/app.js#L538)). The Data & governance tab shows the matrix of what each role
 may do ([access.js:44](project/src/access.js#L44)).
 
 **Privacy-thresholded diversity measures.** Every DEI measure has a privacy-safe twin in the layer,
@@ -113,7 +113,7 @@ Diversity tab charts only those, and states the rules in a panel ([access.js:24]
 table with the comparison value (last year by default) and the change, coloured by whether that direction is good
 ([catalogue.js:98](project/src/catalogue.js#L98)). The sparkline sits in a `-t` twin of the page's
 selection group, which mirrors the page's selections, so a click on a month never narrows the page
-([app.js:394](project/src/app.js#L394)).
+([app.js:401](project/src/app.js#L401)).
 
 **The assistant answers from stored questions.** A question is scored against the 61 stored
 questions by keyword overlap with synonyms ([assistant.js:32](project/src/assistant.js#L32)); named
@@ -123,14 +123,14 @@ from the returned rows.
 
 **Writeback as events.** `ctx.writeback` inserts rows through `app.writeback` when the runtime has
 the `data:writeback` capability, and otherwise reports that it could not
-([app.js:598](project/src/app.js#L598)). Every People Actions step becomes an `Action Events` row
+([app.js:605](project/src/app.js#L605)). Every People Actions step becomes an `Action Events` row
 ([actions.js:51](project/src/actions.js#L51)), so does every data-issue triage step
 ([dataops.js:56](project/src/dataops.js#L56)), and a saved scenario becomes a `Saved Scenarios`
 row ([simulator.js:206](project/src/simulator.js#L206)). Objects over those views are re-queried by
-nudging their query limit ([app.js:606](project/src/app.js#L606)), and the query cache never holds
+nudging their query limit ([app.js:613](project/src/app.js#L613)), and the query cache never holds
 them ([throttle.js:158](project/src/throttle.js#L158)). Approval is maker–checker: the approver
 must differ from the submitter, and £1m or more needs the Group CHRO
-([actions.js:62](project/src/actions.js#L62)).
+([actions.js:70](project/src/actions.js#L70)).
 
 **Two simulators over governed baselines.** The retention projection is one pure function of the
 baseline and five levers ([simulator.js:37](project/src/simulator.js#L37)); the FY28 plan absorbs
@@ -142,18 +142,18 @@ in the browser ([plan.js:139](project/src/plan.js#L139)).
 object against only the fields it references; the compiled and themed vSpec is cached per device
 under a hash of its definition, so a repeat visit skips that step
 ([app.js:178](project/src/app.js#L178)). The other pages then load one at a time in the background,
-and a page the reader opens jumps the queue ([app.js:546](project/src/app.js#L546)). Hidden panes
+and a page the reader opens jumps the queue ([app.js:553](project/src/app.js#L553)). Hidden panes
 stay laid out at full width with `visibility: hidden` ([pi.css:102](project/src/pi.css#L102)).
 Queries run through lanes with 429 backoff and a session cache ([throttle.js:134](project/src/throttle.js#L134)).
 
 Also useful:
-- drill-down: a single value selected on a drillable chart's current level steps it one level down, with breadcrumbs to step back ([app.js:488](project/src/app.js#L488)); a structured investigation of one segment, opened from a click ([explain.js:83](project/src/explain.js#L83));
-- in-place switchers that swap a chart's measures or dimension and rebuild its vSpec without remounting ([app.js:427](project/src/app.js#L427));
-- a sticky bar with the persona scope, the page's selections as removable chips and Clear all ([app.js:324](project/src/app.js#L324)), with pending selections applied after 250 ms ([app.js:139](project/src/app.js#L139));
+- drill-down: a single value selected on a drillable chart's current level steps it one level down, with breadcrumbs to step back ([app.js:495](project/src/app.js#L495)); a structured investigation of one segment, opened from a click ([explain.js:83](project/src/explain.js#L83));
+- in-place switchers that swap a chart's measures or dimension and rebuild its vSpec without remounting ([app.js:434](project/src/app.js#L434));
+- a sticky bar with the persona scope, the page's selections as removable chips and Clear all ([app.js:331](project/src/app.js#L331)), with pending selections applied after 250 ms ([app.js:139](project/src/app.js#L139));
 - a written briefing composed from governed queries for the viewer's scope ([home.js:16](project/src/home.js#L16));
-- a scatter map with a raster basemap laid under its plot area, the axes pinned to a lon/lat extent and refitted to true scale ([basemap.js:37](project/src/basemap.js#L37), [app.js:407](project/src/app.js#L407));
-- the executive-summary workbook, seven sheets from persona-scoped governed queries, the current scenario and the action register ([export.js:9](project/src/export.js#L9));
-- nine smoke checks the app registers: on six tabs and Data operations a selection moves a KPI, a chart and a table and clearing restores the KPI; the custom report builds a table, changes when a measure is added and exports; the header export downloads its workbook ([checks.js:61](project/src/checks.js#L61)).
+- a scatter map with a raster basemap laid under its plot area, the axes pinned to a lon/lat extent and refitted to true scale ([basemap.js:37](project/src/basemap.js#L37), [app.js:414](project/src/app.js#L414));
+- the executive-summary workbook, seven sheets: five governed queries under the persona scope and the applied selections of the page on screen (pages keep independent selection groups, so the export follows the one being looked at (on Custom report, the report's own `g-rb` group); only an engine rejection of the selections drops them from a sheet, any other query failure fails the export; each sheet's subtitle names the selections it follows), the scenario for the simulator's own population, and the action register in the persona's scope ([export.js:18](project/src/export.js#L18)). `buildWorkbook` returns the Blob, the header button downloads it, and `appState.exportProbe` lets the smoke test prove a Home selection narrows every governed sheet ([checks.js:112](project/src/checks.js#L112));
+- nine smoke checks the app registers: on six tabs and Data operations a selection moves a KPI, a chart and a table and clearing restores the KPI; the custom report builds a table, changes when a measure is added and exports; the header export downloads its workbook ([checks.js:21](project/src/checks.js#L21)).
 
 ## Semantic layer
 
@@ -192,9 +192,9 @@ tile service at run time. The persona choice is remembered in `localStorage`.
 ## Caveats
 
 - **Mock data.** The `PEOPLE_*` tables are generated; the source systems on the Data & governance and Data operations tabs are part of the mock architecture. Dates are fixed at 30 September 2026. The app names no company on screen; it is branded "People Intelligence · Group HR".
-- **Scope is not security.** The persona scope is a static filter added by the app ([app.js:374](project/src/app.js#L374)), not row-level security; anyone who can open the layer can query outside it. Enforce access in the semantic layer before copying this for real data.
+- **Scope is not security.** The persona scope is a static filter added by the app ([app.js:381](project/src/app.js#L381)), not row-level security; anyone who can open the layer can query outside it. Enforce access in the semantic layer before copying this for real data.
 - **Writeback inserts events only.** Action records and data-issue states live in `localStorage` (`people-actions-v2`, `people-issues-v1`) over the governed seed; each step is also inserted into `Action Events`, and saved scenarios into `Saved Scenarios`. Without the writeback capability the app says so and keeps the browser copy. No smoke check exercises writeback ([checks.js:9](project/src/checks.js#L9)).
-- The custom report's table splits its width equally between columns ([app.js:585](project/src/app.js#L585)), so long values truncate. Its Excel export asks for at least 2,000 rows whatever the Rows setting, and writes a pivot as a flat table.
+- The custom report's table splits its width equally between columns ([app.js:592](project/src/app.js#L592)), so long values truncate. Its Excel export asks for at least 2,000 rows whatever the Rows setting (and says so in the sheet when that limit is reached), follows the report's filters and any selection clicked on the report, and writes a pivot as a flat table.
 - Currency comparison rows in KPI cards clip to a red "+".
 - On visualizations 0.9 a combo's secondary-axis layer does not move when the card narrows; objects are clipped to their card ([pi.css:658](project/src/pi.css#L658)) rather than fixed.
 - The simulators' elasticities and costs are illustrative constants, listed on screen ([simulator.js:27](project/src/simulator.js#L27), [plan.js:27](project/src/plan.js#L27)). The assistant matches by keyword overlap, not a language model.

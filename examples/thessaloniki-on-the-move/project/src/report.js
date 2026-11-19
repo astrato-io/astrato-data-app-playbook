@@ -2,6 +2,10 @@
  * Management report: a multi-tab, styled .xlsx built from governed queries of the
  * "Thessaloniki on the Move" semantic layer, scoped to the filters on screen.
  * In-cell bars (█) stand in for charts so every tab reads as a quick visual summary.
+ *
+ * Every query takes the filter bar's applied selections explicitly (filtersFor reads the main
+ * group at call time), never a chapter's own group, so chapters that are off screen, whose groups
+ * catch up only when scrolled to, export under the same filters as the one on screen.
  */
 import { workbookBlob } from './xlsx.js';
 
@@ -13,28 +17,34 @@ const banner = (title, sub, width) => [
 ];
 const head = (labels) => labels.map((v) => ({ v, s: 'headl' }));
 const SOURCE = 'Source: OSETH GTFS timetable (data.gov.gr, feed 14 Jul – 3 Aug 2026) → Snowflake ASTRATO_GALLERY.MOCK_DATA.TH_* → Astrato semantic layer “Thessaloniki on the Move”. Scheduled service, not ridership.';
+const LIMITS = { lines: 1000, stops: 10000 };
+/** A note row when a query came back at its row limit, so a cut list never passes as complete. */
+const capNote = (rows, limit, what) => (rows.length >= limit ? [[], [{ v: `Only the first ${limit.toLocaleString('en-GB')} ${what} are listed: the query hit its row limit.`, s: 'note' }]] : []);
 const num = (v) => (v == null || Number.isNaN(Number(v)) ? null : Number(v));
 const strip = (s) => String(s ?? '').replace(/^\d\.\s*/, '');
 
 /**
  * @param q          governed query helper: q({ dims: [[column, view]], measures, filters }) → row objects
  * @param filtersFor view → the on-screen filters that view can honour
+ * @param scope      every applied filter in full (each sheet's subtitle names it)
+ * @returns the workbook as a Blob; downloadReport saves it
  */
 export const buildReport = async ({ q, filtersFor, views: { SV, LV, ST }, scope, period }) => {
   const fs = filtersFor(SV);
   const fst = filtersFor(ST);
+  const fl = filtersFor(LV); // queries grouped by Lines columns ask for Lines' filters, as app.js does
   const [[t = {}], [s = {}], cats, lines, hours, dows, stops, bands] = await Promise.all([
     q({ measures: ['Active Lines', 'Trips per Day', 'Weekday Trips per Day', 'Sunday Retention', 'Vehicle Km per Day', 'Vehicle Hours per Day', 'Commercial Speed', 'Stop Calls per Day', 'Peak Share'], filters: fs, limit: 1 }),
     q({ measures: ['Stops', 'Frequent Stop Share', 'Underserved Stops', 'Underserved Share', 'Stops Without Sunday Bus', 'Avg Longest Gap'], filters: fst, limit: 1 }),
-    q({ dims: [['Category', LV]], measures: ['Active Lines', 'Trips per Day', 'Share of Trips', 'Vehicle Km per Day', 'Commercial Speed', 'Sunday Retention'], filters: fs, limit: 10 }),
-    q({ dims: [['Line', LV], ['Line Label', LV], ['Category', LV]], measures: ['Trips per Day', 'Weekday Trips per Day', 'Sunday Retention', 'Commercial Speed', 'Avg Trip Minutes', 'Vehicle Km per Day', 'Vehicle Hours per Day', 'Buses at 8am', 'AM Headway', 'First Bus', 'Last Bus'], filters: fs, limit: 400 }),
+    q({ dims: [['Category', LV]], measures: ['Active Lines', 'Trips per Day', 'Share of Trips', 'Vehicle Km per Day', 'Commercial Speed', 'Sunday Retention'], filters: fl, limit: 10 }),
+    q({ dims: [['Line', LV], ['Line Label', LV], ['Category', LV]], measures: ['Trips per Day', 'Weekday Trips per Day', 'Sunday Retention', 'Commercial Speed', 'Avg Trip Minutes', 'Vehicle Km per Day', 'Vehicle Hours per Day', 'Buses at 8am', 'AM Headway', 'First Bus', 'Last Bus'], filters: fl, limit: LIMITS.lines }),
     q({ dims: [['Hour Label', SV]], measures: ['Trips per Day', 'Vehicle Hours per Day'], filters: fs, limit: 30 }),
     q({ dims: [['Day Label', SV]], measures: ['Trips per Day'], filters: fs, limit: 10 }),
-    q({ dims: [['Stop Label', ST], ['Stop Name', ST], ['Sector', ST], ['Dist Band', ST], ['Service Level', ST]], measures: ['Weekday Departures', 'Saturday Departures', 'Sunday Departures', 'Lines per Stop', 'Peak Buses per Hour', 'Longest Gap', 'Distance from Centre'], filters: fst, limit: 4000 }),
+    q({ dims: [['Stop Label', ST], ['Stop Name', ST], ['Sector', ST], ['Dist Band', ST], ['Service Level', ST]], measures: ['Weekday Departures', 'Saturday Departures', 'Sunday Departures', 'Lines per Stop', 'Peak Buses per Hour', 'Longest Gap', 'Distance from Centre'], filters: fst, limit: LIMITS.stops }),
     q({ dims: [['Dist Band', ST]], measures: ['Stops', 'Frequent Stop Share', 'Underserved Share', 'Avg Longest Gap', 'Departures per Stop'], filters: fst, limit: 10 }),
   ]);
   const when = new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
-  const sub = `Timetable ${period} · scope: ${scope} · generated ${when}`;
+  const sub = `Timetable ${period} · filters: ${scope} · generated ${when}`;
   lines.sort((a, b) => num(b['Trips per Day']) - num(a['Trips per Day']));
   stops.sort((a, b) => num(b['Weekday Departures']) - num(a['Weekday Departures']));
   cats.sort((a, b) => num(b['Trips per Day']) - num(a['Trips per Day']));
@@ -65,31 +75,37 @@ export const buildReport = async ({ q, filtersFor, views: { SV, LV, ST }, scope,
     `Lines slower than 18 km/h use ${Math.round(slowVH).toLocaleString('en-GB')} bus-hours a day (${((slowVH / (num(t['Vehicle Hours per Day']) || 1)) * 100).toFixed(0)}% of the fleet’s time): the case for bus priority.`,
   ].filter(Boolean);
   const maxCat = Math.max(...cats.map((r) => num(r['Trips per Day'])), 1);
+  const kpiRows = [
+    kpiRow(([l]) => ({ v: l, s: 'kpiLabel' })),
+    { height: 30, cells: kpiRow(([, v, st]) => ({ v: num(v), s: st })) },
+    kpiRow(([, , , n]) => ({ v: n, s: 'kpiNote' })),
+  ];
+  const bulletRows = bullets.map((x) => ({ height: 28, cells: [null, { v: `•  ${x}`, s: 'note' }] }));
+  const catRows = cats.map((r) => [null, { v: strip(r.Category), s: 'text' }, { v: num(r['Trips per Day']), s: 'int' }, { v: num(r['Share of Trips']), s: 'pct' }, { v: num(r['Commercial Speed']), s: 'dec' }, { v: bar(num(r['Trips per Day']) / maxCat, 40), s: 'bar' }]);
   const summary = [
     ...banner('Thessaloniki on the Move · management report', sub, 13),
     [null, { v: 'Headline', s: 'section' }],
     [],
-    kpiRow(([l]) => ({ v: l, s: 'kpiLabel' })),
-    { height: 30, cells: kpiRow(([, v, st]) => ({ v: num(v), s: st })) },
-    kpiRow(([, , , n]) => ({ v: n, s: 'kpiNote' })),
+    ...kpiRows,
     [],
     [null, { v: 'What the timetable says', s: 'section' }],
-    ...bullets.map((x) => ({ height: 28, cells: [null, { v: `•  ${x}`, s: 'note' }] })),
+    ...bulletRows,
     [],
     [null, { v: 'Trips a day by line category', s: 'section' }],
     [null, ...head(['Category', 'Trips/day', 'Share', 'Speed km/h', '']), ...Array(8).fill(null)],
-    ...cats.map((r) => [null, { v: strip(r.Category), s: 'text' }, { v: num(r['Trips per Day']), s: 'int' }, { v: num(r['Share of Trips']), s: 'pct' }, { v: num(r['Commercial Speed']), s: 'dec' }, { v: bar(num(r['Trips per Day']) / maxCat, 40), s: 'bar' }]),
+    ...catRows,
     [],
     [null, { v: SOURCE, s: 'note' }],
   ];
-  const bs = 12;
+  // Merge ranges from the rows' own positions (1-based), so they move with the layout.
+  const at = (row) => summary.indexOf(row) + 1;
   const summarySheet = {
     name: 'Summary', tab: 'FF10263F', cols: [3, 14, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13],
     rows: summary,
     merges: [
-      ...kpis.flatMap((_, i) => { const c1 = String.fromCharCode(66 + i * 2); const c2 = String.fromCharCode(67 + i * 2); return [7, 8, 9].map((r) => `${c1}${r}:${c2}${r}`); }),
-      ...bullets.map((_, i) => `B${bs + i}:M${bs + i}`),
-      ...cats.map((_, i) => `F${bs + bullets.length + 3 + i}:M${bs + bullets.length + 3 + i}`),
+      ...kpis.flatMap((_, i) => { const c1 = String.fromCharCode(66 + i * 2); const c2 = String.fromCharCode(67 + i * 2); return kpiRows.map((row) => `${c1}${at(row)}:${c2}${at(row)}`); }),
+      ...bulletRows.map((row) => `B${at(row)}:M${at(row)}`),
+      ...catRows.map((row) => `F${at(row)}:M${at(row)}`),
       `B${summary.length}:M${summary.length}`,
     ],
     freeze: { row: 4, col: 0 },
@@ -109,6 +125,7 @@ export const buildReport = async ({ q, filtersFor, views: { SV, LV, ST }, scope,
         { v: num(r['Buses at 8am']), s: 'int' }, { v: num(r['AM Headway']), s: 'int' }, { v: r['First Bus'] ?? '', s: 'text' }, { v: r['Last Bus'] ?? '', s: 'text' },
         { v: bar(num(r['Trips per Day']) / maxTrips, 24), s: 'bar' },
       ]),
+      ...capNote(lines, LIMITS.lines, 'lines'),
     ],
     merges: [], freeze: { row: 4, col: 2 },
   };
@@ -165,6 +182,8 @@ export const buildReport = async ({ q, filtersFor, views: { SV, LV, ST }, scope,
           ...(l ? [{ v: l['Line Label'], s: 'text' }, { v: num(l['Commercial Speed']), s: 'dec' }, { v: num(l['Vehicle Hours per Day']), s: 'int' }, { v: num(l['Trips per Day']), s: 'int' }] : []),
         ];
       }),
+      ...capNote(stops, LIMITS.stops, 'stops (underserved stops are picked from them)'),
+      ...capNote(lines, LIMITS.lines, 'lines (slow lines are picked from them)'),
     ],
     merges: [], freeze: { row: 5, col: 0 },
   };
@@ -180,6 +199,7 @@ export const buildReport = async ({ q, filtersFor, views: { SV, LV, ST }, scope,
         { v: num(r['Weekday Departures']), s: 'int' }, { v: num(r['Saturday Departures']), s: 'int' }, { v: num(r['Sunday Departures']), s: 'int' }, { v: num(r['Lines per Stop']), s: 'int' },
         { v: num(r['Peak Buses per Hour']), s: 'dec' }, { v: num(r['Longest Gap']), s: 'int' }, { v: num(r['Distance from Centre']), s: 'dec' },
       ]),
+      ...capNote(stops, LIMITS.stops, 'stops'),
     ],
     merges: [], freeze: { row: 4, col: 1 },
   };
@@ -207,7 +227,7 @@ export const buildReport = async ({ q, filtersFor, views: { SV, LV, ST }, scope,
     merges: [], freeze: { row: 4, col: 0 },
   };
 
-  return workbookBlob({ sheets: [summarySheet, linesSheet, rhythmSheet, accessSheet, oppSheet, stopsSheet, defs], title: 'Thessaloniki on the Move — management report', author: 'Astrato' });
+  return workbookBlob({ sheets: [summarySheet, linesSheet, rhythmSheet, accessSheet, oppSheet, stopsSheet, defs], title: 'Thessaloniki on the Move — management report', author: 'Astrato', footer: 'Thessaloniki on the Move · OSETH GTFS timetable, scheduled service' });
 };
 
 export const downloadReport = (blob) => {

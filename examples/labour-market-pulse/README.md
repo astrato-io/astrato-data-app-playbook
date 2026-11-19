@@ -42,10 +42,10 @@ Chart clicks select a month, a sector or a region. Every card is titled with its
 `Period Status = Latest` with a selected year: the result is empty. Snapshot cards are declared
 with `latest: true` ([catalogue.js:34](project/src/catalogue.js#L34)) and mount with the Latest
 static filter; when a Year or month is selected, `refreshLatest` swaps their static filter group
-for one without it through `setStaticFilterGroup` ([app.js:264](project/src/app.js#L264), the op at
-[app.js:274](project/src/app.js#L274)), and the card subtitle changes to "Average of the selected
+for one without it through `setStaticFilterGroup` ([app.js:266](project/src/app.js#L266), the op at
+[app.js:276](project/src/app.js#L276)), and the card subtitle changes to "Average of the selected
 months". Tables do the same by swapping to a selected-period variant compiled at load
-([app.js:132](project/src/app.js#L132)) and mounted into the same slot ([app.js:250](project/src/app.js#L250)).
+([app.js:134](project/src/app.js#L134)) and mounted into the same slot ([app.js:252](project/src/app.js#L252)).
 The latest-release tables keep "latest" inside their measures (`Latest Value`, `Latest Change on a
 Year Earlier`), so they carry no period filter and their trend column draws the full history
 ([catalogue.js:59](project/src/catalogue.js#L59)).
@@ -54,15 +54,15 @@ Year Earlier`), so they carry no period filter and their trend column draws the 
 selections; each data tab has a group for charts and filters and one for KPIs, and `SCOPE` says
 which fields each takes: KPIs on UK series take only time, Demand's charts also take Sector,
 Regions takes Geography ([app.js:42](project/src/app.js#L42)). `mirrorInto` copies the state into
-the visible tab's groups by difference ([app.js:95](project/src/app.js#L95)), on every change and
-when a tab is opened ([app.js:405](project/src/app.js#L405)). Pending selections from chart clicks
-are applied after 200 ms and become the app's state ([app.js:311](project/src/app.js#L311)); chips
-for a field the visible tab cannot take are greyed ([app.js:291](project/src/app.js#L291)).
+the visible tab's groups by difference ([app.js:97](project/src/app.js#L97)), on every change and
+when a tab is opened ([app.js:407](project/src/app.js#L407)). Pending selections from chart clicks
+are applied after 200 ms and become the app's state ([app.js:313](project/src/app.js#L313)); chips
+for a field the visible tab cannot take are greyed ([app.js:294](project/src/app.js#L294)).
 
 **What-if through a layer parameter.** `Real Value of Pay Award` and `Pay Award vs Private Sector
 Pay Growth` take the layer parameter `Pay Award %`; the slider sets it on the two mounted numbers
 with `setMeasureDefinedParameter` through `applyRuntimeOperations`, no remount
-([app.js:366](project/src/app.js#L366), the op at [app.js:377](project/src/app.js#L377)). The baseline,
+([app.js:368](project/src/app.js#L368), the op at [app.js:379](project/src/app.js#L379)). The baseline,
 `Implied CPIH Inflation`, is a governed measure beside them.
 
 **Every object on a stored question.** All 38 charts, tables and KPI parts stand for 34 of the
@@ -70,33 +70,33 @@ layer's 42 stored questions, named by the card's question ([catalogue.js:38](pro
 [tools/questions.mjs](project/tools/questions.mjs) turns each tile into a question definition,
 including the moving average and the rank as advanced calculations ([questions.mjs:45](project/tools/questions.mjs#L45)).
 Only the hero sentence, the KPI colours, the workflow evidence and the Excel pack read stored
-measures through the app's own governed query ([app.js:69](project/src/app.js#L69)).
+measures through the app's own governed query ([app.js:71](project/src/app.js#L71)).
 
 **KPI = number + coloured comparison + mini line.** The value is a native `number` with the
 stored "… Change on Year" measure added as its comparison ([tiles.js:126](project/src/tiles.js#L126));
 those change measures are null where there is no prior year, rather than the value itself. After
 render, the app reads the change with the card's own selections and colours the comparison and its
-caption by its sign and whether up is good for that measure ([app.js:231](project/src/app.js#L231)).
+caption by its sign and whether up is good for that measure ([app.js:233](project/src/app.js#L233)).
 The mini line is its own object on its own question ([catalogue.js:35](project/src/catalogue.js#L35)).
 
 **The direct-query shape the engine accepts.** `engine.getData` dimensions go as `{ itemKey,
 label }`, the shape charts send; `{ fieldKey: '[dimension]…' }` is refused with HTTP 400
-"Astrato rejected the runtime request" ([app.js:70](project/src/app.js#L70)). `contains` filters were
+"Astrato rejected the runtime request" ([app.js:72](project/src/app.js#L72)). `contains` filters were
 refused by `getData` too, so the Excel pack reads sectors through the `Sector` dimension and the
-sector measures' own filter ([export.js:55](project/src/export.js#L55)); the `contains` static filter
+sector measures' own filter ([export.js:72](project/src/export.js#L72)); the `contains` static filter
 on charts is fine ([tiles.js:31](project/src/tiles.js#L31)).
 
 Also useful:
-- every tab mounted at load through four lanes, the visible tab first and mini lines last ([app.js:217](project/src/app.js#L217)), inactive panes off-screen rather than `display: none` ([styles.css:43](project/src/styles.css#L43)) at the active width ([app.js:397](project/src/app.js#L397));
+- every tab mounted at load through four lanes, the visible tab first and mini lines last ([app.js:219](project/src/app.js#L219)), inactive panes off-screen rather than `display: none` ([styles.css:43](project/src/styles.css#L43)) at the active width ([app.js:399](project/src/app.js#L399));
 - tables with static column widths refitted to the slot after mount, on resize and on tab show, with `setColumnWidth` operations, never a remount ([app.js:198](project/src/app.js#L198), widths at [tiles.js:107](project/src/tiles.js#L107));
 - the pre-pandemic band on the hero trend, its level read from a stored measure before mount ([app.js:431](project/src/app.js#L431), the band at [tiles.js:82](project/src/tiles.js#L82));
 - signed bars coloured by meaning, falls in vacancies and rises in unemployment red ([tiles.js:87](project/src/tiles.js#L87));
 - one pre-mount path (definition → compile → operations) shared with the compile check ([tiles.js:196](project/src/tiles.js#L196), [tools/compile-adapter.mjs](project/tools/compile-adapter.mjs)), which also replays the static-filter swap and the parameter;
 - a query lane with 429 backoff, timeouts and a session cache keyed by the exact request ([throttle.js:112](project/src/throttle.js#L112));
 - the maker–checker call with "Acting as" and the four-eyes rule ([workflow.js:43](project/src/workflow.js#L43), [workflow.js:62](project/src/workflow.js#L62));
-- a seven-sheet Excel pack (Summary with the current call, Market, Demand, Pay, Regions, Data, Definitions) from governed queries with the on-screen selections ([export.js:30](project/src/export.js#L30));
-- `?tab=` opens on a tab ([app.js:414](project/src/app.js#L414));
-- nine self-checks the smoke test runs, each through the app's real selection path ([app.js:476](project/src/app.js#L476)).
+- a seven-sheet Excel pack (Summary with the current call, Market, Demand, Pay, Regions, Data, Definitions) from governed queries that carry the app-wide selections explicitly, so hidden tabs follow them too; each sheet takes the selections its tab takes on screen, and its banner names those it follows and those it does not (a Region on the UK-wide Summary, say) ([export.js:37](project/src/export.js#L37)). `buildWorkbook` returns the Blob and the button downloads it; `appState.exportProbe` lets the kit smoke test build the pack with and without a Year from the landing tab and fail any sheet that did not change ([app.js:536](project/src/app.js#L536));
+- `?tab=` opens on a tab ([app.js:416](project/src/app.js#L416));
+- nine self-checks the smoke test runs, each through the app's real selection path ([app.js:465](project/src/app.js#L465)).
 
 ## Semantic layer
 
@@ -104,7 +104,7 @@ Also useful:
 no joins, 11 dimensions, 50 measures and 42 stored business questions.
 
 - **View:** `Labour Market` (`LMS_FACT`): one row per ONS series per month, Jan 2015 to Jun/Jul 2026, with the series' value 3 and 12 months earlier and in Feb 2020 on the same row, and a `Period Status` of Latest or History per series.
-- **Dimensions used:** Period, Year, Period Status, Sector, Geography, Indicator, Theme, Unit, Sex (static filter only). Selections go on each dimension's raw column ([app.js:86](project/src/app.js#L86)).
+- **Dimensions used:** Period, Year, Period Status, Sector, Geography, Indicator, Theme, Unit, Sex (static filter only). Selections go on each dimension's raw column ([app.js:88](project/src/app.js#L88)).
 - **Measures used:** the headline series (Unemployed per Vacancy, Unemployment Rate, Vacancies (000s), Regular / Real Regular / Private / Public Sector Pay Growth, Redundancies (000s)) and their guarded "… Change on Year" measures; Unemployed per Vacancy Pre-Pandemic; Value, Change on Quarter, Change on a Year Earlier, Change vs Pre-Pandemic and their `Latest …` forms; Sector Vacancies (000s), Sector Vacancy Change on Year (000s), Share of Sector Vacancies and its latest form; the regional rates and changes and their latest forms; Implied CPIH Inflation, Real Value of Pay Award and Pay Award vs Private Sector Pay Growth (parameter `Pay Award %`, default 4).
 - **Questions:** 34 of the 42, e.g. *How far has the labour market loosened since the 2022 peak?*, *Where does the UK labour market stand in the latest release?*, *Which sectors cut vacancies most over the year?*, *What is a pay award worth after inflation?*, *Which regions have seen unemployment rise most over the year?* Full list in [questions.md](../../layers/uk-labour-market/questions.md).
 - Defined but unused by the app: eight questions (among them *Is the jobs market loosening?*, *Why are people economically inactive?*, *Is long-term sickness still rising?*), and measures such as Youth Unemployment Rate, Employment Rate, Inactivity Rate, Long-term Sick (000s), Employment Level (000s), Growth on Year % and the unguarded Change on Year.
@@ -136,13 +136,13 @@ Needs Node 24.18 or later. [docs/brief.md](project/docs/brief.md) and
 - **A test run.** Built by an agent from this repo in a clean environment, then brought up to standard; read it as what the playbook produces.
 - **One fixed release** (15 Sep 2026), not live. The latest period differs by series (Apr–Jun 2026 for survey series, Jul 2026 for pay and vacancies), so every "latest" figure uses `Period Status`, never the view's maximum date.
 - **No writeback.** The call and its audit trail live in `localStorage` (`labour-market-pulse-calls-v1`, [workflow.js:9](project/src/workflow.js#L9)), and the screen says so.
-- The hero's "above the pre-pandemic" figure is a subtraction in the app of two governed values ([app.js:424](project/src/app.js#L424)), and the badge is an app rule on the sign of the U/V change with a ±0.05 dead band ([app.js:420](project/src/app.js#L420)), not a stored measure.
+- The hero's "above the pre-pandemic" figure is a subtraction in the app of two governed values ([app.js:426](project/src/app.js#L426)), and the badge is an app rule on the sign of the U/V change with a ±0.05 dead band ([app.js:422](project/src/app.js#L422)), not a stored measure.
 - Headline measures average the monthly readings in context: with a Year selected a KPI shows the year's average, not its last reading (the card says so). Regional KPIs average the selected regions unweighted.
 - Sector vacancies cover seven sectors (426k of 702k), not the full industry breakdown. A Geography selection applies on Regions only.
 - KPIs query twice under a time selection: once for the selection, once for the static-filter swap.
 - The sector trend reuses similar purples; several lines are hard to tell apart.
 - The questions are written from the app's catalogue, not synced back from the stored definitions; the five owner-authored questions the app uses are restated in the catalogue and could drift. The header of `questions.mjs` names a `src/questions.js` and a `tools/sync-questions.mjs` that do not exist.
-- The Excel Definitions sheet uses notes written in the app ([export.js:9](project/src/export.js#L9)), not the layer's descriptions; the Pay sheet holds only the three pay KPIs. Export with a Sector selection is untested.
+- The Excel Definitions sheet uses notes written in the app ([export.js:14](project/src/export.js#L14)), not the layer's descriptions, and omit some measures the pack uses (Redundancies, the pay "Change on Year" measures, the pre-pandemic level); the Pay sheet holds only the three pay KPIs, not the what-if. With a time selected the Data sheet lists every selected month per indicator (the screen's table averages them), capped at 10,000 rows with a note if reached. Export with a Sector selection is untested.
 - The pay and regional tables scroll inside their cards at 1440.
 - Inert leftovers: an unused prefetch helper in `throttle.js`, whose header still mentions a timetable and a `prefetch.js`.
 - A library console error on visualizations 0.9 (TypeError reading `reduce` in the table's `pivotRowDimensionsAsColumns`) is allow-listed in [tools/smoke-allow.txt](project/tools/smoke-allow.txt); the table still renders. Its second line matches any "visualization reported an error", so it would hide other object errors too.

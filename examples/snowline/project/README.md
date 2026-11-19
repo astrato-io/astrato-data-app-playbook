@@ -29,7 +29,9 @@ season's budget where good snow went unsold.
 
 Every chart, KPI and table is a native Astrato object on one of the layer's 32 stored business
 questions (`src/questions.js`), titled with the question. The headline sentence reads four stored
-measures through one governed query and follows the filters. Excel report: header button, 8 sheets.
+measures through one governed query and follows the filters. Excel report: header button, 8 sheets;
+before reading, it copies the filters into every tab's selection group and waits for the
+re-queries, so hidden tabs' sheets follow the filters too (registered as `appState.exportProbe`).
 
 ## Run it
 

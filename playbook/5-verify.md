@@ -109,7 +109,10 @@ for a flash), and table columns refit.
 ## 8. Deliverables
 
 - **Excel report:** click the button with a selection applied. The file lands on disk, opens,
-  and its figures match the screen for that selection.
+  and its figures match the screen for that selection **on every sheet**, not only the sheet for
+  the tab you are on: sheets for hidden tabs are where filters get lost. Register
+  `appState.exportProbe` so the smoke test proves this on every run
+  ([pattern](../patterns/xlsx-export.md#sync-every-group-before-reading)).
 - **What-if:** move each input; the dependent numbers change and return on reset.
 - **Workflow:** run one item through every state as each role; the audit trail records each
   step; the maker cannot approve their own item; reset restores the seed. After a write, the

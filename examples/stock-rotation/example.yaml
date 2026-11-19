@@ -50,7 +50,7 @@ capabilities:
   - writeback-workflow — project/src/workflow.js:48
   - role-switcher — project/src/app.js:92
   - what-if — project/src/app.js:187
-  - excel-export — project/src/app.js:274
+  - excel-export — project/src/app.js:290
 stealable:
   - "Each stock step as a sequence of app.writeback inserts and updates on governed tables (batch, movement, purchase order), then a cache clear and a re-query of every mounted object — project/src/workflow.js:48"
   - "First-expired-first-out enforced at the pick list: a batch is blocked if quarantined, below the product's minimum shelf life, or not the oldest eligible batch for that product and warehouse — project/src/workflow.js:35"
@@ -68,6 +68,6 @@ caveats:
   - No data generator or reset script is shipped; the layer's tables were loaded from CSV files that are not included. layers/inventory-rotation/schema/ddl.sql gives the shapes, but lists the Month and Period custom fields of Movements and Sales Orders as columns. The SQL views hard-code ASTRATO_GALLERY.ASTRATO.
   - Transfers assume exactly two warehouses (WH-UK and WH-US). The Plan tab is browser arithmetic over a governed baseline. The Value at risk card's mini-chart plots units expired by month, not value at risk.
   - styles.css, objects.css and ops.css carry rules for screens this app does not have.
-  - Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite. Verified with compile-check (21/21) and vite build; the app registers six smoke checks, but no smoke-test run is recorded for this export.
+  - Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite. Verified with compile-check (21/21) and vite build; the app registers six smoke checks and an export probe, but no smoke-test run is recorded for this export.
   - No screenshots are shipped yet.
   - astrato.json carries a zero placeholder semanticLayerId; layer.json's datasource is a placeholder too.

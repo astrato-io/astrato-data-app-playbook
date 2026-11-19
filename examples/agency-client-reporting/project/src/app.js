@@ -65,9 +65,11 @@ const main = async () => {
   throttleQueries(app.client.hostServices);
   const { engine, selections } = app.client.hostServices;
   window.__sel = selections; window.__engine = engine;
+  const appliedIn = {}; // group -> its applied selections, which the Excel pack passes to its queries
   for (const g of [...GROUPS, 'g-nash']) {
     let timer;
     selections.onActiveSelectionChange(g).subscribe((next) => {
+      appliedIn[g] = next.applied ?? [];
       clearTimeout(timer);
       if (next.pending.length > 0) timer = setTimeout(() => selections.applyPendingSelections(g), 250);
     });
@@ -94,10 +96,12 @@ const main = async () => {
   const mark = (id, render, error) => window.__astrato.mounted.set(id, { id, render, ...(error ? { error } : {}) });
 
   // Governed queries for the narratives, Nash, the planner, the workflow and the Excel pack.
-  const q = async ({ dims = [], measures = [], limit = 2000 }) => {
+  // `filters` are engine filters (see filtersOf below); without them a query covers every client.
+  const LIMIT = 2000;
+  const q = async ({ dims = [], measures = [], limit = LIMIT, filters = [] }) => {
     const dimensions = dims.map(([name, view]) => ({ fieldKey: fields.raw(name, view).fieldKey, name }));
     const calculations = measures.map((name) => ({ calculation: '{m1}', itemKey: fields.measure(name).fieldKey, label: name }));
-    const query = { dimensions, calculations, orders: [], limit, offset: 0, filters: [], totals: false, showRecordsCount: false, outerViews: [], associativeListFilter: null };
+    const query = { dimensions, calculations, orders: [], limit, offset: 0, filters, totals: false, showRecordsCount: false, outerViews: [], associativeListFilter: null };
     const { response } = await engine.getData({ ...dataBinding, query });
     const names = [...dimensions.map((d) => d.name), ...measures];
     return Object.values(response?.data ?? {}).map((row) => Object.fromEntries(names.map((n, i) => [n, row[i]])));
@@ -145,7 +149,9 @@ const main = async () => {
     body.append(pane);
     tabs.append(el('button', { 'data-page': key, text: label, onclick: () => show(key) }));
   }
+  let current = null;
   const show = (key) => {
+    current = key;
     for (const [k, p] of Object.entries(panes)) p.pane.hidden = k !== key;
     for (const b of tabs.children) b.classList.toggle('on', b.dataset.page === key);
   };
@@ -382,64 +388,100 @@ const main = async () => {
   }).catch((e) => { wiHost.querySelector('.kx-wi-out').textContent = `Baseline query failed: ${e?.message ?? e}`; });
 
   // ------------------------------------------------------------------ Excel pack
-  const buildSheets = async (client, commentary) => {
+  // Every sheet's rows come from engine queries that carry the scope's filters, read at export time.
+  // The tabs keep independent selection groups by design (nothing mirrors one into another), so the
+  // portfolio pack follows the filter bar of the tab on screen, or Agency portfolio's when the tab on
+  // screen has none. A client pack (Excel view, Client reports) is that client's report: its scope
+  // is the client alone, and the banner says so.
+  const fieldName = (key) => fields.all.find((f) => f.fieldKey === key || f.rawKey === key)?.name ?? key;
+  // Engine filter shape: a governed item goes by itemKey, a raw view column by field.fieldKey.
+  const engineFilter = (key, operator, values) => (fields.all.find((f) => f.fieldKey === key)?.kind ?? 'field') === 'field'
+    ? { field: { fieldKey: key }, operator, values } : { itemKey: key, operator, values };
+  const filtersOf = (group) => (appliedIn[group] ?? []).filter((x) => x.values?.length).map((x) => {
+    const key = x.field?.fieldKey ?? x.fieldKey;
+    return { filter: engineFilter(key, x.operator ?? 'inList', x.values), label: `${fieldName(key)} = ${x.values.join(', ')}` };
+  });
+  // A tab has a filter bar when its page lists filter controls; the Infographic's client picker is not one.
+  const hasFilterBar = (tab) => (PAGES.find(([k]) => k === tab)?.[3].length ?? 0) > 0;
+  const exportTab = () => (hasFilterBar(current) ? current : 'pf');
+  const scopeOf = (client, tab = exportTab()) => {
+    if (client) return { filters: [engineFilter(clientKey, 'inList', [client])], text: `Client = ${client} (client report; dashboard filters do not apply)` };
+    const fs = filtersOf(`g-${tab}`), label = PAGES.find(([k]) => k === tab)[1];
+    const fell = current && tab !== current && !hasFilterBar(current) ? ` (${PAGES.find(([k]) => k === current)?.[1] ?? current} has no filter bar)` : '';
+    return { filters: fs.map((f) => f.filter), text: (fs.length ? `Filters from ${label}: ${fs.map((f) => f.label).join('; ')}` : `No filters on ${label}`) + fell };
+  };
+  const buildSheets = async (client, commentary, tab) => {
+    const scope = scopeOf(client, tab);
+    const fq = (args) => q({ ...args, filters: scope.filters });
     const pick = (rows) => (client ? rows.filter((r) => r.Client === client) : rows);
     const KM = ['Spend', 'Impressions', 'Clicks', 'Conversions', 'Conversion Value', 'CTR', 'CPC', 'CVR', 'CPA', 'ROAS', 'Sessions', 'Key Events', 'Web Revenue', 'Engagement Rate', 'Organic Clicks', 'Organic Impressions', 'Average Position'];
     const kmeas = KM.flatMap((m) => [`${m} This Month`, `${m} Last Month`, `${m} Same Month LY`]);
+    // Facts are loaded fresh under the scope, not from the session's unfiltered facts().
     const [kpiRows, months, camps, kws, F] = await Promise.all([
-      client ? q({ dims: [['Client', CL]], measures: kmeas }) : q({ measures: kmeas, limit: 1 }),
-      q({ dims: [['Client', CL], ['Month', MV]], measures: ['Spend', 'Conversions', 'Conversion Value', 'Sessions', 'Key Events', 'Organic Clicks'] }),
-      q({ dims: [['Client', CL], ['Campaign', AD], ['Channel', CH]], measures: ['Spend This Month', 'Impressions This Month', 'Clicks This Month', 'CTR This Month', 'CPC This Month', 'Conversions This Month', 'CVR This Month', 'CPA This Month', 'Conversion Value This Month', 'ROAS This Month', 'ROAS MoM'] }),
-      q({ dims: [['Client', CL], ['Keyword Group', SV]], measures: ['Organic Clicks This Month', 'Organic Clicks MoM', 'Organic Impressions This Month', 'Organic CTR This Month', 'Average Position This Month', 'Average Position MoM', 'Top 3 Keywords This Month'] }),
-      facts(),
+      client ? fq({ dims: [['Client', CL]], measures: kmeas }) : fq({ measures: kmeas, limit: 1 }),
+      fq({ dims: [['Client', CL], ['Month', MV]], measures: ['Spend', 'Conversions', 'Conversion Value', 'Sessions', 'Key Events', 'Organic Clicks'] }),
+      fq({ dims: [['Client', CL], ['Campaign', AD], ['Channel', CH]], measures: ['Spend This Month', 'Impressions This Month', 'Clicks This Month', 'CTR This Month', 'CPC This Month', 'Conversions This Month', 'CVR This Month', 'CPA This Month', 'Conversion Value This Month', 'ROAS This Month', 'ROAS MoM'] }),
+      fq({ dims: [['Client', CL], ['Keyword Group', SV]], measures: ['Organic Clicks This Month', 'Organic Clicks MoM', 'Organic Impressions This Month', 'Organic CTR This Month', 'Average Position This Month', 'Average Position MoM', 'Top 3 Keywords This Month'] }),
+      loadFacts(fq),
     ]);
     const t = client ? kpiRows.find((r) => r.Client === client) : kpiRows[0];
     const N = (r, k) => Number(r?.[k] ?? 0);
     const when = new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
-    const who = client ?? 'All clients';
-    const banner = (title, cols) => [[{ v: 'tidewater', s: 'brand' }, { v: title, s: 'title' }, ...Array(Math.max(0, cols - 2)).fill({ v: '', s: 'title' })], [null, { v: `${who} · September 2026 · generated ${when} · mock data`, s: 'subtitle' }], []];
+    const who = client ?? (scope.filters.length ? 'Portfolio' : 'All clients');
+    const banner = (title, cols, scopeText = scope.text) => [[{ v: 'tidewater', s: 'brand' }, { v: title, s: 'title' }, ...Array(Math.max(0, cols - 2)).fill({ v: '', s: 'title' })], [null, { v: `${who} · September 2026 · ${scopeText} · generated ${when} · mock data`, s: 'subtitle' }], []];
+    // A query that fills its limit may have dropped rows: say so in the sheet instead of cutting silently.
+    const cut = (rows) => (rows.length >= LIMIT ? [[], [{ v: `Only the first ${LIMIT.toLocaleString('en-GB')} rows were returned: this sheet is incomplete.`, s: 'bold' }]] : []);
     const head = (labels) => labels.map((v, i) => ({ v, s: i ? 'head' : 'headl' }));
     const FMTK = { Spend: 'gbp', 'Conversion Value': 'gbp', 'Web Revenue': 'gbp', CPC: 'psf', CPA: 'psf', ROAS: 'x', CTR: 'pct2', CVR: 'pct2', 'Engagement Rate': 'pct', 'Average Position': 'dec' };
     const SRC = { Sessions: 'GA4', 'Key Events': 'GA4', 'Web Revenue': 'GA4', 'Engagement Rate': 'GA4', 'Organic Clicks': 'Search Console', 'Organic Impressions': 'Search Console', 'Average Position': 'Search Console' };
     const rate = (m) => ['CTR', 'CVR', 'Engagement Rate'].includes(m);
-    const chg = (m, a, b) => (m === 'Average Position' ? a - b : rate(m) ? a - b : a / b - 1);
+    // Position: change in places. Rates: change in percentage points (×100 for the "pp" format).
+    // Everything else: relative change, blank when the comparison month is zero.
+    const chg = (m, a, b) => (m === 'Average Position' ? a - b : rate(m) ? (a - b) * 100 : b ? a / b - 1 : null);
+    const chgCell = (m, a, b, s) => { const v = chg(m, a, b); return v == null ? { v: '—', s: 'text' } : { v, s }; };
     const e = client ? explain(F, client) : null;
     const summary = { name: 'Summary', cols: [4, 30, 16, 16, 16, 12, 12, 22], freeze: { row: 4, col: 0 }, merges: [],
       rows: [...banner('Monthly performance summary', 8), head(['', 'Measure', 'Sep 2026', 'Aug 2026', 'Sep 2025', 'MoM', 'YoY', 'Source']),
-        ...KM.map((m) => { const f = FMTK[m] ?? 'int'; const a = N(t, `${m} This Month`), b = N(t, `${m} Last Month`), c = N(t, `${m} Same Month LY`); const cf = m === 'Average Position' ? 'spos' : rate(m) ? 'spct' : 'spct';
-          return [null, { v: m, s: 'bold' }, { v: a, s: f }, { v: b, s: f }, { v: c, s: f }, { v: chg(m, a, b), s: cf }, { v: chg(m, a, c), s: cf }, { v: SRC[m] ?? 'Google Ads + Meta', s: 'text' }]; }),
-        [], [null, { v: client ? 'Commentary' : 'Note', s: 'bold' }], [null, { v: commentary ?? (client ? commentaryOf(F, client) : 'Portfolio view across all clients. Per-client packs are produced from the Client reports tab.'), s: 'text' }]] };
+        ...KM.map((m) => { const f = FMTK[m] ?? 'int'; const a = N(t, `${m} This Month`), b = N(t, `${m} Last Month`), c = N(t, `${m} Same Month LY`); const cf = m === 'Average Position' ? 'spos' : rate(m) ? 'spts' : 'spct';
+          return [null, { v: m, s: 'bold' }, { v: a, s: f }, { v: b, s: f }, { v: c, s: f }, chgCell(m, a, b, cf), chgCell(m, a, c, cf), { v: SRC[m] ?? 'Google Ads + Meta', s: 'text' }]; }),
+        [], [null, { v: client ? 'Commentary' : 'Note', s: 'bold' }], [null, { v: commentary ?? (client ? commentaryOf(F, client) : `Portfolio view · ${scope.text}. Per-client packs are produced from the Client reports tab.`), s: 'text' }]] };
     const clientsSheet = { name: 'Clients', cols: [26, 18, 14, 14, 10, 14, 10, 10, 12, 14, 10], freeze: { row: 4, col: 1 }, merges: [],
       rows: [...banner('Client scorecard', 11), head(['Client', 'Account manager', 'Spend', 'Conv. value', 'MoM', 'Conversions', 'ROAS', 'ROAS LM', 'CPA', 'Organic clicks', 'MoM']),
-        ...pick(F.byClient).sort((a, b) => N(b, 'Spend This Month') - N(a, 'Spend This Month')).map((r) => [{ v: r.Client, s: 'bold' }, { v: r['Account Manager'], s: 'text' }, { v: N(r, 'Spend This Month'), s: 'gbp' }, { v: N(r, 'Conversion Value This Month'), s: 'gbp' }, { v: N(r, 'Conversion Value MoM'), s: 'spct' }, { v: N(r, 'Conversions This Month'), s: 'int' }, { v: N(r, 'ROAS This Month'), s: 'x' }, { v: N(r, 'ROAS Last Month'), s: 'x' }, { v: N(r, 'CPA This Month'), s: 'psf' }, { v: N(r, 'Organic Clicks This Month'), s: 'int' }, { v: N(r, 'Organic Clicks MoM'), s: 'spct' }])] };
+        ...pick(F.byClient).sort((a, b) => N(b, 'Spend This Month') - N(a, 'Spend This Month')).map((r) => [{ v: r.Client, s: 'bold' }, { v: r['Account Manager'], s: 'text' }, { v: N(r, 'Spend This Month'), s: 'gbp' }, { v: N(r, 'Conversion Value This Month'), s: 'gbp' }, { v: N(r, 'Conversion Value MoM'), s: 'spct' }, { v: N(r, 'Conversions This Month'), s: 'int' }, { v: N(r, 'ROAS This Month'), s: 'x' }, { v: N(r, 'ROAS Last Month'), s: 'x' }, { v: N(r, 'CPA This Month'), s: 'psf' }, { v: N(r, 'Organic Clicks This Month'), s: 'int' }, { v: N(r, 'Organic Clicks MoM'), s: 'spct' }]), ...cut(F.byClient)] };
     const byMonth = new Map();
     for (const r of pick(months)) { const m = byMonth.get(r.Month) ?? { Month: r.Month, s: 0, c: 0, v: 0, se: 0, k: 0, o: 0 }; m.s += N(r, 'Spend'); m.c += N(r, 'Conversions'); m.v += N(r, 'Conversion Value'); m.se += N(r, 'Sessions'); m.k += N(r, 'Key Events'); m.o += N(r, 'Organic Clicks'); byMonth.set(r.Month, m); }
     const trend = { name: 'Monthly trend', cols: [12, 14, 12, 14, 10, 12, 12, 14], freeze: { row: 4, col: 1 }, merges: [],
       rows: [...banner('Monthly series', 8), head(['Month', 'Spend', 'Conversions', 'Conv. value', 'ROAS', 'Sessions', 'Key events', 'Organic clicks']),
-        ...[...byMonth.values()].sort((a, b) => a.Month.localeCompare(b.Month)).map((m) => [{ v: m.Month, s: 'bold' }, { v: m.s, s: 'gbp' }, { v: m.c, s: 'int' }, { v: m.v, s: 'gbp' }, { v: m.s ? m.v / m.s : 0, s: 'x' }, { v: m.se, s: 'int' }, { v: m.k, s: 'int' }, { v: m.o, s: 'int' }])] };
+        ...[...byMonth.values()].sort((a, b) => a.Month.localeCompare(b.Month)).map((m) => [{ v: m.Month, s: 'bold' }, { v: m.s, s: 'gbp' }, { v: m.c, s: 'int' }, { v: m.v, s: 'gbp' }, { v: m.s ? m.v / m.s : 0, s: 'x' }, { v: m.se, s: 'int' }, { v: m.k, s: 'int' }, { v: m.o, s: 'int' }]), ...cut(months)] };
     const campSheet = { name: 'Campaigns', cols: [24, 26, 18, 12, 14, 12, 9, 9, 10, 9, 10, 14, 9, 9], freeze: { row: 4, col: 2 }, merges: [],
       rows: [...banner('Campaigns · September', 14), head(['Client', 'Campaign', 'Channel', 'Spend', 'Impressions', 'Clicks', 'CTR', 'CPC', 'Conv.', 'CVR', 'CPA', 'Conv. value', 'ROAS', 'MoM']),
-        ...pick(camps).sort((a, b) => N(b, 'Spend This Month') - N(a, 'Spend This Month')).map((r) => [{ v: r.Client, s: 'text' }, { v: r.Campaign, s: 'bold' }, { v: r.Channel, s: 'text' }, { v: N(r, 'Spend This Month'), s: 'gbp' }, { v: N(r, 'Impressions This Month'), s: 'int' }, { v: N(r, 'Clicks This Month'), s: 'int' }, { v: N(r, 'CTR This Month'), s: 'pct2' }, { v: N(r, 'CPC This Month'), s: 'psf' }, { v: N(r, 'Conversions This Month'), s: 'int' }, { v: N(r, 'CVR This Month'), s: 'pct2' }, { v: N(r, 'CPA This Month'), s: 'psf' }, { v: N(r, 'Conversion Value This Month'), s: 'gbp' }, { v: N(r, 'ROAS This Month'), s: 'x' }, { v: N(r, 'ROAS MoM'), s: 'spct' }])] };
+        ...pick(camps).sort((a, b) => N(b, 'Spend This Month') - N(a, 'Spend This Month')).map((r) => [{ v: r.Client, s: 'text' }, { v: r.Campaign, s: 'bold' }, { v: r.Channel, s: 'text' }, { v: N(r, 'Spend This Month'), s: 'gbp' }, { v: N(r, 'Impressions This Month'), s: 'int' }, { v: N(r, 'Clicks This Month'), s: 'int' }, { v: N(r, 'CTR This Month'), s: 'pct2' }, { v: N(r, 'CPC This Month'), s: 'psf' }, { v: N(r, 'Conversions This Month'), s: 'int' }, { v: N(r, 'CVR This Month'), s: 'pct2' }, { v: N(r, 'CPA This Month'), s: 'psf' }, { v: N(r, 'Conversion Value This Month'), s: 'gbp' }, { v: N(r, 'ROAS This Month'), s: 'x' }, { v: N(r, 'ROAS MoM'), s: 'spct' }]), ...cut(camps)] };
     const seoSheet = { name: 'SEO', cols: [24, 18, 12, 10, 14, 10, 10, 10, 10], freeze: { row: 4, col: 2 }, merges: [],
       rows: [...banner('Search Console · keyword groups', 9), head(['Client', 'Keyword group', 'Clicks', 'MoM', 'Impressions', 'CTR', 'Position', 'Change', 'Top-3 kw']),
-        ...pick(kws).map((r) => [{ v: r.Client, s: 'text' }, { v: r['Keyword Group'], s: 'bold' }, { v: N(r, 'Organic Clicks This Month'), s: 'int' }, { v: N(r, 'Organic Clicks MoM'), s: 'spct' }, { v: N(r, 'Organic Impressions This Month'), s: 'int' }, { v: N(r, 'Organic CTR This Month'), s: 'pct2' }, { v: N(r, 'Average Position This Month'), s: 'dec' }, { v: N(r, 'Average Position MoM'), s: 'spos' }, { v: N(r, 'Top 3 Keywords This Month'), s: 'int' }])] };
+        ...pick(kws).map((r) => [{ v: r.Client, s: 'text' }, { v: r['Keyword Group'], s: 'bold' }, { v: N(r, 'Organic Clicks This Month'), s: 'int' }, { v: N(r, 'Organic Clicks MoM'), s: 'spct' }, { v: N(r, 'Organic Impressions This Month'), s: 'int' }, { v: N(r, 'Organic CTR This Month'), s: 'pct2' }, { v: N(r, 'Average Position This Month'), s: 'dec' }, { v: N(r, 'Average Position MoM'), s: 'spos' }, { v: N(r, 'Top 3 Keywords This Month'), s: 'int' }]), ...cut(kws)] };
     const drv = { name: 'Why it changed', cols: [24, 20, 10, 10, 12, 14, 12, 14, 10, 10], freeze: { row: 4, col: 2 }, merges: [],
       rows: [...banner('Conversion bridge · Aug → Sep (adds up exactly)', 10), head(['Client', 'Channel', 'Aug', 'Sep', 'Change', 'Reach effect', 'CTR effect', 'CVR effect', 'CTR Aug', 'CTR Sep']),
-        ...pick(F.byChan).map((r) => [{ v: r.Client, s: 'text' }, { v: r.Channel, s: 'bold' }, { v: N(r, 'Conversions Last Month'), s: 'int' }, { v: N(r, 'Conversions This Month'), s: 'int' }, { v: N(r, 'Conversions Change MoM'), s: 'sint' }, { v: N(r, 'Conversions Impressions Effect MoM'), s: 'sint' }, { v: N(r, 'Conversions CTR Effect MoM'), s: 'sint' }, { v: N(r, 'Conversions CVR Effect MoM'), s: 'sint' }, { v: N(r, 'CTR Last Month'), s: 'pct2' }, { v: N(r, 'CTR This Month'), s: 'pct2' }]),
+        ...pick(F.byChan).map((r) => [{ v: r.Client, s: 'text' }, { v: r.Channel, s: 'bold' }, { v: N(r, 'Conversions Last Month'), s: 'int' }, { v: N(r, 'Conversions This Month'), s: 'int' }, { v: N(r, 'Conversions Change MoM'), s: 'sint' }, { v: N(r, 'Conversions Impressions Effect MoM'), s: 'sint' }, { v: N(r, 'Conversions CTR Effect MoM'), s: 'sint' }, { v: N(r, 'Conversions CVR Effect MoM'), s: 'sint' }, { v: N(r, 'CTR Last Month'), s: 'pct2' }, { v: N(r, 'CTR This Month'), s: 'pct2' }]), ...cut(F.byChan),
         ...(e ? [[], [{ v: 'Explanation', s: 'bold' }], [{ v: e.headline, s: 'text' }], ...e.bullets.map((b) => [{ v: `• ${b}`, s: 'text' }]), [], [{ v: 'Next steps', s: 'bold' }], ...e.actions.map((a) => [{ v: `• ${a}`, s: 'text' }])] : [])] };
-    const pr = plan.base?.filter((r) => r.client === (client ?? plan.client));
+    // The Budget planner plans one client, so only a client pack carries it: that client's September
+    // actuals with the levers as set on the Budget planner tab.
+    const pr = client ? plan.base?.filter((r) => r.client === client) : null;
     const ps = pr ? project(pr, plan.levers) : [], pb = pr ? project(pr, ZERO) : [];
     const wiSheet = { name: 'Budget plan', cols: [30, 16, 16, 16, 16], merges: [],
-      rows: [...banner(`Q4 budget scenario · ${client ?? plan.client}`, 5), head(['Lever', 'Setting', '', '', '']), ...LEVERS.map(([k, label, , , , unit]) => [{ v: label, s: 'bold' }, { v: `${plan.levers[k] > 0 ? '+' : ''}${plan.levers[k]}${unit}`, s: 'text' }]), [],
+      rows: [...banner(`Q4 budget scenario · ${client}`, 5, `${scope.text} · levers as set on the Budget planner tab`), head(['Lever', 'Setting', '', '', '']), ...LEVERS.map(([k, label, , , , unit]) => [{ v: label, s: 'bold' }, { v: `${plan.levers[k] > 0 ? '+' : ''}${plan.levers[k]}${unit}`, s: 'text' }]), [],
         head(['Channel', 'Spend', 'Conversions', 'Conv. value', 'vs run-rate']), ...ps.map((r, i) => [{ v: r.ch, s: 'bold' }, { v: r.spend, s: 'gbp' }, { v: r.conv, s: 'int' }, { v: r.value, s: 'gbp' }, { v: r.value - pb[i].value, s: 'sgbp' }])] };
+    // Status and audit entries for the clients in scope only, so a client pack carries no other client's trail.
     const W = workflowState();
+    const inScope = new Set(pick(F.byClient).map((r) => r.Client));
+    const named = (what) => !scope.filters.length || [...inScope].some((c) => what.includes(c));
     const wfSheet = { name: 'Sign-off', cols: [20, 40, 60], merges: [],
       rows: [...banner('Report status & audit trail', 3), head(['Client', 'Status', 'Approved by']),
-        ...Object.entries(W.reports).filter(([c]) => !client || c === client).map(([c, r]) => [{ v: c, s: 'bold' }, { v: r.status, s: 'text' }, { v: r.approvedBy ?? '—', s: 'text' }]), [],
-        head(['When', 'Who', 'What']), ...W.audit.map((a) => [{ v: a.at, s: 'text' }, { v: a.who, s: 'text' }, { v: a.what, s: 'text' }])] };
-    return { sheets: [summary, ...(client ? [] : [clientsSheet]), drv, trend, campSheet, seoSheet, wiSheet, wfSheet], title: `Tidewater Media – ${who} – September 2026` };
+        ...Object.entries(W.reports).filter(([c]) => !scope.filters.length || inScope.has(c)).map(([c, r]) => [{ v: c, s: 'bold' }, { v: r.status, s: 'text' }, { v: r.approvedBy ?? '—', s: 'text' }]), [],
+        head(['When', 'Who', 'What']), ...W.audit.filter((a) => named(a.what)).map((a) => [{ v: a.at, s: 'text' }, { v: a.who, s: 'text' }, { v: a.what, s: 'text' }])] };
+    return { sheets: [summary, ...(client ? [] : [clientsSheet]), drv, trend, campSheet, seoSheet, ...(client ? [wiSheet] : []), wfSheet], title: `Tidewater Media – ${who} – September 2026` };
   };
-  const buildWorkbook = async (client, commentary) => workbookBlob({ ...(await buildSheets(client, commentary)), author: 'Tidewater Media (Astrato)' });
+  /** The pack as a Blob; the buttons below download it, and the smoke test's export probe reads it. */
+  const buildWorkbook = async (client, commentary, tab) => workbookBlob({ ...(await buildSheets(client, commentary, tab)), author: 'Tidewater Media (Astrato)' });
   mountSheetView(panes.xl.grid, { clients: () => facts().then((F) => F.clients), build: buildSheets, download: async (c) => download(await buildWorkbook(c), c) });
   const download = (blob, name) => {
     const url = URL.createObjectURL(blob);
@@ -545,6 +587,20 @@ const main = async () => {
     for (let i = 0; i < 120 && !window.__lastExport; i++) await sleep(500);
     show('pf');
     return { pass: window.__lastExport > 0, detail: `${window.__lastExport} bytes` };
+  });
+  // Export probe: a Sector selection made in Agency portfolio's group, the way the filter bar and the
+  // checks above make it, must narrow every sheet of the pack built from that tab (Sign-off is a
+  // status list and may not change).
+  let probeSel = null;
+  appState.exportProbe({
+    build: () => buildWorkbook(null, undefined, 'pf'),
+    select: async () => {
+      probeSel = selectionOf(fields.raw('Sector', CL).fieldKey, [firstOf(await valuesOf('Sector', CL))]);
+      selections.selectValues('g-pf', probeSel, { state: 'pending' });
+      await appState.quiet({ quietMs: 1200 });
+    },
+    clear: () => { if (probeSel) selections.removeSelection('g-pf', probeSel); probeSel = null; },
+    exempt: ['Sign-off'],
   });
 };
 

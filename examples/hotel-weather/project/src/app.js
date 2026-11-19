@@ -331,8 +331,7 @@ const main = async () => {
   }
 
   /* ---------- figures for the headline, KPI colours, levers, checks and Excel */
-  const duckFigures = async () => {
-    const w = engineDuck.where();
+  const duckFigures = async (w = engineDuck.where()) => {
     const m = duck.MEASURES;
     const [[a] = [], [b] = []] = await Promise.all([
       engineDuck.run(`SELECT ${m['Average high'][0]} AS hi, ${m['Average high vs last autumn'][0]} AS hi_vs, ${m['Wet city-days'][0]} AS wet, ${m['Wet city-days vs last autumn'][0]} AS wet_vs, ${m['Wet share'][0]} AS wet_share FROM weather ${w}`, 'Figures · weather'),
@@ -340,8 +339,9 @@ const main = async () => {
     ]);
     return { hi: a?.hi, hiVsLy: a?.hi_vs, wet: a?.wet, wetVsLy: a?.wet_vs, wetShare: a?.wet_share, gap: b?.gap, gapVsLy: b?.gap_vs, gapLy: b?.gap_ly };
   };
-  const readFigures = async () => {
-    const [[g = {}], d] = await Promise.all([gov({ measures: ['Occupancy L3M', 'Occupancy L3M vs LY', 'Room Revenue L3M', 'Room Revenue L3M YoY'], limit: 1 }), duckFigures()]);
+  /** Governed figures under `filters` (City, Stay Date), API and blended ones under `where`. */
+  const readFigures = async ({ filters = govFilters(), where = engineDuck.where() } = {}) => {
+    const [[g = {}], d] = await Promise.all([gov({ measures: ['Occupancy L3M', 'Occupancy L3M vs LY', 'Room Revenue L3M', 'Room Revenue L3M YoY'], filters, limit: 1 }), duckFigures(where)]);
     return { occ: g['Occupancy L3M'], occVsLy: g['Occupancy L3M vs LY'], rev: g['Room Revenue L3M'], revYoY: g['Room Revenue L3M YoY'], ...d };
   };
 
@@ -357,14 +357,20 @@ const main = async () => {
     await applyRuntimeOperations({ runtime: govRuntime, instanceId: t.id, availableFields: govFields, operationRequests: lyColumnOps(t, refsOf.get(t.id), hidden) })
       .catch((e) => console.warn('[table ly]', e?.message));
   };
-  const rainSentence = (f) => {
+  const rainSentence = (f, cmpOn = comparing) => {
     if (f.gap == null) return 'Too few wet or dry nights here to compare.';
     const side = (v) => `${num(Math.abs(v), 1)} pts ${v >= 0 ? 'above' : 'below'}`;
-    const ly = comparing && f.gapLy != null ? ` (last autumn ${side(f.gapLy)})` : '';
+    const ly = cmpOn && f.gapLy != null ? ` (last autumn ${side(f.gapLy)})` : '';
     if (Math.abs(f.gap) < 2) return `Rain barely moved demand: wet nights ran ${side(f.gap)} dry nights${ly}.`;
     return f.gap < 0
       ? `Rain cost demand here: wet nights ran ${side(f.gap)} dry nights${ly}, the case for a wet-night offer.`
       : `Rain helped demand here: wet nights ran ${side(f.gap)} dry nights${ly}.`;
+  };
+  /** The headline sentence for figures `f`, with or without the comparison with last autumn. */
+  const findingOf = (f, cmpOn, selected) => {
+    const scope = selected ? 'For this selection, the' : 'This autumn the';
+    return f.occ == null ? 'No hotel nights match this selection.'
+      : `${scope} hotels were ${num(f.occ * 100, 1)}% full${cmpOn ? ` (${signed(f.occVsLy, 1, ' pts')} on last autumn)` : ''}. ${rainSentence(f, cmpOn)}${cmpOn ? '' : ' Comparisons with last autumn are off for a date selection.'}`;
   };
   const refresh = async () => {
     // A date selection has no like-for-like nights last autumn: take the comparison off every KPI,
@@ -391,9 +397,7 @@ const main = async () => {
       }
     }
     const f = figures;
-    const scope = applied().length ? 'For this selection, the' : 'This autumn the';
-    finding = f.occ == null ? 'No hotel nights match this selection.'
-      : `${scope} hotels were ${num(f.occ * 100, 1)}% full${comparing ? ` (${signed(f.occVsLy, 1, ' pts')} on last autumn)` : ''}. ${rainSentence(f)}${comparing ? '' : ' Comparisons with last autumn are off for a date selection.'}`;
+    finding = findingOf(f, comparing, applied().length > 0);
     $('hero').innerHTML = esc(finding).replace(/(\d[\d.,]*%|\d[\d.,]* pts)/g, '<b>$1</b>');
     $('hero').dataset.gap = String(f.gap ?? '');
     // The wet-night share the what-if starts from: what the weather shows for this selection.
@@ -439,13 +443,15 @@ const main = async () => {
   $('wet-reset').addEventListener('click', () => { wetFollows = true; if (wetObserved != null) setLever('wet_share', Math.round(wetObserved * 100) / 100, { follow: true }); renderLeverNotes(); });
 
   // The governed figures behind the verdict line and an offer flag: what the native objects show.
+  // A read that fails returns null (not []), so `failed` tells a failed read from an empty answer.
   const planRows = async (id) => {
-    const res = await handles.get(id)?.getData({ limit: 100 }).catch(() => null);
-    return Object.values(res?.data?.response?.data ?? res?.data?.data ?? {});
+    const res = await handles.get(id)?.getData({ limit: 100 }).catch((e) => { console.warn('[plan]', id, e?.message); return null; });
+    return res ? Object.values(res?.data?.response?.data ?? res?.data?.data ?? {}) : null;
   };
   const planFigures = async () => {
-    const [[base] = [], [rev] = [], [occb] = [], [occ] = [], cities] = await Promise.all(['p-base', 'p-rev', 'p-occb', 'p-occ', 'p-city'].map(planRows));
-    return { base: base?.[0], scenario: rev?.[0], change: rev?.[1], occ: occb?.[0], occScenario: occ?.[0], cities: cities.map((x) => ({ city: x[0], gain: x[1] })) };
+    const all = await Promise.all(['p-base', 'p-rev', 'p-occb', 'p-occ', 'p-city'].map(planRows));
+    const [[base] = [], [rev] = [], [occb] = [], [occ] = [], cities] = all.map((x) => x ?? []);
+    return { base: base?.[0], scenario: rev?.[0], change: rev?.[1], occ: occb?.[0], occScenario: occ?.[0], cities: cities.map((x) => ({ city: x[0], gain: x[1] })), failed: all.includes(null) };
   };
   let verdictTimer;
   const scheduleVerdict = () => { clearTimeout(verdictTimer); verdictTimer = setTimeout(renderVerdict, 1200); };
@@ -480,14 +486,16 @@ const main = async () => {
     if (on) { syncPlanFromMain(); if (planDirty) applyParams(); else scheduleVerdict(); }
   };
 
-  /** The offer figures for an export: brought up to date first when the tab is off screen. */
+  /** The offer figures for an export, on screen or not: the plan group is synced from main and
+   *  the levers on screen are applied now (not after the 250 ms slider debounce), then the export
+   *  waits for the re-queries to go quiet before it reads the objects. */
   const freshPlan = async () => {
-    if (!planVisible) {
-      syncPlanFromMain();
-      planVisible = true;
-      try { await applyParams(); } finally { planVisible = false; }
-      await appState.quiet({ quietMs: 600, paintMs: 400 });
-    }
+    const wasVisible = planVisible;
+    syncPlanFromMain();
+    clearTimeout(paramTimer);
+    planVisible = true;
+    try { await applyParams(); } finally { planVisible = wasVisible; }
+    await appState.quiet({ quietMs: 600, paintMs: 0 });
     return planFigures();
   };
 
@@ -554,14 +562,32 @@ const main = async () => {
   $('reset').addEventListener('click', () => { offers.reset(actor()); say({ ok: true, message: 'Demo flags and trail cleared.' }); });
 
   /* ---------- Excel */
-  const selectionText = () => (applied().length ? applied().map((x) => `${CHIP_NAME[keyOf(x)] ?? nameOf(keyOf(x))} = ${keyOf(x) === DATE ? dateLabel(x.values) : x.values.join(', ')}`).join('; ') : 'none (all cities, all nights)');
+  const describe = (list, none) => (list.length ? list.map((x) => `${CHIP_NAME[keyOf(x)] ?? nameOf(keyOf(x))} = ${keyOf(x) === DATE ? dateLabel(x.values) : x.values.join(', ')}`).join('; ') : none);
+  /** The workbook under the selections applied now. The selections are read once, up front, and
+   *  every sheet is queried under that one reading: governed sheets with its City/Stay Date filters,
+   *  DuckDB sheets with its WHERE (bands included), the What-if from the offer objects after their
+   *  group is synced from main. Nothing is taken from the screen's last refresh. */
+  const buildReport = async () => {
+    await refreshing;
+    const all = applied();
+    const filters = govFilters();
+    const where = engineDuck.where();
+    const cmpOn = !dateSelected();
+    const bands = all.filter((x) => !GOVERNED_KEYS.has(keyOf(x)));
+    const govText = describe(all.filter((x) => GOVERNED_KEYS.has(keyOf(x))), 'none (all cities, all nights)');
+    const [figs, plan] = await Promise.all([readFigures({ filters, where }), freshPlan()]);
+    return buildWorkbook({
+      gov: (q) => gov({ ...q, filters }), duckRun: (sql, label) => engineDuck.run(sql, label), where: () => where,
+      figures: figs, finding: findingOf(figs, cmpOn, all.length > 0), comparing: cmpOn,
+      selectionText: describe(all, 'none (all cities, all nights)'), govSelectionText: govText, bandsSelected: bands.length > 0,
+      plan: { ...plan, levers: { ...levers }, wetObserved, planCurrent: !plan.failed }, offers: offers.state,
+    });
+  };
   $('export').disabled = false;
   $('export').addEventListener('click', async () => {
     $('export').disabled = true;
     try {
-      await refreshing;
-      const plan = await freshPlan();
-      const { blob, filename } = await buildWorkbook({ gov, duckRun: (sql, label) => engineDuck.run(sql, label), where: engineDuck.where, figures, finding, comparing, selectionText: selectionText(), plan: { ...plan, levers: { ...levers }, wetObserved, planCurrent: true }, offers: offers.state });
+      const { blob, filename } = await buildReport();
       const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: filename });
       document.body.append(a); a.click(); a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 5000);
@@ -793,6 +819,16 @@ const main = async () => {
     clearAll(); await settle();
     const pass = sheets.length >= 8 && sheets.includes('What-if') && sheets.includes('Offers') && /City = Boston/.test(text) && rev != null && text.includes(String(Math.round(rev * 100) / 100).slice(0, 7));
     return { pass, detail: `${(captured?.size ?? 0).toLocaleString('en-US')} bytes; sheets ${sheets.join(', ')}; Boston revenue ${rev} found in the workbook: ${rev != null && text.includes(String(Math.round(rev * 100) / 100).slice(0, 7))}` };
+  });
+
+  // The smoke test builds the workbook with and without City = Boston (a row click, as the checks
+  // above make it) from the landing tab, and fails any sheet that does not change. Offers is the
+  // browser-only flag store, unfiltered by design; Notes is definitions.
+  appState.exportProbe({
+    build: async () => (await buildReport()).blob,
+    select: async () => { await clickRow('Boston'); await settle(); },
+    clear: async () => { clearAll(); await settle(); },
+    exempt: ['Offers', 'Notes'],
   });
 
   window.__hw = { app, selections, figures: () => figures, handles, duckQuery, levers, offers };

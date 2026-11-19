@@ -47,34 +47,34 @@ start_here:
   - project/src/prepare.js — the one pre-mount path (theme, governed parameters, relabel, widths) shared with tools/compile-adapter.mjs
   - project/src/workflow.js — the focus plan: propose, approve or return, four-eyes rule, audit trail (browser-only)
 capabilities:
-  - what-if — project/src/app.js:305
-  - narrative-headline — project/src/app.js:147
+  - what-if — project/src/app.js:304
+  - narrative-headline — project/src/app.js:146
   - simulated-workflow — project/src/workflow.js:32
-  - excel-export — project/src/export.js:22
+  - excel-export — project/src/export.js:40
 stealable:
-  - "A selection group per tab, mirrored from main by difference and only while the tab is visible, so a click re-queries only what is on screen; a self-check holds queries per selection to the visible objects — project/src/app.js:253"
-  - "Chart clicks arrive as pending selections in the tab's group and are handed to main after 200 ms, so every tab and the chips follow — project/src/app.js:284"
-  - "What-if through the layer: the slider sets the governed `score` parameter of Projected Rank at Score on the mounted object, with no remount — project/src/app.js:314"
-  - "The same slider writes a governed `between` selection on Total Score (2027) into an `overtake` group, so the overtaken count and table are governed rows — project/src/app.js:247"
+  - "A selection group per tab, mirrored from main by difference and only while the tab is visible, so a click re-queries only what is on screen; a self-check holds queries per selection to the visible objects — project/src/app.js:252"
+  - "Chart clicks arrive as pending selections in the tab's group and are handed to main after 200 ms, so every tab and the chips follow — project/src/app.js:283"
+  - "What-if through the layer: the slider sets the governed `score` parameter of Projected Rank at Score on the mounted object, with no remount — project/src/app.js:309"
+  - "The same slider writes a governed `between` selection on Total Score (2027) into an `overtake` group, so the overtaken count and table are governed rows — project/src/app.js:246"
   - "One pre-mount path for every tile (theme, governed parameters such as our score as `benchmark`, relabel by position), shared with the offline compile adapter so the check runs what the browser runs — project/src/prepare.js:63"
   - "A stored question's rank-within-set and 2-edition moving average carried onto the tile as advanced-calculation operations — project/src/catalogue.js:84"
-  - "Table column widths from header length at the font size, a wrapping name column sized for the longest name, row height from its line count; re-applied on resize without a remount (src/app.js:322) — project/src/prepare.js:18"
+  - "Table column widths from header length at the font size, a wrapping name column sized for the longest name, row height from its line count; re-applied on resize without a remount (src/app.js:323) — project/src/prepare.js:18"
   - "Bar charts narrower than 220 px drop their data labels rather than ellipsise them — project/src/prepare.js:89"
   - "Rank-history sparkline column on the league table, from the joined history view's Edition Date — project/src/catalogue.js:167"
-  - "Seven-sheet Excel report from each mounted object's own data (handle.getData), following the filters — project/src/export.js:22"
+  - "Seven-sheet Excel report from each mounted object's own data (handle.getData), following the filters on every tab sheet (every tab group synced from main first) — project/src/export.js:40"
 caveats:
   - No screenshots in this repo, and no data: bring your own tables shaped like the layer's schema/ddl.sql.
   - "Built by an agent from this repo in a clean environment as a test run, then brought up to standard: read it as what the playbook produces, not as a hand-polished demo."
   - "Third-party published data (licence unconfirmed, see DATA-SOURCES.md): 130 UK universities, 2027 edition, with the two prior overall ranks and a rank-history view (2025–2027). University names are public. The total score's component weights are not in the data, so the app shows gaps per component, not a modelled points bridge."
   - "The focus plan is not written back. Plan, decisions and audit trail live in localStorage (key climb-planner-plan-v1, src/workflow.js:22), and the screen says so."
-  - "The two what-if KPIs (projected rank, universities overtaken) are bare numbers, with no comparison or mini chart (src/app.js:190, src/app.js:191). Projected rank does not break ties."
+  - "The two what-if KPIs (projected rank, universities overtaken) are bare numbers, with no comparison or mini chart (src/app.js:189, src/app.js:190). Projected rank does not break ties."
   - "The rank-on-measure table has no sparkline column; only the league table on Where we stand carries one."
-  - "The hero's \"N points of total score separate us from the top 50\" is a subtraction in the app of two governed values (src/app.js:150), not a stored measure."
+  - "The hero's \"N points of total score separate us from the top 50\" is a subtraction in the app of two governed values (src/app.js:149), not a stored measure."
   - "Some bars draw no data label (in the test run, one of the largest movers on Who moved most, and most gap bars on What costs us places)."
   - "Indicator columns (Moved, the within-set ranks) draw the same small up caret before every value, falls included; only the colour carries direction."
   - "Wrapped university names make table rows taller at 1280 and 1024, so fewer rows show without scrolling."
   - "Clicks on the KPI mini charts and on the moving-average line are untested."
-  - "Changing our university reloads the page with ?uni= (src/app.js:132)."
+  - "Changing our university reloads the page with ?uni= (src/app.js:131)."
   - "Inert leftovers: questions.js carries two questions no object uses (climbersBand, fallersBand); throttle.js exports a prefetch helper nothing calls, and its header comment still mentions a timetable."
   - "Checked in staging: smoke test PASS at 1440, 1280 and 1024, 29 objects, landing-ready in 5.8 s (24 s before compile and theming ran in parallel), 10 app checks (a Nation filter on each of the first three tabs with queries per selection held to the visible objects, a chart click that the next tab follows, the what-if, the focus table, the workflow, an empty selection, the Excel report, no overflow); compile-check 29/29; build passes. Not published, so no live smoke."
   - Runs on @astrato-io/visualizations 0.9.0 and app-runtime 0.8.0 with Vite.

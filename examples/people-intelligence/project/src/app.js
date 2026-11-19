@@ -215,14 +215,21 @@ const main = async () => {
   const scopeOf = (scopeKind = 'all') => (scopeKind === 'none' ? [] : persona.scope.filter(([f]) => scopeKind !== 'bu' || f === 'Business Unit'));
   const rawKey = (name, view) => fields.raw(name, view)?.fieldKey;
 
-  /** A governed engine query. filters: [[field, view, values]]; persona scope added unless scope === 'none'. */
-  const q = async ({ dims = [], measures = [], limit = 500, filters = [], scope = 'all' }) => {
+  /** A governed engine query. filters: [[field, view, values]]; persona scope added unless scope === 'none'.
+   *  selections: applied selections of a group (as appliedOf returns them), passed to the engine as they are:
+   *  a governed item's key as itemKey, a view column's key as field.fieldKey. */
+  const q = async ({ dims = [], measures = [], limit = 500, filters = [], selections: sels = [], scope = 'all' }) => {
     const dimensions = dims.map(([name, view]) => ({ fieldKey: rawKey(name, view), name }));
     const missingD = dimensions.find((d) => !d.fieldKey);
     if (missingD) throw new Error(`dimension ${missingD.name} not in layer`);
     const calculations = measures.map((name) => { const f = fields.measure(name); if (!f) throw new Error(`measure "${name}" not in layer`); return { calculation: '{m1}', itemKey: f.fieldKey, label: name }; });
     const all = [...scopeOf(scope), ...filters];
-    const query = { dimensions, calculations, orders: [], limit, offset: 0, filters: all.map(([f, v, values]) => ({ field: { fieldKey: rawKey(f, v) }, operator: 'inList', values: values.map(String) })), totals: false, showRecordsCount: false, outerViews: [], associativeListFilter: null };
+    const selFilter = (x) => {
+      const fk = x.field?.fieldKey ?? x.fieldKey;
+      const kind = fields.all.find((f) => f.fieldKey === fk)?.kind;
+      return { ...(kind && kind !== 'field' ? { itemKey: fk } : { field: { fieldKey: fk } }), operator: x.operator ?? 'inList', values: x.values };
+    };
+    const query = { dimensions, calculations, orders: [], limit, offset: 0, filters: [...all.map(([f, v, values]) => ({ field: { fieldKey: rawKey(f, v) }, operator: 'inList', values: values.map(String) })), ...sels.map(selFilter)], totals: false, showRecordsCount: false, outerViews: [], associativeListFilter: null };
     const { response } = await engine.getData({ ...dataBinding, query });
     const names = [...dimensions.map((d) => d.name), ...measures];
     return Object.values(response?.data ?? {}).map((row) => Object.fromEntries(names.map((n, i) => [n, row[i]])));

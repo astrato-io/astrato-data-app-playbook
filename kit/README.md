@@ -11,6 +11,7 @@ meant to be copied unchanged. Each was verified on the versions noted in its hea
 | [verify/compile-check.mjs](verify/compile-check.mjs) | The offline check: compiles every tile and applies its operations against the installed library, with no session or browser |
 | [verify/ops.mjs](verify/ops.mjs) | Operation lookup: lists every operation for a chart type, or prints the ones you name |
 | [verify/smoke.mjs](verify/smoke.mjs) | The smoke test: opens the app in Chrome and fails on anything a viewer would see |
+| [verify/xlsx-diff.mjs](verify/xlsx-diff.mjs) | Compares two Excel exports sheet by sheet: which sheets did not change under a filter |
 | [verify/release.mjs](verify/release.mjs) | The release gate: build → smoke locally → publish → smoke the live copy |
 | [verify/fixture/](verify/fixture/index.html) | A stand-in page for trying the smoke test; `?fail=1` breaks it in every way the test checks |
 
@@ -209,8 +210,13 @@ frames, `appState.quiet`, two more frames) and re-measures a horizontal overflow
 so a chart canvas still at the previous width is not reported as scroll; an overflow that persists
 fails. It writes one screenshot per tab per width and a `report.json`. Files the app downloads during
 its checks (an Excel report, say) land in `downloads/` and are listed in the report; a download
-that starts but does not complete fails the run. To test an export, register a check that clicks
-the export button, then open the file. If the app calls `appState.fields(availableFields)`, the
+that starts but does not complete fails the run. To test that the Excel export follows the
+filters, register `appState.exportProbe({ build, select, clear, exempt })` (see
+[app-state.js](verify/app-state.js)). The smoke test then builds the workbook without and with
+your filter, from the landing tab so the other tabs are hidden, and fails every sheet whose figures
+did not change. That catches hidden tabs exporting unfiltered rows
+([pattern](../patterns/xlsx-export.md#sync-every-group-before-reading)). Both workbooks are saved as
+`downloads/probe-*.xlsx`; `node kit/verify/xlsx-diff.mjs a.xlsx b.xlsx` runs the same comparison by hand. If the app calls `appState.fields(availableFields)`, the
 real field catalogue is saved as `available-fields.json` for the compile check. **Look at the
 screenshots**: the test cannot read a canvas, so clipped labels, epoch-number date axes and
 lost number formats (a percentage showing as `0` or `1`) are yours to catch. Screenshots stop at
@@ -263,7 +269,7 @@ live URL in a gitignored `publication.local.json`, never in a public repository.
 ```sh
 npx serve kit/verify            # or any static server
 node kit/verify/smoke.mjs http://localhost:3000/fixture/index.html          # PASS
-node kit/verify/smoke.mjs "http://localhost:3000/fixture/index.html?fail=1" # FAIL, six reasons
+node kit/verify/smoke.mjs "http://localhost:3000/fixture/index.html?fail=1" # FAIL, seven reasons (incl. a sheet that ignores the filter)
 ```
 
 ## What is not in the kit

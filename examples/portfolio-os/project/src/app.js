@@ -29,7 +29,7 @@ import { mountValue } from './pages/value.js';
 import { mountIC } from './pages/ic.js';
 import { mountWorkflows } from './pages/workflows.js';
 import { mountNash } from './pages/nash.js';
-import { exportMenu } from './export.js';
+import { exportMenu, buildWorkbook, PORTFOLIO } from './export.js';
 
 const PAGES = [
   ['portfolio', 'Portfolio', 'space_dashboard', 'Investment command centre'],
@@ -260,7 +260,9 @@ const main = async () => {
     try { history.replaceState(null, '', `#${key}`); } catch { /* */ }
   };
   const onShow = (key, fn) => { (hooks[key] ??= []).push(fn); };
-  const ctx = { el, q, M, fields, tiles, card, kpi, filters, renderTile, dropTile, select, selectedValues, go, onShow, get period() { return period; }, toast, layerId: app.dataBinding.semanticLayerId, questions: QUESTIONS, refreshStore: loadStore, clearQueryCache };
+  const ctx = { el, q, M, fields, tiles, card, kpi, filters, renderTile, dropTile, select, selectedValues, go, onShow, get period() { return period; },
+    // What the export reads as the filters on screen: the page shown, the top-bar Fund, a group's applied selections.
+    get page() { return current; }, get fund() { return fundSel.value; }, applied: (g) => ((selections.getSelection(g) ?? {}).applied ?? []).filter((x) => x.values?.length), labelOf, toast, layerId: app.dataBinding.semanticLayerId, questions: QUESTIONS, refreshStore: loadStore, clearQueryCache };
   window.__ctx = ctx;
   const MOUNT = { portfolio: mountPortfolio, company: mountCompany, monitoring: mountMonitoring, analysis: mountAnalysis, valuations: mountValuations, scenario: mountScenario, value: mountValue, ic: mountIC, workflows: mountWorkflows, nash: mountNash };
   for (const [key, label, ic, sub] of PAGES) {
@@ -425,6 +427,18 @@ const main = async () => {
     await quiet();
     const after = kpiText();
     return { pass: before !== '' && during !== '' && during !== before && after === before, detail: `"${before}" -> "${during}" -> "${after}"; ${sent.length} queries for the selection, ${sent.filter((entry) => entry.key.includes(JSON.stringify(fund))).length} carried the fund` };
+  });
+  // The export probe: the smoke test builds the portfolio documents without and with one fund picked
+  // in the top-bar Fund selector (the same path as the check above) and fails any sheet that did not
+  // narrow. The fund is one that leaves out at least one investment, IC package and initiative.
+  const fundOf = (n) => M.companies.find((c) => c.Company === n)?.Fund;
+  const probeFund = () => M.funds.map((f) => f.Fund).find((f) => [M.companies.map((c) => c.Company), records('IC Package').map((r) => r.company), M.inits.map((i) => i.Company)].every((names) => names.some((n) => fundOf(n) !== f))) ?? M.funds[0]?.Fund;
+  appState.exportProbe({
+    build: () => buildWorkbook(ctx, PORTFOLIO).blob,
+    select: async () => { fundSel.value = probeFund() ?? ''; applyFund(); },
+    clear: async () => { fundSel.value = ''; applyFund(); },
+    // An IC sheet with no packages in the store has nothing to narrow.
+    get exempt() { return records('IC Package').length ? [] : ['IC packages']; },
   });
   window.__boot = 'ready';
   if (localTableWrites().length) toast(`${localTableWrites().length} analytical changes are held in simulated persistence (this browser)`, 'cloud_off');

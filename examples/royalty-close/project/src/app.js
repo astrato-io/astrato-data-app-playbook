@@ -91,6 +91,8 @@ const main = async () => {
     return Object.values(response?.data ?? {}).map((row) => Object.fromEntries(names.map((n, i) => [n, row[i]])));
   };
   window.__q = q;
+  /** A group's applied selections as q() filters. q() never reads selections itself, so callers pass these explicitly. */
+  const appliedOf = (g) => (selections.getSelection(g)?.applied ?? []).filter((x) => x.values?.length && x.field?.fieldKey).map((x) => ({ fieldKey: x.field.fieldKey, values: x.values }));
   // ------------------------------------------------------------------ copy a table to the clipboard (tab-separated, every row)
   // A native table only renders the rows on screen, so the copy re-runs the table's own governed query: same columns,
   // its static filters and the group's applied selections. Pastes straight into Excel or Google Sheets.
@@ -112,7 +114,7 @@ const main = async () => {
       const dimsT = (tile.dimensions ?? []).filter((d) => fields.raw(d.name, d.view));
       const seen = new Set();
       const measT = (tile.measures ?? []).filter((m) => m.ref !== tile.miniChart?.ref && !seen.has(m.name) && seen.add(m.name));
-      const sel = (selections.getSelection(tile.group)?.applied ?? []).filter((x) => x.values?.length && x.field?.fieldKey).map((x) => ({ fieldKey: x.field.fieldKey, values: x.values }));
+      const sel = appliedOf(tile.group);
       const rows = await q({ dims: dimsT.map((d) => [d.name, d.view]), measures: measT.map((m) => m.name), filters: [...(tile.filters ?? []).map((f) => [f.field, f.view, f.values]), ...sel], limit: 10000 });
       const sorts = [].concat(tile.sort ?? []).map((o) => ({ key: [...dimsT, ...measT].find((x) => x.ref === o.by)?.name, dir: o.direction === 'asc' ? 1 : -1 })).filter((o) => o.key);
       if (sorts.length) rows.sort((a, b) => { for (const { key, dir } of sorts) { const x = a[key], y = b[key]; if (x === y) continue; if (x == null) return 1; if (y == null) return -1; return (typeof x === 'number' && typeof y === 'number' ? x - y : String(x).localeCompare(String(y))) * dir; } return 0; });
@@ -478,7 +480,9 @@ const main = async () => {
   hosts['top-st'].append(demo);
 
   // ------------------------------------------------------------------ close simulator (what-if)
-  const base = await q({ dims: [['Branch', BR], ['Currency', BR]], measures: ['Statements Current Run', 'Unreconciled Statements Current Run', 'Exception Statements Current Run', 'Source Exposure USD Current Run', 'Suspense USD Current Run', 'Calc Error Impact USD Current Run', 'Open Cases', 'Overdue Cases'], limit: 50 });
+  // The baseline follows the overview group g-ov (header + overview filters), the group the simulator tab's selection bar shows.
+  const baseQuery = (filters) => q({ dims: [['Branch', BR], ['Currency', BR]], measures: ['Statements Current Run', 'Unreconciled Statements Current Run', 'Exception Statements Current Run', 'Source Exposure USD Current Run', 'Suspense USD Current Run', 'Calc Error Impact USD Current Run', 'Open Cases', 'Overdue Cases'], filters, limit: 50 });
+  let base = await baseQuery(appliedOf('g-ov'));
   const L = { analysts: 6, perDay: 3, days: 3, suspense: 40, rerun: 60, cf: 20 };
   const LEVERS = [['analysts', 'Analysts on close', 1, 15, 1, ''], ['perDay', 'Cases cleared per analyst per day', 1, 8, 1, ''], ['days', 'Working days to close deadline (14 Nov)', 1, 8, 1, ' d'], ['suspense', 'Suspense released after matching', 0, 100, 5, '%'], ['rerun', 'Calc errors fixed by a re-run', 0, 100, 5, '%'], ['cf', 'Residual approved as carry-forward', 0, 60, 5, '%']];
   const simHost = el('div'), outHost = el('div', { class: 'ls-out' }), barsHost = el('div');
@@ -488,10 +492,9 @@ const main = async () => {
     input.addEventListener('input', () => { L[k] = Number(input.value); out.textContent = `${L[k]}${unit}`; recalc(); });
     return el('label', {}, [el('span', { text: label }), out, input]);
   })), el('hr', { style: 'border:0;border-top:1px solid #E1E5E9;margin:14px 0' }), outHost, barsHost, simHost);
-  let lastSim = null;
-  const recalc = () => {
+  const simOf = (rows) => {
     const capacity = L.analysts * L.perDay * L.days;
-    const tot = base.reduce((a, r) => ({ exc: a.exc + num(r['Exception Statements Current Run']), unrec: a.unrec + num(r['Unreconciled Statements Current Run']), exp: a.exp + num(r['Source Exposure USD Current Run']), sus: a.sus + num(r['Suspense USD Current Run']), ce: a.ce + num(r['Calc Error Impact USD Current Run']) }), { exc: 0, unrec: 0, exp: 0, sus: 0, ce: 0 });
+    const tot = rows.reduce((a, r) => ({ exc: a.exc + num(r['Exception Statements Current Run']), unrec: a.unrec + num(r['Unreconciled Statements Current Run']), exp: a.exp + num(r['Source Exposure USD Current Run']), sus: a.sus + num(r['Suspense USD Current Run']), ce: a.ce + num(r['Calc Error Impact USD Current Run']) }), { exc: 0, unrec: 0, exp: 0, sus: 0, ce: 0 });
     const cleared = Math.min(tot.exc, capacity);
     const share = tot.exc ? cleared / tot.exc : 0;
     const expRelief = tot.sus * L.suspense / 100 + tot.ce * L.rerun / 100;
@@ -499,13 +502,27 @@ const main = async () => {
     const cfExp = resid * L.cf / 100;
     const residStmts = Math.max(0, tot.exc - cleared);
     const ready = tot.exc ? (tot.exc - residStmts) / tot.exc : 1;
-    lastSim = { capacity, cleared, residStmts, resid, cfExp, ready, tot };
+    return { capacity, cleared, residStmts, resid, cfExp, ready, tot };
+  };
+  const recalc = () => {
+    const { capacity, cleared, residStmts, resid, cfExp, ready, tot } = simOf(base);
     outHost.innerHTML = [['Exception statements today', tot.exc.toLocaleString(), `${tot.unrec} unreconciled`], ['Cleared by deadline', Math.round(cleared).toLocaleString(), `capacity ${capacity}`], ['Residual at close', Math.round(residStmts).toLocaleString(), residStmts ? '<span class="up">will miss close</span>' : '<span class="down">on track</span>'], ['Residual source exposure', usd(resid), `<span class="down">−${usd(tot.exp - resid)} vs today</span>`], ['Close readiness', `${Math.round(ready * 100)}%`, `${usd(cfExp)} carried forward (still exposed)`]].map(([a, b, c]) => `<div><span>${a}</span><b>${b}</b><i>${c}</i></div>`).join('');
     const rows = base.map((r) => ({ b: r.Branch, e: num(r['Exception Statements Current Run']), x: num(r['Source Exposure USD Current Run']) })).sort((a, b) => b.x - a.x);
     const max = Math.max(...rows.map((r) => r.x), 1);
     barsHost.innerHTML = `<svg class="ls-bars" viewBox="0 0 900 ${rows.length * 30 + 30}" role="img" aria-label="Exposure today vs projected by branch">${rows.map((r, i) => { const w = (r.x / max) * 600, w2 = w * (resid / Math.max(tot.exp, 1)); return `<text x="0" y="${i * 30 + 22}" font-size="13" fill="#1F2A33">${esc(r.b)}</text><rect x="60" y="${i * 30 + 8}" width="${w}" height="18" fill="#D5DEE5" rx="3"/><rect x="60" y="${i * 30 + 8}" width="${w2}" height="18" fill="#13706F" rx="3"/><text x="${70 + w}" y="${i * 30 + 22}" font-size="12" fill="#6B7A88">${usd(r.x)} → ${usd(r.x * resid / Math.max(tot.exp, 1))} · ${r.e} exceptions</text>`; }).join('')}<text x="60" y="${rows.length * 30 + 24}" font-size="11" fill="#6B7A88">Grey: source exposure today (governed, USD equivalent) · Teal: projected at the close deadline</text></svg>`;
   };
   recalc();
+  {
+    const sigOf = (applied) => JSON.stringify((applied ?? []).map((x) => [x.field?.fieldKey, x.values]));
+    let sig = sigOf(selections.getSelection('g-ov')?.applied), baseRun = 0;
+    selections.onActiveSelectionChange('g-ov').subscribe((next) => {
+      const s = sigOf(next.applied);
+      if (s === sig) return;
+      sig = s;
+      const run = ++baseRun;
+      baseQuery(appliedOf('g-ov')).then((rows) => { if (run === baseRun) { base = rows; recalc(); } }).catch((e) => console.warn('[sim]', e));
+    });
+  }
 
   // ------------------------------------------------------------------ business questions → native tables
   const bqList = QUESTIONS.filter((x) => !/Paid vs|Recovery/.test(x.cat));
@@ -566,7 +583,7 @@ const main = async () => {
   const pvTile = { title: 'Exception pivot', group: 'g-ov', dimensions: PV_DIMS.map(([name, view], i) => ({ name, view, ref: `d${i}` })), measures: PV_MEAS.map(([name], i) => ({ name, ref: `m${i}` })), filters: [{ view: ST, field: 'Run Flag', values: ['Current'] }, { view: ST, field: 'Exception Flag', values: [1] }], columnLabels: Object.fromEntries([...PV_DIMS.map(([, , l], i) => [`d${i}`, l]), ...PV_MEAS.map(([, l], i) => [`m${i}`, l])]), sort: [{ by: 'd0', direction: 'asc' }, { by: 'd1', direction: 'asc' }, { by: 'd2', direction: 'asc' }] };
   const loadPivot = async () => {
     const run = ++pvRun;
-    const sel = (selections.getSelection('g-ov')?.applied ?? []).filter((x) => x.values?.length && x.field?.fieldKey).map((x) => ({ fieldKey: x.field.fieldKey, values: x.values }));
+    const sel = appliedOf('g-ov');
     const filters = [['Run Flag', ST, ['Current']], ['Exception Flag', ST, ['1']], ...sel];
     const meas = PV_MEAS.map(([m]) => m);
     try {
@@ -636,30 +653,57 @@ const main = async () => {
   renderBanner(); renderFacts(); renderCase(); renderReview(); renderMine();
 
   // ------------------------------------------------------------------ Excel close pack
+  // Every sheet is queried at export time with its tab group's applied selections passed to engine.getData explicitly,
+  // so hidden tabs export under the same filters as the screen. Summary, Branches, Exception queue and What-if follow
+  // g-ov (Summary, Close overview and Close simulator tabs); Cases and Action history follow g-cr (Controller review).
+  // The header dropdowns write into every group, so they reach every sheet. Each banner lists the filters its rows follow.
+  const XL_LIMIT = 10000;
+  const CASE_DIMS = ['Case Id', 'Statement Id', 'Exception Type', 'Status', 'Owner', 'Due Date', 'Observed Amount', 'Observed Currency', 'Observed Recon Flag', 'Notes', 'Evidence Refs', 'Disposition', 'Controller', 'Controller Rationale', 'Carry Forward', 'Is Overdue', 'Is Open', 'Created By', 'Updated By', 'Updated At'];
+  const scopeText = (tabs, filters) => `Filters (${tabs}): ${filters.length ? filters.map((f) => `${labelOf(f.fieldKey)} = ${f.values.join(', ')}`).join(' · ') : 'none (all branches, runs and currencies)'}`;
+  const capNote = (rows) => (rows.length >= XL_LIMIT ? [[], [{ v: `Only the first ${XL_LIMIT.toLocaleString('en-GB')} rows are included; narrow the filters to see the rest.`, s: 'subtitle' }]] : []);
+  /** The close pack as a Blob, under the selections applied right now. The button downloads it; the smoke test diffs it. */
+  const buildWorkbook = async () => {
+    const fOv = appliedOf('g-ov'), fCr = appliedOf('g-cr');
+    const ovScope = scopeText('Summary, Close overview and Close simulator tabs', fOv), crScope = scopeText('Controller review tab', fCr);
+    const when = new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
+    const bannerRows = (title, cols, scope) => [[{ v: 'larkspur', s: 'brand' }, { v: title, s: 'title' }, ...Array(Math.max(0, cols - 2)).fill({ v: '', s: 'title' })], [null, { v: `Royalty Close & Exception Review · generated ${when} · DEMO DATA`, s: 'subtitle' }], [null, { v: scope, s: 'subtitle' }]];
+    const head = (labels) => labels.map((v, i) => ({ v, s: i ? 'head' : 'headl' }));
+    const [[k = {}], baseRows, queue, caseRows, caseBr] = await Promise.all([
+      q({ measures: ['Statements Current Run', 'Statements Prior Run', 'Exception Statements Current Run', 'Exception Statements Prior Run', 'Unreconciled Statements Current Run', 'Unreconciled Statements Prior Run', 'Source Exposure USD Current Run', 'Source Exposure USD Prior Run', 'Suspense USD Current Run', 'Suspense USD Prior Run', 'Calc Error Impact USD Current Run', 'Calc Error Impact USD Prior Run', 'Write-offs USD Current Run', 'Write-offs USD Prior Run'], filters: fOv, limit: 1 }),
+      baseQuery(fOv),
+      q({ dims: ['Statement Id', 'Branch', 'Payee Name', 'Currency', 'Exception Category', 'Reconciliation Status'].map((n) => [n, ST]), measures: ['Source Exposure', 'Reconciliation Difference', 'Suspense Amount', 'Calc Error Impact', 'Write-offs'], filters: [['Run Flag', ST, ['Current']], ['Exception Flag', ST, ['1']], ...fOv], limit: XL_LIMIT }),
+      q({ dims: CASE_DIMS.map((n) => [n, CC]), filters: fCr, limit: XL_LIMIT }),
+      q({ dims: [['Case Id', CC], ['Branch', ST]], measures: ['Cases'], filters: fCr, limit: XL_LIMIT }),
+    ]);
+    // Action history follows the same filters as the Cases sheet: under any Controller review filter the history query
+    // is filtered to the matching cases' ids in the engine, so the row cap counts in-scope events only.
+    const caseIds = [...new Set(caseRows.map((c) => c['Case Id']))];
+    const hist = fCr.length && !caseIds.length ? []
+      : await q({ dims: ['Event At', 'Case Id', 'Statement Id', 'Action', 'Actor', 'Actor Role', 'Observed Amount', 'Observed Currency', 'Note'].map((n) => [n, CV]), filters: fCr.length ? [['Case Id', CV, caseIds]] : [], limit: XL_LIMIT });
+    const kr = [['Statements', 'Statements', 'int'], ['Exception statements', 'Exception Statements', 'int'], ['Unreconciled statements', 'Unreconciled Statements', 'int'], ['Source exposure (USD)', 'Source Exposure USD', 'usdint'], ['Suspense (USD)', 'Suspense USD', 'usdint'], ['Calc error impact (USD)', 'Calc Error Impact USD', 'usdint'], ['Write-offs (USD)', 'Write-offs USD', 'usdint']];
+    const change = (cur, prior) => (Number.isFinite(cur) && Number.isFinite(prior) && prior !== 0 ? cur / prior - 1 : null);
+    const summary = { name: 'Summary', cols: [4, 34, 18, 18, 14], freeze: { row: 4, col: 0 }, merges: [], rows: [...bannerRows('Close summary · current vs prior run', 5, ovScope), head(['', 'Measure', 'R-2026-10 (current)', 'R-2026-09 (prior)', 'Change']),
+      ...kr.map(([l, m, f]) => [null, { v: l, s: 'bold' }, { v: num(k[`${m} Current Run`]), s: f }, { v: num(k[`${m} Prior Run`]), s: f }, { v: change(num(k[`${m} Current Run`]), num(k[`${m} Prior Run`])), s: 'spct' }])] };
+    const sc = { name: 'Branches', cols: [8, 8, 12, 12, 14, 16, 12, 12], freeze: { row: 4, col: 1 }, merges: [], rows: [...bannerRows('Branch scorecard · current run', 8, ovScope), head(['Branch', 'Ccy', 'Statements', 'Exceptions', 'Unreconciled', 'Exposure USD', 'Open cases', 'Overdue']),
+      ...[...baseRows].sort((a, b) => num(b['Source Exposure USD Current Run']) - num(a['Source Exposure USD Current Run'])).map((r) => [{ v: r.Branch, s: 'bold' }, { v: r.Currency, s: 'text' }, { v: num(r['Statements Current Run']), s: 'int' }, { v: num(r['Exception Statements Current Run']), s: 'int' }, { v: num(r['Unreconciled Statements Current Run']), s: 'int' }, { v: num(r['Source Exposure USD Current Run']), s: 'usdint' }, { v: num(r['Open Cases']), s: 'int' }, { v: num(r['Overdue Cases']), s: 'int' }])] };
+    const qs = { name: 'Exception queue', cols: [18, 7, 26, 7, 22, 16, 14, 14, 14, 14, 14], freeze: { row: 4, col: 1 }, merges: [], rows: [...bannerRows('Exception queue · current run (local currency, source flag read-only)', 11, ovScope), head(['Statement', 'Br.', 'Payee', 'Ccy', 'Exception', 'Source recon flag', 'Exposure', 'Recon diff', 'Suspense', 'Calc impact', 'Write-offs']),
+      ...[...queue].sort((a, b) => num(b['Source Exposure']) - num(a['Source Exposure'])).map((r) => [{ v: r['Statement Id'], s: 'bold' }, { v: r.Branch, s: 'text' }, { v: r['Payee Name'], s: 'text' }, { v: r.Currency, s: 'text' }, { v: r['Exception Category'], s: 'text' }, { v: r['Reconciliation Status'], s: 'text' }, ...['Source Exposure', 'Reconciliation Difference', 'Suspense Amount', 'Calc Error Impact', 'Write-offs'].map((m) => ({ v: num(r[m]), s: 'amt' }))]), ...capNote(queue)] };
+    // Governed (warehouse) cases only: changes kept in this browser by the writeback fallback are not in the pack.
+    const brOf = Object.fromEntries(caseBr.map((r) => [r['Case Id'], r.Branch]));
+    const localNote = readLocal()?.cases?.length ? [[], [{ v: 'Changes kept only in this browser (writeback unavailable) are not included: this sheet is the warehouse copy.', s: 'subtitle' }]] : [];
+    const cases = { name: 'Cases', cols: [12, 18, 6, 22, 16, 24, 12, 14, 6, 40, 40, 36, 18, 40], freeze: { row: 4, col: 1 }, merges: [], rows: [...bannerRows('Close cases & dispositions', 14, crScope), head(['Case', 'Statement', 'Br.', 'Exception', 'Owner', 'Status', 'Due', 'Observed', 'Ccy', 'Disposition', 'Evidence', 'Notes', 'Controller', 'Rationale']),
+      ...caseRows.map((c) => [{ v: c['Case Id'], s: 'bold' }, { v: c['Statement Id'], s: 'text' }, { v: brOf[c['Case Id']] ?? '', s: 'text' }, { v: c['Exception Type'], s: 'text' }, { v: c.Owner, s: 'text' }, { v: c.Status, s: 'text' }, { v: day(c['Due Date']), s: 'text' }, { v: num(c['Observed Amount']), s: 'amt' }, { v: c['Observed Currency'], s: 'text' }, { v: blank(c.Disposition), s: 'text' }, { v: blank(c['Evidence Refs']), s: 'text' }, { v: blank(c.Notes), s: 'text' }, { v: blank(c.Controller), s: 'text' }, { v: blank(c['Controller Rationale']), s: 'text' }]), ...capNote(caseRows), ...localNote] };
+    const audit = { name: 'Action history', cols: [20, 12, 18, 30, 18, 20, 14, 6, 50], freeze: { row: 4, col: 0 }, merges: [], rows: [...bannerRows('Action history (audit trail)', 9, `${crScope}${fCr.length ? ' · events of the matching cases' : ''}`), head(['When', 'Case', 'Statement', 'Action', 'Actor', 'Role', 'Observed', 'Ccy', 'Note']),
+      ...hist.map((h) => ({ ...h, at: stamp(h['Event At']) })).sort((a, b) => String(b.at).localeCompare(a.at)).map((h) => [{ v: h.at, s: 'text' }, { v: h['Case Id'], s: 'bold' }, { v: h['Statement Id'], s: 'text' }, { v: h.Action, s: 'text' }, { v: h.Actor, s: 'text' }, { v: h['Actor Role'], s: 'text' }, { v: num(h['Observed Amount']), s: 'amt' }, { v: h['Observed Currency'], s: 'text' }, { v: blank(h.Note), s: 'text' }]), ...capNote(hist)] };
+    const s = simOf(baseRows);
+    const sim = { name: 'What-if', cols: [44, 18], merges: [], rows: [...bannerRows('Close readiness what-if', 2, ovScope), head(['Lever', 'Setting']), ...LEVERS.map(([kk, label, , , , unit]) => [{ v: label, s: 'text' }, { v: `${L[kk]}${unit}`, s: 'text' }]), [], head(['Result', 'Value']),
+      [{ v: 'Exception statements today', s: 'bold' }, { v: s.tot.exc, s: 'int' }], [{ v: 'Cleared by deadline', s: 'bold' }, { v: Math.round(s.cleared), s: 'int' }], [{ v: 'Residual at close', s: 'bold' }, { v: Math.round(s.residStmts), s: 'int' }], [{ v: 'Source exposure today (USD)', s: 'bold' }, { v: s.tot.exp, s: 'usdint' }], [{ v: 'Residual exposure at close (USD)', s: 'bold' }, { v: s.resid, s: 'usdint' }], [{ v: 'Carried forward, still exposed (USD)', s: 'bold' }, { v: s.cfExp, s: 'usdint' }], [{ v: 'Close readiness', s: 'bold' }, { v: s.ready, s: 'pct' }]] };
+    return workbookBlob({ sheets: [summary, sc, qs, cases, audit, sim], title: 'Larkspur Music – Royalty Close pack (demo data)', author: 'Astrato' });
+  };
   exportBtn.addEventListener('click', async () => {
     exportBtn.disabled = true; exportBtn.textContent = 'Building…';
     try {
-      const when = new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
-      const bannerRows = (title, cols) => [[{ v: 'larkspur', s: 'brand' }, { v: title, s: 'title' }, ...Array(Math.max(0, cols - 2)).fill({ v: '', s: 'title' })], [null, { v: `Royalty Close & Exception Review · generated ${when} · DEMO DATA`, s: 'subtitle' }], []];
-      const head = (labels) => labels.map((v, i) => ({ v, s: i ? 'head' : 'headl' }));
-      const [[k]] = [await q({ measures: ['Statements Current Run', 'Statements Prior Run', 'Exception Statements Current Run', 'Exception Statements Prior Run', 'Unreconciled Statements Current Run', 'Unreconciled Statements Prior Run', 'Source Exposure USD Current Run', 'Source Exposure USD Prior Run', 'Suspense USD Current Run', 'Suspense USD Prior Run', 'Calc Error Impact USD Current Run', 'Calc Error Impact USD Prior Run', 'Write-offs USD Current Run', 'Write-offs USD Prior Run'], limit: 1 })];
-      const kr = [['Statements', 'Statements', 'int'], ['Exception statements', 'Exception Statements', 'int'], ['Unreconciled statements', 'Unreconciled Statements', 'int'], ['Source exposure (USD)', 'Source Exposure USD', 'usd0'], ['Suspense (USD)', 'Suspense USD', 'usd0'], ['Calc error impact (USD)', 'Calc Error Impact USD', 'usd0'], ['Write-offs (USD)', 'Write-offs USD', 'usd0']];
-      const summary = { name: 'Summary', cols: [4, 34, 18, 18, 14], freeze: { row: 4, col: 0 }, merges: [], rows: [...bannerRows('Close summary · current vs prior run', 5), head(['', 'Measure', 'R-2026-10 (current)', 'R-2026-09 (prior)', 'Change']),
-        ...kr.map(([l, m, f]) => [null, { v: l, s: 'bold' }, { v: num(k[`${m} Current Run`]), s: f }, { v: num(k[`${m} Prior Run`]), s: f }, { v: num(k[`${m} Current Run`]) / num(k[`${m} Prior Run`]) - 1, s: 'spct' }])] };
-      const sc = { name: 'Branches', cols: [8, 8, 12, 12, 14, 16, 12, 12], freeze: { row: 4, col: 1 }, merges: [], rows: [...bannerRows('Branch scorecard · current run', 8), head(['Branch', 'Ccy', 'Statements', 'Exceptions', 'Unreconciled', 'Exposure USD', 'Open cases', 'Overdue']),
-        ...base.sort((a, b) => num(b['Source Exposure USD Current Run']) - num(a['Source Exposure USD Current Run'])).map((r) => [{ v: r.Branch, s: 'bold' }, { v: r.Currency, s: 'text' }, { v: num(r['Statements Current Run']), s: 'int' }, { v: num(r['Exception Statements Current Run']), s: 'int' }, { v: num(r['Unreconciled Statements Current Run']), s: 'int' }, { v: num(r['Source Exposure USD Current Run']), s: 'usd0' }, { v: num(r['Open Cases']), s: 'int' }, { v: num(r['Overdue Cases']), s: 'int' }])] };
-      const queue = await q({ dims: ['Statement Id', 'Branch', 'Payee Name', 'Currency', 'Exception Category', 'Reconciliation Status'].map((n) => [n, ST]), measures: ['Source Exposure', 'Reconciliation Difference', 'Suspense Amount', 'Calc Error Impact', 'Write-offs'], filters: [['Run Flag', ST, ['Current']], ['Exception Flag', ST, ['1']]], limit: 1000 });
-      const qs = { name: 'Exception queue', cols: [18, 7, 26, 7, 22, 16, 14, 14, 14, 14, 14], freeze: { row: 4, col: 1 }, merges: [], rows: [...bannerRows('Exception queue · current run (local currency, source flag read-only)', 11), head(['Statement', 'Br.', 'Payee', 'Ccy', 'Exception', 'Source recon flag', 'Exposure', 'Recon diff', 'Suspense', 'Calc impact', 'Write-offs']),
-        ...queue.sort((a, b) => num(b['Source Exposure']) - num(a['Source Exposure'])).map((r) => [{ v: r['Statement Id'], s: 'bold' }, { v: r.Branch, s: 'text' }, { v: r['Payee Name'], s: 'text' }, { v: r.Currency, s: 'text' }, { v: r['Exception Category'], s: 'text' }, { v: r['Reconciliation Status'], s: 'text' }, ...['Source Exposure', 'Reconciliation Difference', 'Suspense Amount', 'Calc Error Impact', 'Write-offs'].map((m) => ({ v: num(r[m]), s: 'amt' }))])] };
-      const cases = { name: 'Cases', cols: [12, 18, 6, 22, 16, 24, 12, 14, 6, 40, 40, 36, 18, 40], freeze: { row: 4, col: 1 }, merges: [], rows: [...bannerRows('Close cases & dispositions', 14), head(['Case', 'Statement', 'Br.', 'Exception', 'Owner', 'Status', 'Due', 'Observed', 'Ccy', 'Disposition', 'Evidence', 'Notes', 'Controller', 'Rationale']),
-        ...state.cases.map((c) => [{ v: c['Case Id'], s: 'bold' }, { v: c['Statement Id'], s: 'text' }, { v: c.Branch ?? '', s: 'text' }, { v: c['Exception Type'], s: 'text' }, { v: c.Owner, s: 'text' }, { v: c.Status, s: 'text' }, { v: c['Due Date'], s: 'text' }, { v: num(c['Observed Amount']), s: 'amt' }, { v: c['Observed Currency'], s: 'text' }, { v: c.Disposition, s: 'text' }, { v: c['Evidence Refs'], s: 'text' }, { v: c.Notes, s: 'text' }, { v: c.Controller, s: 'text' }, { v: c['Controller Rationale'], s: 'text' }])] };
-      const hist = await q({ dims: ['Event At', 'Case Id', 'Statement Id', 'Action', 'Actor', 'Actor Role', 'Observed Amount', 'Observed Currency', 'Note'].map((n) => [n, CV]), limit: 3000 });
-      const audit = { name: 'Action history', cols: [20, 12, 18, 30, 18, 20, 14, 6, 50], freeze: { row: 4, col: 0 }, merges: [], rows: [...bannerRows('Action history (audit trail)', 9), head(['When', 'Case', 'Statement', 'Action', 'Actor', 'Role', 'Observed', 'Ccy', 'Note']),
-        ...hist.map((h) => ({ ...h, at: stamp(h['Event At']) })).sort((a, b) => String(b.at).localeCompare(a.at)).map((h) => [{ v: h.at, s: 'text' }, { v: h['Case Id'], s: 'bold' }, { v: h['Statement Id'], s: 'text' }, { v: h.Action, s: 'text' }, { v: h.Actor, s: 'text' }, { v: h['Actor Role'], s: 'text' }, { v: num(h['Observed Amount']), s: 'amt' }, { v: h['Observed Currency'], s: 'text' }, { v: blank(h.Note), s: 'text' }])] };
-      const s = lastSim;
-      const sim = { name: 'What-if', cols: [44, 18], merges: [], rows: [...bannerRows('Close readiness what-if', 2), head(['Lever', 'Setting']), ...LEVERS.map(([kk, label, , , , unit]) => [{ v: label, s: 'text' }, { v: `${L[kk]}${unit}`, s: 'text' }]), [], head(['Result', 'Value']),
-        [{ v: 'Exception statements today', s: 'bold' }, { v: s.tot.exc, s: 'int' }], [{ v: 'Cleared by deadline', s: 'bold' }, { v: Math.round(s.cleared), s: 'int' }], [{ v: 'Residual at close', s: 'bold' }, { v: Math.round(s.residStmts), s: 'int' }], [{ v: 'Source exposure today (USD)', s: 'bold' }, { v: s.tot.exp, s: 'usd0' }], [{ v: 'Residual exposure at close (USD)', s: 'bold' }, { v: s.resid, s: 'usd0' }], [{ v: 'Carried forward, still exposed (USD)', s: 'bold' }, { v: s.cfExp, s: 'usd0' }], [{ v: 'Close readiness', s: 'bold' }, { v: s.ready, s: 'pct' }]] };
-      const blob = workbookBlob({ sheets: [summary, sc, qs, cases, audit, sim], title: 'Larkspur Music – Royalty Close pack (demo data)', author: 'Astrato' });
+      const blob = await buildWorkbook();
       const url = URL.createObjectURL(blob);
       const a = Object.assign(document.createElement('a'), { href: url, download: `Larkspur Music_Royalty_Close_${new Date().toISOString().slice(0, 10)}.xlsx` });
       document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
@@ -720,6 +764,16 @@ const main = async () => {
     exportBtn.click();
     for (let i = 0; i < 120 && (exportBtn.disabled || window.__lastExportBytes === bytes0); i++) await new Promise((r) => setTimeout(r, 250));
     return { pass: Boolean(window.__lastExportBytes) && window.__lastExportBytes !== bytes0, detail: `${window.__lastExportBytes ?? 0} bytes` };
+  });
+  // The smoke test builds the pack without and with header Branch = UK (written into every group by applyHeader)
+  // and fails any sheet whose figures did not change.
+  const until = async (ok, ms = 5000) => { for (const t0 = Date.now(); !ok() && Date.now() - t0 < ms;) await new Promise((r) => setTimeout(r, 50)); };
+  const headerBranchIs = (v) => () => ['g-ov', 'g-cr'].every((g) => (selectedValues(g, 'Branch', BR)[0] ?? '') === v);
+  appState.exportProbe({
+    build: () => buildWorkbook(),
+    select: async () => { setHeader('UK'); await until(headerBranchIs('UK')); },
+    clear: async () => { setHeader(); await until(headerBranchIs('')); },
+    exempt: [],
   });
   appState.mark('landing-ready');
   window.__state = state;
