@@ -66,6 +66,13 @@ four numbers with the count, for example "12 queries for 4 objects + 1 sparkline
 controls/app queries, budget 11". Many more than the budget means hidden tabs are in the same group;
 see [preload tabs](../patterns/preload-tabs.md). Record the count and the time to settle.
 
+**When the warehouse is the bottleneck.** If step 1 found that single queries take several
+seconds (the layer's own measures included), a selection cannot settle in 3 s whatever the app
+does. Run the smoke test with longer limits (`--landing-ms 60000`, `--check-ms 240000`), list
+those flags in the verification record, score E2 on the settle time you measured, and name the
+fix for the data owner: a materialised table at the grain the app reads
+([knowledge](../knowledge/performance.md#every-query-takes-several-seconds-the-layers-own-measures-included)).
+
 ## 4. Console and network
 
 - No console errors and no failed requests (status ≥ 400) after load, after a tab switch, and

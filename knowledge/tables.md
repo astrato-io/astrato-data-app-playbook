@@ -97,11 +97,21 @@ are built with operations after compile ([how](#a-sparkline-mini-chart-column-in
 
 ## A progress column blanks the table or draws pills
 
-- **Fix:** a `progress` column blanks the whole table until configured; read each
-  `setColumnProgress*` / `setColumnMiniChartProgress*` `payloadSchema` first (`{ progressBarColor }`,
-  `{ backgroundColor }`). `setColumnProgressDynamicScaleEnabled true`. Value placement `'right'`
-  draws pills; `'inside'` works.
-- **Verified on:** visualizations 0.4.0, 2026-09.
+- **Symptom:** the whole table goes blank; or a data-bar column is refused with *"Invalid
+  payload"*.
+- **Cause:** a `progress` column blanks the table until it is configured. On 0.9 the
+  representation is named `progress` (`setColumnRepresentation`'s values: `text`, `html`,
+  `markdown`, `image`, `url`, `legacy-button`, `indicator`, `bar-chart`, `line-chart`,
+  `progress`); there is no `data-bar`. The progress operations take the column's data-item keys
+  plus one named value, not a bare value.
+- **Fix:** read each `setColumnProgress*` / `setColumnMiniChartProgress*` `payloadSchema` first
+  (`node kit/verify/ops.mjs table Progress`): `{ progressBarColor }`, `{ backgroundColor }`, and
+  `setColumnProgressDynamicScaleEnabled` with `{ dataItemInternalKey, dataItemUniqueSignature,
+  dynamicScaleEnabled: true }` (not `enabled`). Value placement `'right'` draws pills; `'inside'`
+  works.
+- **Verified on:** visualizations 0.4.0, 2026-09; the representation name and the
+  `dynamicScaleEnabled` key from the 0.9.0 operations reference and a test run's compile check,
+  2026-11-18.
 
 ## Indicator (traffic-light) colours are inverted
 

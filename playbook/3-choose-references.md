@@ -32,7 +32,7 @@ contract, each example's compile adapter). Two things do not: their token-bound 
 which need a personal access token in the shell, and any tile that sets
 `format: { formatType: … }` on a governed measure (leave `format` off so the layer's format applies).
 On CLI 0.2.0's dashboard template (React + TypeScript) the same techniques are ported into its
-components rather than pasted; see [getting started](0-getting-started.md#choose-one-start-the-template-or-the-examples-vanilla-layout).
+components rather than pasted; see [getting started](0-getting-started.md#recommended-the-examples-layout).
 
 Write the result into the brief:
 
@@ -101,7 +101,7 @@ and show it in the card title.
 ### Before calling something impossible
 
 Look for the capability in this order: the visualization definition schema; the full operation
-list for the object type (list every operation name with `node kit/verify/ops.mjs <type>` and scan them all
+list for the object type (list every operation name with `node kit/verify/ops.mjs <type>`, run from the app folder where the package is installed, and scan them all
 before searching for a guessed word; the full references run to 200 KB each); the type's settings in a
 compiled vSpec; another object type that carries the data shape (a one-row table does period
 comparison a number tile cannot). Only then report a gap, with what you tried. See

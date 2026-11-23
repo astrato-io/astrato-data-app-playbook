@@ -8,11 +8,23 @@ step is a written data brief; it contains no design decisions.
 
 ## Before you start
 
-- Call `astrato_get_context` and read `auth.scopes`. Its result is about 60 KB: save it to a
-  file and parse what you need ([knowledge](../knowledge/performance.md#mcp-calls-fill-the-agents-context)). Reading metadata needs `sl:read`; profiling
+- Call `astrato_get_context` and read `auth.scopes`. Its full result is about 60 KB and lands
+  in your context; you cannot save an MCP result to a file yourself (some clients spill a large
+  result to a file on their own: then read that file). For scopes alone, call it with
+  `detail: "identity"` (about 1 KB); that omits the `designBrief`, so call it once without
+  `detail` before you build, and note the brief's points in your own notes
+  ([knowledge](../knowledge/performance.md#mcp-calls-fill-the-agents-context)). Reading metadata needs `sl:read`; profiling
   needs `data:query`. If the connection cannot query, say so and get it fixed, or profile from
   the app's own development session. Never write an unprofiled metric into the brief as verified.
 - Name the semantic layer by id on every call. Names collide; ids do not.
+- **When several layers fit the request** (`… Analytics`, `… Analytics-copy (date)`,
+  `… SAMPLE`), do not take the obvious name on trust. For each candidate, read its last check status
+  (`lastCheck`; a layer marked "Unverified, 5 errors" may not query at all), compare the published revision with the draft, and run one probe query on a
+  headline measure. Pick the one that is published, queries cleanly and holds the subject; record
+  the choice and why in the data brief, and ask the user when two still fit (or, with no one to ask, record
+  it as an assumption). In one test run
+  (2026-11-18) the layer named for the job failed every query in the warehouse, a `SAMPLE` copy
+  refused every query, and a `-copy` layer was the maintained one.
 - MCP queries read the **published** layer. Draft changes are invisible to them.
 
 ## The sequence
@@ -33,10 +45,15 @@ Scan the name index for junk: `Copy of …`, placeholders, trailing spaces, near
 
 On a small layer (under about 100 measures), one `astrato_semantic_layer_get_summary` with
 `includeDetails: true` returns every view, field and item. Above that it outgrows an agent's
-tool-output limit (358 measures came to about 60 KB): call `get_summary` with
-`includeSnapshot: true`, save the snapshot it links to a file and parse it with a script, or page
-through `astrato_semantic_layer_get_details` one section at a time. Use
-`astrato_semantic_layer_search` / `astrato_semantic_layer_search_fields` for concepts. See
+tool-output limit (358 measures came to about 60 KB). Read it in pages instead: page through
+`astrato_semantic_layer_get_details` one section at a time, or list the catalogue through
+`astrato_data_prepare_query` (`scope: "semantic"`) page by page, and use
+`astrato_semantic_layer_search` / `astrato_semantic_layer_search_fields` for concepts. Write what
+each page tells you into the data brief (or a working notes file next to it) as you go, so the
+notes, not the raw responses, carry the inventory. An MCP result or resource cannot be saved to
+disk by the agent: `get_summary` with `includeSnapshot: true` links a snapshot resource that you
+can only read into context (a large layer's export ran to megabytes), so use it only on a layer
+small enough to read whole. See
 [keeping MCP responses small](../knowledge/performance.md#mcp-calls-fill-the-agents-context).
 
 Read paginated results to the end. Record every measure and dimension with its type and
@@ -116,6 +133,12 @@ Profile:
   a date field returns one row per day unless a date level was set on it; its description proves
   nothing. See [knowledge](../knowledge/semantic-layer.md#a-date-dimension-returns-one-row-per-day-whatever-its-name-says).
 - **Null share** of anything you will chart.
+- **Query speed.** Note how long a few queries take end to end: a headline measure, a stored
+  question, one by the main dimension. About a second each is the normal floor. Several seconds
+  each, the layer's existing measures included, means the warehouse (or a Custom SQL view the
+  layer re-runs on every query) is the bottleneck, and no app on this layer will settle a
+  selection in 3 s. Record it in the brief's caveats now, not after the build
+  ([what to do](../knowledge/performance.md#every-query-takes-several-seconds-the-layers-own-measures-included)).
 
 ### 6. Reconciliation pairs
 

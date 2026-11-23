@@ -41,11 +41,12 @@ The examples in this repo pin their own versions in `examples/<slug>/project/pac
 
 ## Status on 0.8
 
-The public packages are now `@astrato-io/*`. The three examples were ported to and tested on
-visualizations 0.8.0, sdk 0.7.0, app-runtime 0.8.0 and CLI 0.1.3, with MCP contract 10.37 (CLI
-0.2.0 and app-runtime 0.9.0 followed on 2026-11-18; the examples have not been re-run on them). Since
-then npm has started serving **visualizations 0.9.0**. The examples pin `^0.8.0`; one fresh-agent
-build ran on 0.9.0 (2026-11) and found the two 0.9 rows below. The 0.9.0 package's own changelog stops
+This section covers 0.8 and what has been seen on 0.9. The public packages are now
+`@astrato-io/*`. Three examples (lending-affordability, portfolio-os, revenue-war-room) were
+ported to and tested on visualizations 0.8.0, sdk 0.7.0, app-runtime 0.8.0 and CLI 0.1.3, with
+MCP contract 10.37, and still pin `^0.8.0`. npm now serves **visualizations 0.9.0** and
+app-runtime 0.9.0 (with CLI 0.2.0, 2026-11-18); the other 12 examples pin visualizations
+`^0.9.0`, and fresh-agent builds on 0.9.0 found the 0.9 rows below. Build new apps on 0.9. The 0.9.0 package's own changelog stops
 at 0.6.2, so there is no list of changes from 0.7 to 0.9: test what you rely on. Most entries here were verified on 0.4–0.6 and have **not**
 been re-run. A first build on 0.8 (2026-11) gave the evidence below. "Compiles" means the
 definition and operations were accepted offline by `kit/verify/compile-check.mjs`; nothing in
@@ -71,6 +72,9 @@ this table was seen rendering in a browser.
 | `app.writeback` needs `dataviewID: layerId` | **Not needed** on app-runtime 0.8/0.9: the request type has none and the runtime adds the layer id | Insert, update, delete run under `astrato dev` on 0.9.0 |
 | Omit `structure` on a flat table | **Either works** on 0.9.0: `structure: 'normal'` is optional on a flat table ([entry](tables.md#a-table-definition-is-rejected)) | Compiles |
 | A static filter on an integer field | **Range works, exact match does not** on 0.9.0: `isBetween` on an `int` Year rendered in a heat map; `inList` fails silently ([entry](visualizations.md#a-definition-filters-entry-on-a-number-or-date-field-is-rejected)) | Run in a browser |
+| Table progress (data-bar) column | **Named `progress`** on 0.9.0, no `data-bar`; `setColumnProgressDynamicScaleEnabled` takes `dynamicScaleEnabled` ([entry](tables.md#a-progress-column-blanks-the-table-or-draws-pills)) | Operations reference and compile check |
+| Date format on a week-level dimension | **Refused** on 0.9.0 ("not allowed for this data item"); leave it off ([entry](visualizations.md#a-date-format-is-refused-on-a-week-level-dimension)) | Compile check |
+| Every label on a long heat-map axis | **No operation** on 0.9.0: `setLabelOverlap` is `auto` or `show-last`, no axis font size ([entry](visualizations.md#a-heat-map-drops-every-other-label-on-a-long-axis)) | Operations reference; seen in a browser |
 
 **All three examples are ported.** Each was moved from 0.5–0.6 to a Vite project on the public
 packages and run in headless Chrome with the kit's smoke test, which also ran each app's own
@@ -114,7 +118,7 @@ workaround only if the test fails, and record which version you saw it on.
 
 ## Index
 
-### [visualizations.md](visualizations.md) (44)
+### [visualizations.md](visualizations.md) (46)
 
 - [A definition fails with `invalid_structure: Invalid input` and names no field](visualizations.md#a-definition-fails-with-invalid_structure-invalid-input-and-names-no-field)
 - [`applyOperations` reports success but nothing changed](visualizations.md#applyoperations-reports-success-but-nothing-changed)
@@ -123,6 +127,7 @@ workaround only if the test fails, and record which version you saw it on.
 - [Operations need data-item keys and fail with "Invalid payload"](visualizations.md#operations-need-data-item-keys-and-fail-with-invalid-payload)
 - [`Formatter type number is not allowed for this data item`](visualizations.md#formatter-type-number-is-not-allowed-for-this-data-item)
 - [A date axis shows 13-digit numbers (epoch milliseconds)](visualizations.md#a-date-axis-shows-13-digit-numbers-epoch-milliseconds)
+- [A date format is refused on a week-level dimension](visualizations.md#a-date-format-is-refused-on-a-week-level-dimension)
 - [Weekday or month names in calendar order](visualizations.md#weekday-or-month-names-in-calendar-order)
 - [A custom format string renders the wrong text](visualizations.md#a-custom-format-string-renders-the-wrong-text)
 - [The legend will not hide, or hiding it fails validation](visualizations.md#the-legend-will-not-hide-or-hiding-it-fails-validation)
@@ -144,6 +149,7 @@ workaround only if the test fails, and record which version you saw it on.
 - [Combo chart limitations](visualizations.md#combo-chart-limitations)
 - [Changing a filter or parameter on a mounted chart](visualizations.md#changing-a-filter-or-parameter-on-a-mounted-chart)
 - [Product gaps to design around](visualizations.md#product-gaps-to-design-around)
+- [A heat map drops every other label on a long axis](visualizations.md#a-heat-map-drops-every-other-label-on-a-long-axis)
 - [`filter` objects: label, size and preset filters](visualizations.md#filter-objects-label-size-and-preset-filters)
 - [`Unknown visualization instance` / every chart mounts twice](visualizations.md#unknown-visualization-instance--every-chart-mounts-twice)
 - [Compile fails for every tile because of one field, or "Invalid available field"](visualizations.md#compile-fails-for-every-tile-because-of-one-field-or-invalid-available-field)
@@ -181,7 +187,7 @@ workaround only if the test fails, and record which version you saw it on.
 - [`Cannot read properties of undefined (reading 'reduce')` from one table](tables.md#cannot-read-properties-of-undefined-reading-reduce-from-one-table)
 - [Clickable dimension cells sit half a row low](tables.md#clickable-dimension-cells-sit-half-a-row-low)
 
-### [selections.md](selections.md) (13)
+### [selections.md](selections.md) (14)
 
 - [A filter or chart click does nothing](selections.md#a-filter-or-chart-click-does-nothing)
 - [Charts on governed dimensions or measures do not cross-filter](selections.md#charts-on-governed-dimensions-or-measures-do-not-cross-filter)
@@ -196,6 +202,7 @@ workaround only if the test fails, and record which version you saw it on.
 - [A chart should ignore one filter ("this chart ignores the month")](selections.md#a-chart-should-ignore-one-filter-this-chart-ignores-the-month)
 - [Click and brush behaviour on native charts](selections.md#click-and-brush-behaviour-on-native-charts)
 - [A click on a chart over a Custom SQL view highlights but never selects](selections.md#a-click-on-a-chart-over-a-custom-sql-view-highlights-but-never-selects)
+- [A filter-bar chip shows a generated name such as `Group_Name`](selections.md#a-filter-bar-chip-shows-a-generated-name-such-as-group_name)
 - [Sharing one selection across Astrato and non-Astrato data](selections.md#sharing-one-selection-across-astrato-and-non-astrato-data)
 
 ### [engine-and-queries.md](engine-and-queries.md) (16)
@@ -217,16 +224,18 @@ workaround only if the test fails, and record which version you saw it on.
 - [An ad-hoc measure over MCP is refused](engine-and-queries.md#an-ad-hoc-measure-over-mcp-is-refused)
 - [`getData` with a stored dimension's key: "Astrato rejected the runtime request"](engine-and-queries.md#getdata-with-a-stored-dimensions-key-astrato-rejected-the-runtime-request)
 
-### [performance.md](performance.md) (9)
+### [performance.md](performance.md) (11)
 
 - [Each query takes about a second, however small the data](performance.md#each-query-takes-about-a-second-however-small-the-data)
 - [429 "Astrato is rate limiting requests"](performance.md#429-astrato-is-rate-limiting-requests)
+- [A burst of HTTP 400 "Astrato rejected the runtime request" that succeeds on retry](performance.md#a-burst-of-http-400-astrato-rejected-the-runtime-request-that-succeeds-on-retry)
 - [One click fires dozens of queries](performance.md#one-click-fires-dozens-of-queries)
 - [Page load is slow before any data arrives](performance.md#page-load-is-slow-before-any-data-arrives)
 - [The page freezes on a layer with thousands of fields](performance.md#the-page-freezes-on-a-layer-with-thousands-of-fields)
 - [The hosted app sits on the splash screen](performance.md#the-hosted-app-sits-on-the-splash-screen)
 - [Selection effects lag several seconds](performance.md#selection-effects-lag-several-seconds)
 - [Slow Custom SQL views](performance.md#slow-custom-sql-views)
+- [Every query takes several seconds, the layer's own measures included](performance.md#every-query-takes-several-seconds-the-layers-own-measures-included)
 - [MCP calls fill the agent's context](performance.md#mcp-calls-fill-the-agents-context)
 
 ### [rendering.md](rendering.md) (10)
@@ -255,7 +264,7 @@ workaround only if the test fails, and record which version you saw it on.
 - [Right-to-left (Hebrew, Arabic) layouts](theming.md#right-to-left-hebrew-arabic-layouts)
 - [Translating an app, including data values](theming.md#translating-an-app-including-data-values)
 
-### [semantic-layer.md](semantic-layer.md) (33)
+### [semantic-layer.md](semantic-layer.md) (35)
 
 - [The app does not see a measure I just added](semantic-layer.md#the-app-does-not-see-a-measure-i-just-added)
 - [Publishing one measure changed another measure's result type](semantic-layer.md#publishing-one-measure-changed-another-measures-result-type)
@@ -274,6 +283,8 @@ workaround only if the test fails, and record which version you saw it on.
 - [Time axes and relative periods compare the wrong period](semantic-layer.md#time-axes-and-relative-periods-compare-the-wrong-period)
 - [A season comparison drops the last week of the previous season](semantic-layer.md#a-season-comparison-drops-the-last-week-of-the-previous-season)
 - [Share of total, 100% stacks and indexes](semantic-layer.md#share-of-total-100-stacks-and-indexes)
+- [A share of total in a stored question is too high when the question has a top N](semantic-layer.md#a-share-of-total-in-a-stored-question-is-too-high-when-the-question-has-a-top-n)
+- [Publish or edit-session results list joins you did not change](semantic-layer.md#publish-or-edit-session-results-list-joins-you-did-not-change)
 - [Mapping dimensions sort alphabetically and expose a phantom key](semantic-layer.md#mapping-dimensions-sort-alphabetically-and-expose-a-phantom-key)
 - [Stored business questions: authoring shapes that work](semantic-layer.md#stored-business-questions-authoring-shapes-that-work)
 - [A rank in a stored question shows as currency](semantic-layer.md#a-rank-in-a-stored-question-shows-as-currency)

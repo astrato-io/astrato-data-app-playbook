@@ -47,7 +47,9 @@ name ("Crowd Index", not "Visits"), and never invent the missing figure in the l
 1. `astrato_semantic_layer_create` on the connection, named for the subject, not the app.
 2. One **view per table** (or per Custom SQL view when a table needs reshaping), through
    `astrato_semantic_layer_prepare_view_change` / `apply_view_change`. Name views for what a row
-   is ("Orders", "Order Lines", "Customers"), not after the table.
+   is ("Orders", "Order Lines", "Customers"), not after the table. A Custom SQL view is re-run
+   inside every query the app sends, so keep its scan small and time one query on it
+   ([why](../knowledge/performance.md#slow-custom-sql-views)).
 3. **Never declare a field's data type.** Let the layer read it from the warehouse, then run
    `astrato_semantic_layer_check_source_schema` until drift is 0
    ([why](../knowledge/semantic-layer.md#field-types-drift-from-the-warehouse)).

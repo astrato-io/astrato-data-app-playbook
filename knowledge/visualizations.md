@@ -119,6 +119,19 @@ Node. Expose them on `window` in dev.
 - **Verified on:** visualizations 0.4.0, 2026-09; 0.4.x/0.5.2 apps, 2026-11.
 - **See also:** [tables.md](tables.md), [rendering.md](rendering.md#canvas-text-passes-every-text-check).
 
+## A date format is refused on a week-level dimension
+
+- **Symptom:** `setDimensionFormatType` with any date format (`ddmmmyy`, `defaultDate`, …) on a
+  dimension grouped by week fails with *"… is not allowed for this data item"*, although the
+  operation's schema lists those formats.
+- **Cause:** the format is checked against the data item at apply time; a week-level item accepts
+  none of the date formats. The schema cannot show this, only the compile check or a mount can.
+- **Fix:** leave the format off a week-level dimension. On 0.9.0 its axis already prints the
+  week's start date ("17 Aug 26"). For another label, add a text label dimension in the layer
+  (a week-start string, or "W34"). Run the compile check after every date-format change.
+- **Verified on:** visualizations 0.9.0, 2026-11-18 (a test run; found by the compile check).
+- **See also:** [A date axis shows 13-digit numbers](#a-date-axis-shows-13-digit-numbers-epoch-milliseconds).
+
 ## Weekday or month names in calendar order
 
 - **Symptom:** Mon–Sun or Jan–Dec come out alphabetically.
@@ -396,6 +409,20 @@ Node. Expose them on `window` in dev.
   rebase in the layer instead.
 - `atomic-input` compiles but cannot be mounted.
 - **Verified on:** visualizations 0.4.0–0.6.4, 2026-09/11.
+
+## A heat map drops every other label on a long axis
+
+- **Symptom:** with about 40 or more members on a heat map's vertical axis, every other label is
+  missing.
+- **Cause:** on 0.9.0 no operation shows every axis label: `setLabelOverlap` takes only `auto` and
+  `show-last` (for `dimension` or `secondaryDimension`), and there is no axis-label font-size
+  operation (only legend and data-label font sizes).
+- **Fix:** put the long dimension on the horizontal axis across the full width and the short one
+  (weeks, months) down the side; or cut the members to a top N; or make it a table with an
+  indicator or progress column. Look at the screenshot: the smoke test cannot read canvas labels.
+- **Verified on:** visualizations 0.9.0, 2026-11-18 (operations reference; the dropped labels in a
+  test run).
+- **See also:** [Product gaps to design around](#product-gaps-to-design-around).
 
 ## `filter` objects: label, size and preset filters
 
