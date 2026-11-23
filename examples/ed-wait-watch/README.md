@@ -48,7 +48,7 @@ raises; an open flag is started, resolved or reassigned; only an ED operations l
 reopens; **four eyes**: nobody signs off a flag they raised or resolved (the resolver is read from
 the audit trail); a note is required to resolve, reassign or reopen. Every action button is always
 shown, and a refused one says why. Both modes go through the same path: check the rule, then
-record the change ([workflow.js:125](project/src/workflow.js#L125)). *Acting as* switches between
+record the change ([workflow.js:126](project/src/workflow.js#L126)). *Acting as* switches between
 four demo personas, two duty managers and two leads ([workflow.js:28](project/src/workflow.js#L28)).
 
 **Live mode** writes through governed writeback (`app.writeback`): a flag is a row in the records
@@ -56,16 +56,16 @@ view and every change is a row in the audit-events view (who, role, action, befo
 when). An update that changed no row is an error ([workflow.js:106](project/src/workflow.js#L106),
 the event insert at [workflow.js:115](project/src/workflow.js#L115)); after each write the app
 clears its query cache and remounts only the flag objects
-([app.js:579](project/src/app.js#L579)), so the native flag tables show the change. Live is
+([app.js:582](project/src/app.js#L582)), so the native flag tables show the change. Live is
 offered only when the runtime can write ([workflow.js:96](project/src/workflow.js#L96)).
 
 **Practice mode** (the default, labelled "nothing saved") runs the same rules on flags kept in the
 browser tab's `sessionStorage`, with a practice audit trail that also lists refused attempts and a
-*Reset practice* ([workflow.js:120](project/src/workflow.js#L120)). Nothing is written and the
+*Reset practice* ([workflow.js:314](project/src/workflow.js#L314)). Nothing is written and the
 native flag tables do not change. The app's own workflow check drives it through the UI (raise,
 start, resolve without a note (refused), resolve, self sign-off (refused, four eyes), duty manager
 sign-off (refused), another lead signs off, reset) and asserts that no writeback call was made
-([app.js:754](project/src/app.js#L754)).
+([app.js:778](project/src/app.js#L778)).
 
 ## Worth copying
 
@@ -86,9 +86,9 @@ Those reads jump the query queue ([throttle.js:31](project/src/throttle.js#L31))
 the change, sorted by change, with a seen-in-time points change and a trend column; the changes add
 up to the total ([catalogue.js:78](project/src/catalogue.js#L78)).
 
-**What-if on the target.** A 15–45 minute slider ([app.js:451](project/src/app.js#L451)) sets the
+**What-if on the target.** A 15–45 minute slider ([app.js:454](project/src/app.js#L454)) sets the
 layer's `Target Minutes` parameter on two native numbers with `setMeasureDefinedParameter` through
-`applyRuntimeOperations`, no remount ([app.js:464](project/src/app.js#L464)); the 30-minute
+`applyRuntimeOperations`, no remount ([app.js:467](project/src/app.js#L467)); the 30-minute
 baseline is a separate, parameter-free object and stays put.
 
 **Every object on a stored question.** 45 data objects over 33 of the layer's 37 stored questions,
@@ -98,12 +98,12 @@ card title, and turned into definitions and operations by [tiles.js](project/src
 operation ([tiles.js:116](project/src/tiles.js#L116)).
 
 Also useful:
-- pending clicks applied after 200 ms in every group, with the visible tab's applied state mirrored into one app-wide selection; the trend's group never takes the month, so it keeps every month ([app.js:430](project/src/app.js#L430), the mirror at [app.js:146](project/src/app.js#L146));
+- pending clicks applied after 200 ms in every group, with the visible tab's applied state mirrored into one app-wide selection; the trend's group never takes the month, so it keeps every month ([app.js:433](project/src/app.js#L433), the mirror at [app.js:146](project/src/app.js#L146));
 - every tab mounted at load through four lanes, the visible tab first ([app.js:275](project/src/app.js#L275)), inactive panes off-screen rather than `display: none` ([styles.css:58](project/src/styles.css#L58));
 - a query lane with 429 and 502/503/504 backoff, timeouts and a session cache ([throttle.js:117](project/src/throttle.js#L117));
 - table widths refitted on window resize with width operations, no remount ([app.js:273](project/src/app.js#L273));
-- a seven-sheet Excel report (Summary, When, Who, Satisfaction, Flags, Data, Definitions) that follows the selections ([export.js:21](project/src/export.js#L21), [export.js:53](project/src/export.js#L53));
-- 15 self-checks the smoke test runs, including the stale-text check, two empty-state edges and the Practice workflow ([app.js:627](project/src/app.js#L627)).
+- a seven-sheet Excel report (Summary, When, Who, Satisfaction, Flags, Data, Definitions) whose queries pass filters rebuilt from the app-wide selections at the click, so hidden tabs cannot export stale rows: visit sheets follow the visit selections, the Flags sheet the flag selections, and each banner names exactly those ([export.js:29](project/src/export.js#L29), [export.js:63](project/src/export.js#L63)); the smoke test's export probe proves it ([app.js:698](project/src/app.js#L698));
+- 15 self-checks the smoke test runs, including the stale-text check, two empty-state edges and the Practice workflow ([app.js:638](project/src/app.js#L638)).
 
 ## Semantic layer
 

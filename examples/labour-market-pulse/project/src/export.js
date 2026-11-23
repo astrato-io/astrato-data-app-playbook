@@ -1,7 +1,12 @@
 /**
- * The Excel briefing pack: Summary, one sheet per tab, the latest-release data and definitions.
- * Every figure comes from the same stored measures as the screen, with the on-screen selections:
- * the app-wide selections that apply to each tab, and "latest release" unless a time is selected.
+ * The Excel briefing pack: Summary, one sheet per tab, the headline data and definitions.
+ * Every figure comes from the same stored measures as the screen, through direct governed queries
+ * (`q`) that carry the app-wide selections explicitly, so hidden tabs follow them too: each sheet
+ * takes the selections its tab takes on screen (`scope`, the app's SCOPE), and "latest release"
+ * unless a time is selected. Each sheet's banner names exactly the selections its rows follow,
+ * and any it does not.
+ *
+ * buildWorkbook() returns the Blob; downloadWorkbook() is what the header button calls.
  */
 import { workbookBlob } from './xlsx.js';
 import { calls } from './workflow.js';
@@ -25,15 +30,25 @@ const MEASURE_NOTES = {
   'Regional Employment Rate': '16-64 employment rate of a region or nation, %.',
 };
 
-const SCOPES = { market: ['Period Year', 'Period'], demand: ['Period Year', 'Period', 'Sector'], pay: ['Period Year', 'Period'], regions: ['Period Year', 'Period', 'Geography'] };
+/** Row cap for the month-level Data sheet; a full result is noted in the sheet, never cut silently. */
+const DATA_LIMIT = 10000;
 
-export const exportWorkbook = async ({ q, keyOf, mainSel, timeSelected, chipLabel }) => {
+/** Build the workbook. Returns { blob, info }; `info` is what the smoke check reads. */
+const buildPack = async ({ q, keyOf, mainSel, timeSelected, chipLabel, scope }) => {
   const latest = timeSelected ? [] : [{ field: { fieldKey: keyOf('Period Status') }, operator: 'inList', values: ['Latest'] }];
+  const fieldsFor = (tab, kpi) => new Set((kpi ? scope[tab].kpis : scope[tab].charts).map(keyOf));
   const sel = (tab, { kpi = false } = {}) => [...mainSel]
-    .filter(([k]) => (kpi ? ['Period Year', 'Period', ...(tab === 'regions' ? ['Geography'] : [])] : SCOPES[tab]).map(keyOf).includes(k))
+    .filter(([k]) => fieldsFor(tab, kpi).has(k))
     .map(([fieldKey, values]) => ({ field: { fieldKey }, operator: 'inList', values }));
   const basis = timeSelected ? 'Average of the selected months' : 'Latest release';
-  const selText = [...mainSel].map(([k, v]) => chipLabel(k, v).join(': ')).join('; ') || 'None';
+  /** The banner of a sheet: the selections its rows follow, and those they ignore. */
+  const selText = (tab, { kpi = false } = {}) => {
+    const allowed = fieldsFor(tab, kpi);
+    const label = ([k, v]) => chipLabel(k, v, true).join(': ');
+    const applied = [...mainSel].filter(([k]) => allowed.has(k)).map(label);
+    const ignored = [...mainSel].filter(([k]) => !allowed.has(k)).map(label);
+    return `Selections applied: ${applied.join('; ') || 'none'}.${ignored.length ? ` Not applied to this sheet: ${ignored.join('; ')}.` : ''}`;
+  };
 
   const kpiDefs = [
     ['Unemployed per vacancy', 'Unemployed per Vacancy', 'Unemployed per Vacancy Change on Year', 'market', 'dec'],
@@ -44,6 +59,7 @@ export const exportWorkbook = async ({ q, keyOf, mainSel, timeSelected, chipLabe
     ['Private sector pay growth (%)', 'Private Sector Pay Growth', 'Private Sector Pay Growth Change on Year', 'pay', 'num1'],
     ['Redundancies (000s)', 'Redundancies (000s)', 'Redundancies Change on Year (000s)', 'demand', 'int'],
   ];
+  // Every headline KPI takes the same fields (time only), so the Summary has one banner.
   const kpis = await Promise.all(kpiDefs.map(async ([label, m, d, tab, f]) => {
     const [r] = await q({ measures: [m, d], filters: [...sel(tab, { kpi: true }), ...latest] });
     return [{ v: label, s: 'bold' }, { v: r?.[m] ?? null, s: f }, { v: r?.[d] ?? null, s: 'sdec' }];
@@ -60,12 +76,15 @@ export const exportWorkbook = async ({ q, keyOf, mainSel, timeSelected, chipLabe
     .filter((r) => r.Sector != null && r.Sector !== '' && r['Sector Vacancies (000s)'] != null);
   const regions = await q({ dims: ['Geography'], measures: ['Regional Unemployment Rate', 'Regional Unemployment Change on a Year Earlier', 'Regional Employment Rate'], filters: [...sel('regions'), ...latest, { field: { fieldKey: keyOf('Theme') }, operator: 'inList', values: ['Regional'] }] });
   const trend = await q({ dims: ['Year'], measures: ['Unemployed per Vacancy', 'Vacancies (000s)', 'Unemployment Rate', 'Regular Pay Growth', 'Real Regular Pay Growth', 'Implied CPIH Inflation'], filters: sel('market') });
-  const latestTable = await q({ dims: ['Theme', 'Indicator', 'Period Label'], measures: ['Value', 'Change on Quarter', 'Change on a Year Earlier', 'Change vs Pre-Pandemic'], filters: [...sel('market'), ...latest, { field: { fieldKey: keyOf('Geography') }, operator: 'inList', values: ['United Kingdom'] }, { field: { fieldKey: keyOf('Sex') }, operator: 'inList', values: ['All'] }] });
+  // With no time selected this is each indicator's latest month; with one, every selected month.
+  const latestTable = await q({ dims: ['Theme', 'Indicator', 'Period Label'], measures: ['Value', 'Change on Quarter', 'Change on a Year Earlier', 'Change vs Pre-Pandemic'], limit: DATA_LIMIT, filters: [...sel('market'), ...latest, { field: { fieldKey: keyOf('Geography') }, operator: 'inList', values: ['United Kingdom'] }, { field: { fieldKey: keyOf('Sex') }, operator: 'inList', values: ['All'] }] });
+  const dataBasis = timeSelected ? 'One row per indicator and selected month' : 'Latest release';
+  const dataCut = latestTable.length >= DATA_LIMIT ? ` Only the first ${DATA_LIMIT} rows are included; select fewer months for the full list.` : '';
 
   const sheets = [
     { name: 'Summary', cols: [38, 16, 16], rows: [
       title('Labour Market Pulse — monthly briefing pack'),
-      [{ v: `ONS Labour Market Statistics, release of 15 Sep 2026 (contains public sector information licensed under the Open Government Licence v3.0). Basis: ${basis}. Selections: ${selText}.`, s: 'subtitle' }],
+      [{ v: `ONS Labour Market Statistics, release of 15 Sep 2026 (contains public sector information licensed under the Open Government Licence v3.0). Basis: ${basis}. Headline figures are UK-wide. ${selText('market', { kpi: true })}`, s: 'subtitle' }],
       [],
       head(['Headline', 'Value', 'Change on a year']),
       ...kpis,
@@ -78,27 +97,27 @@ export const exportWorkbook = async ({ q, keyOf, mainSel, timeSelected, chipLabe
       [{ v: 'Workflow records are simulated in the browser.', s: 'note' }],
     ], merges: ['A1:C1', 'A2:C2'] },
     { name: 'Market', cols: [10, 14, 14, 14, 14, 14, 14], freeze: { row: 3 }, rows: [
-      title('Is the UK labour market tightening or loosening? Annual averages'), [{ v: `Selections: ${selText}`, s: 'subtitle' }],
+      title('Is the UK labour market tightening or loosening? Annual averages'), [{ v: selText('market'), s: 'subtitle' }],
       head(['Year', 'Unemployed per vacancy', 'Vacancies (000s)', 'Unemployment %', 'Pay growth %', 'Real pay %', 'Implied CPIH %']),
       ...trend.map((r) => [r.Year, { v: r['Unemployed per Vacancy'], s: 'dec' }, { v: r['Vacancies (000s)'], s: 'int' }, { v: r['Unemployment Rate'], s: 'num1' }, { v: r['Regular Pay Growth'], s: 'num1' }, { v: r['Real Regular Pay Growth'], s: 'num1' }, { v: r['Implied CPIH Inflation'], s: 'num1' }]),
     ], merges: ['A1:G1'] },
     { name: 'Demand', cols: [36, 14, 14, 12], freeze: { row: 3 }, rows: [
-      title('Where is hiring demand falling?'), [{ v: `${basis}. Seven sectors only. Selections: ${selText}`, s: 'subtitle' }],
+      title('Where is hiring demand falling?'), [{ v: `${basis}. Seven sectors only. ${selText('demand')}`, s: 'subtitle' }],
       head(['Sector', 'Vacancies (000s)', 'Δ year (000s)', 'Share']),
       ...sector.sort((a, b) => b['Sector Vacancies (000s)'] - a['Sector Vacancies (000s)']).map((r) => [r.Sector, { v: r['Sector Vacancies (000s)'], s: 'int' }, { v: r['Sector Vacancy Change on Year (000s)'], s: 'sdec' }, { v: r['Share of Sector Vacancies'], s: 'pct' }]),
     ], merges: ['A1:D1'] },
     { name: 'Pay', cols: [36, 14, 16], rows: [
-      title('What does a looser market mean for pay?'), [{ v: basis, s: 'subtitle' }],
+      title('What does a looser market mean for pay?'), [{ v: `${basis}. UK-wide. ${selText('pay', { kpi: true })}`, s: 'subtitle' }],
       head(['Measure', 'Value', 'Change on a year']),
       ...kpis.slice(3, 6),
     ], merges: ['A1:C1'] },
     { name: 'Regions', cols: [24, 16, 16, 16], freeze: { row: 3 }, rows: [
-      title('Which regions are loosening fastest?'), [{ v: `${basis}. Selections: ${selText}`, s: 'subtitle' }],
+      title('Which regions are loosening fastest?'), [{ v: `${basis}. ${selText('regions')}`, s: 'subtitle' }],
       head(['Region', 'Unemployment %', 'Δ year (pp)', 'Employment %']),
       ...regions.sort((a, b) => b['Regional Unemployment Change on a Year Earlier'] - a['Regional Unemployment Change on a Year Earlier']).map((r) => [r.Geography, { v: r['Regional Unemployment Rate'], s: 'num1' }, { v: r['Regional Unemployment Change on a Year Earlier'], s: 'pp' }, { v: r['Regional Employment Rate'], s: 'num1' }]),
     ], merges: ['A1:D1'] },
     { name: 'Data', cols: [14, 36, 16, 12, 12, 12, 14], freeze: { row: 3 }, rows: [
-      title('Every UK headline indicator'), [{ v: basis, s: 'subtitle' }],
+      title('Every UK headline indicator'), [{ v: `${dataBasis}. UK-wide. ${selText('market')}${dataCut}`, s: 'subtitle' }],
       head(['Theme', 'Indicator', 'Period', 'Value', 'Δ quarter', 'Δ year', 'Δ vs Feb 2020']),
       ...latestTable.sort((a, b) => `${a.Theme}${a.Indicator}`.localeCompare(`${b.Theme}${b.Indicator}`)).map((r) => [r.Theme, r.Indicator, r['Period Label'], { v: r.Value, s: 'num1' }, { v: r['Change on Quarter'], s: 'sdec' }, { v: r['Change on a Year Earlier'], s: 'sdec' }, { v: r['Change vs Pre-Pandemic'], s: 'sdec' }]),
     ], merges: ['A1:G1'] },
@@ -109,10 +128,20 @@ export const exportWorkbook = async ({ q, keyOf, mainSel, timeSelected, chipLabe
     ], merges: ['A1:B1'] },
   ];
   const blob = workbookBlob({ sheets, title: 'Labour Market Pulse', author: 'Labour Market Pulse' });
+  const info = { at: Date.now(), basis, diag, sheets: sheets.map((s) => s.name), dataRows: latestTable.length, kpis: kpis.map((r) => [r[0].v, r[1].v, r[2].v]) };
+  return { blob, info };
+};
+
+/** The workbook as a Blob, under the selections in `ctx` (what the smoke test's export probe builds). */
+export const buildWorkbook = async (ctx) => (await buildPack(ctx)).blob;
+
+/** Build the workbook and download it (the header button). */
+export const downloadWorkbook = async (ctx) => {
+  const { blob, info } = await buildPack(ctx);
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `labour-market-pulse-${new Date().toISOString().slice(0, 10)}.xlsx`;
   document.body.append(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-  window.__lastExport = { at: Date.now(), basis, diag, sheets: sheets.map((s) => s.name), kpis: kpis.map((r) => [r[0].v, r[1].v, r[2].v]) };
+  window.__lastExport = info;
 };

@@ -72,11 +72,11 @@ const main = async () => {
   await Promise.all(compiled.compiled.map(async (t) => { const themed = await themeVSpec({ id: t.id, type: t.type, vSpec: t.vSpec, dataBinding }, availableFields, t); tiles.set(t.id, { ...t, vSpec: themed.vSpec }); }));
   window.__astrato = { tiles: [...tiles.keys()], failures, mounted: {} };
 
-  /** Governed query. dims: [[field, view]]; filters: [[field, view, values]]. */
-  const q = async ({ dims = [], measures = [], filters = [], limit = 500 }) => {
+  /** Governed query. dims: [[field, view]]; filters: [[field, view, values]]; sel: engine filters as built by selFilters. */
+  const q = async ({ dims = [], measures = [], filters = [], sel = [], limit = 500 }) => {
     const dimensions = dims.map(([name, view]) => ({ fieldKey: fields.raw(name, view).fieldKey, name }));
     const calculations = measures.map((name) => ({ calculation: '{m1}', itemKey: fields.measure(name).fieldKey, label: name }));
-    const query = { dimensions, calculations, orders: [], limit, offset: 0, filters: filters.map(([f, v, values]) => ({ field: { fieldKey: fields.raw(f, v).fieldKey }, operator: 'inList', values: values.map(String) })), totals: false, showRecordsCount: false, outerViews: [], associativeListFilter: null };
+    const query = { dimensions, calculations, orders: [], limit, offset: 0, filters: [...filters.map(([f, v, values]) => ({ field: { fieldKey: fields.raw(f, v).fieldKey }, operator: 'inList', values: values.map(String) })), ...sel], totals: false, showRecordsCount: false, outerViews: [], associativeListFilter: null };
     const { response } = await engine.getData({ ...dataBinding, query });
     const names = [...dimensions.map((d) => d.name), ...measures];
     return Object.values(response?.data ?? {}).map((row) => Object.fromEntries(names.map((n, i) => [n, row[i]])));
@@ -271,25 +271,54 @@ const main = async () => {
   roleSel.onchange = () => ops.setUser(roleSel.value);
 
   // ------------------------------------------------------------------ Excel export
+  // The report is the Stock tab's: Summary, Products and Expiry follow the Stock tab's own selection
+  // group (g-stock), passed to engine.getData as filters, so hidden or not, they match the Stock tab.
+  // The Ledger tab has its own group and no sheet. Options is the Plan tab's unfiltered baseline and
+  // Workflows is this browser's request log; their banners say they are not filtered.
+  const XGROUP = 'g-stock', XLIMIT = 5000;
+  const selValue = (v) => String(v && typeof v === 'object' ? v.value ?? v.text : v);
+  /** The group's selections as engine filters (raw view columns, so field.fieldKey); pending overrides applied. */
+  const selFilters = (g) => {
+    const { applied = [], pending = [] } = selections.getSelection(g) ?? {};
+    const byField = new Map();
+    for (const x of [...applied, ...pending]) { const fk = x.field?.fieldKey ?? x.fieldKey; if (fk) byField.set(fk, x); }
+    return [...byField.entries()].filter(([, x]) => x.values?.length).map(([fieldKey, x]) => ({ field: { fieldKey }, operator: x.operator ?? 'inList', values: x.values.map(selValue) }));
+  };
+  const scopeText = (sel) => (sel.length ? `Stock tab selections: ${sel.map((f) => `${labelOf(f.field.fieldKey)} = ${f.values.slice(0, 6).join(', ')}${f.values.length > 6 ? ', …' : ''}`).join('; ')}` : 'Stock tab selections: none (all stock)');
+  const day = (ms) => { const d = ms == null ? null : new Date(Number(ms)); return d && !Number.isNaN(d.getTime()) ? d.toISOString().slice(0, 10) : ''; };
+  /** Builds the workbook the button downloads, as a Blob. */
+  const buildWorkbook = async () => {
+    const sel = selFilters(XGROUP);
+    const K = ['Units On Hand', 'Stock Value', 'Value At Risk', 'Units Inbound', 'Delayed PO Units', 'Suggested Order Units', 'Received 30d', 'Received Prior 30d', 'Shipped 30d', 'Shipped Prior 30d', 'Written Off 30d', 'Written Off Prior 30d', 'Revenue 30d', 'Revenue Prior 30d'];
+    const [[t = {}], prods, batches] = await Promise.all([
+      q({ measures: K, sel, limit: 1 }),
+      q({ dims: [['Category', PV], ['Product Name', PV]], measures: ['Stock Value', 'Value At Risk', 'Units Available', 'Days Of Cover', 'Shipped 30d', 'Received 30d', 'Units Inbound', 'Suggested Order Units'], sel, limit: XLIMIT }),
+      // Re-queried under the same selections, not the workflow queues (loaded once, unfiltered).
+      q({ dims: [['BATCH_ID', BR], ['PRODUCT_NAME', BR], ['WAREHOUSE_ID', BR], ['STATUS', BR], ['EXPIRY_DATE', BR]], measures: ['Units On Hand', 'Units At Risk', 'Value At Risk'], sel, limit: XLIMIT }),
+    ]);
+    const when = new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
+    const scope = scopeText(sel);
+    const banner = (title, cols, line = scope) => [[{ v: 'CORVO', s: 'brand' }, { v: title, s: 'title' }, ...Array(cols - 2).fill({ v: '', s: 'title' })], [null, { v: `Stock Rotation · generated ${when} · illustrative synthetic data`, s: 'subtitle' }], [null, { v: line, s: 'subtitle' }], []];
+    const capped = (rows) => (rows.length >= XLIMIT ? [[], [{ v: `First ${XLIMIT.toLocaleString('en-GB')} rows only: the query limit was reached.`, s: 'bold' }]] : []);
+    const head = (labels) => labels.map((v, i) => ({ v, s: i ? 'head' : 'headl' }));
+    // A prior of zero has no percentage change: "new" when something happened, 0% when nothing did.
+    const change = (a, b) => (N(t[b]) ? { v: N(t[a]) / N(t[b]) - 1, s: 'spct' } : N(t[a]) ? { v: 'new', s: 'text' } : { v: 0, s: 'spct' });
+    const flow = (l, a, b, f) => [null, { v: l, s: 'bold' }, { v: N(t[a]), s: f }, { v: N(t[b]), s: f }, change(a, b)];
+    const snap = (l, a, f) => [null, { v: l, s: 'bold' }, { v: N(t[a]), s: f }];
+    const summary = { name: 'Summary', cols: [4, 32, 16, 16, 14], freeze: { row: 5, col: 0 }, merges: [], rows: [...banner('Rotation summary', 5), head(['', 'Measure', 'Last 30 days', 'Prior 30 days', 'Change']), flow('Units received', 'Received 30d', 'Received Prior 30d', 'int'), flow('Units shipped', 'Shipped 30d', 'Shipped Prior 30d', 'int'), flow('Units written off', 'Written Off 30d', 'Written Off Prior 30d', 'int'), flow('Revenue', 'Revenue 30d', 'Revenue Prior 30d', 'gbp'), [], head(['', 'Position today', 'Value', '', '']), snap('Units on hand', 'Units On Hand', 'int'), snap('Stock value', 'Stock Value', 'gbp'), snap('Value at risk', 'Value At Risk', 'gbp'), snap('Inbound units', 'Units Inbound', 'int'), snap('Delayed PO units', 'Delayed PO Units', 'int'), snap('Suggested order units', 'Suggested Order Units', 'int')] };
+    const prodSheet = { name: 'Products', cols: [14, 30, 12, 12, 12, 10, 12, 12, 10, 12], freeze: { row: 5, col: 2 }, merges: [], rows: [...banner('Rotation by product', 10), head(['Category', 'Product', 'Stock value', 'At risk', 'Available', 'Cover', 'Shipped 30d', 'Received 30d', 'Inbound', 'To order']), ...[...prods].sort((a, b) => N(b['Value At Risk']) - N(a['Value At Risk'])).map((r) => [{ v: r.Category, s: 'text' }, { v: r['Product Name'], s: 'bold' }, { v: N(r['Stock Value']), s: 'gbp' }, { v: N(r['Value At Risk']), s: 'gbp' }, { v: N(r['Units Available']), s: 'int' }, { v: N(r['Days Of Cover']), s: 'dec' }, { v: N(r['Shipped 30d']), s: 'int' }, { v: N(r['Received 30d']), s: 'int' }, { v: N(r['Units Inbound']), s: 'int' }, { v: N(r['Suggested Order Units']), s: 'int' }]), ...capped(prods)] };
+    const expiryKey = (b) => { const n = Number(b.EXPIRY_DATE); return b.EXPIRY_DATE == null || Number.isNaN(n) ? Infinity : n; };
+    const batchSheet = { name: 'Expiry', cols: [18, 30, 10, 12, 12, 10, 10, 12], freeze: { row: 5, col: 1 }, merges: [], rows: [...banner('Batches by expiry', 8), head(['Batch', 'Product', 'WH', 'Status', 'Expiry', 'On hand', 'At risk', 'Value at risk']), ...[...batches].sort((a, b) => expiryKey(a) - expiryKey(b)).map((b) => [{ v: b.BATCH_ID, s: 'bold' }, { v: b.PRODUCT_NAME, s: 'text' }, { v: b.WAREHOUSE_ID, s: 'text' }, { v: b.STATUS, s: 'text' }, { v: day(b.EXPIRY_DATE), s: 'text' }, { v: N(b['Units On Hand']), s: 'int' }, { v: N(b['Units At Risk']), s: 'int' }, { v: N(b['Value At Risk']), s: 'gbp' }]), ...capped(batches)] };
+    const r = evaluate(S);
+    const wiSheet = { name: 'Options', cols: [46, 16], merges: [], rows: [...banner('Options scenario', 2, 'Plan tab baseline: all stock, not filtered by the Stock tab selections'), head(['Lever', 'Setting']), ...LEVERS.map(([k, label, , , , unit]) => [{ v: label, s: 'bold' }, { v: `${S[k]}${unit}`, s: 'text' }]), [], head(['Outcome', 'Value']), ...(r ? [['Write-off avoided', r.avoided, 'gbp'], ['Revenue recovered', r.recovered, 'gbp'], ['Still at risk', r.remaining, 'gbp'], ['Units to order', r.reorder, 'int']].map(([a, v, f]) => [{ v: a, s: 'bold' }, { v, s: f }]) : [[{ v: 'The governed baseline had not loaded yet.', s: 'text' }]])] };
+    const W = workflowState();
+    const wfSheet = { name: 'Workflows', cols: [18, 22, 60, 12], merges: [], rows: [...banner('Requests and audit trail', 4, 'Every request and step recorded in this browser, not filtered'), head(['Request', 'Workflow', 'What', 'Status']), ...W.requests.map((x) => [{ v: x.id, s: 'bold' }, { v: x.action, s: 'text' }, { v: x.label, s: 'text' }, { v: x.status, s: 'text' }]), [], head(['When', 'Who', 'What', 'Run']), ...W.audit.map((a) => [{ v: a.at, s: 'text' }, { v: a.who, s: 'text' }, { v: a.what, s: 'text' }, { v: a.how, s: 'text' }])] };
+    return workbookBlob({ sheets: [summary, prodSheet, batchSheet, wiSheet, wfSheet], title: 'Corvo – Stock Rotation', author: 'Astrato' });
+  };
   exportBtn.addEventListener('click', async () => {
     exportBtn.disabled = true; exportBtn.textContent = 'Building report…';
     try {
-      const K = ['Units On Hand', 'Stock Value', 'Value At Risk', 'Units Inbound', 'Delayed PO Units', 'Suggested Order Units', 'Received 30d', 'Received Prior 30d', 'Shipped 30d', 'Shipped Prior 30d', 'Written Off 30d', 'Written Off Prior 30d', 'Revenue 30d', 'Revenue Prior 30d'];
-      const [[t], prods] = await Promise.all([q({ measures: K, limit: 1 }), q({ dims: [['Category', PV], ['Product Name', PV]], measures: ['Stock Value', 'Value At Risk', 'Units Available', 'Days Of Cover', 'Shipped 30d', 'Received 30d', 'Units Inbound', 'Suggested Order Units'] })]);
-      const Q = ops.queues();
-      const when = new Date().toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' });
-      const banner = (title, cols) => [[{ v: 'CORVO', s: 'brand' }, { v: title, s: 'title' }, ...Array(cols - 2).fill({ v: '', s: 'title' })], [null, { v: `Stock Rotation · generated ${when} · illustrative synthetic data`, s: 'subtitle' }], []];
-      const head = (labels) => labels.map((v, i) => ({ v, s: i ? 'head' : 'headl' }));
-      const flow = (l, a, b, f) => [null, { v: l, s: 'bold' }, { v: N(t[a]), s: f }, { v: N(t[b]), s: f }, { v: N(t[b]) ? N(t[a]) / N(t[b]) - 1 : 0, s: 'spct' }];
-      const snap = (l, a, f) => [null, { v: l, s: 'bold' }, { v: N(t[a]), s: f }];
-      const summary = { name: 'Summary', cols: [4, 32, 16, 16, 14], freeze: { row: 4, col: 0 }, merges: [], rows: [...banner('Rotation summary', 5), head(['', 'Measure', 'Last 30 days', 'Prior 30 days', 'Change']), flow('Units received', 'Received 30d', 'Received Prior 30d', 'int'), flow('Units shipped', 'Shipped 30d', 'Shipped Prior 30d', 'int'), flow('Units written off', 'Written Off 30d', 'Written Off Prior 30d', 'int'), flow('Revenue', 'Revenue 30d', 'Revenue Prior 30d', 'gbp'), [], head(['', 'Position today', 'Value', '', '']), snap('Units on hand', 'Units On Hand', 'int'), snap('Stock value', 'Stock Value', 'gbp'), snap('Value at risk', 'Value At Risk', 'gbp'), snap('Inbound units', 'Units Inbound', 'int'), snap('Delayed PO units', 'Delayed PO Units', 'int'), snap('Suggested order units', 'Suggested Order Units', 'int')] };
-      const prodSheet = { name: 'Products', cols: [14, 30, 12, 12, 12, 10, 12, 12, 10, 12], freeze: { row: 4, col: 2 }, merges: [], rows: [...banner('Rotation by product', 10), head(['Category', 'Product', 'Stock value', 'At risk', 'Available', 'Cover', 'Shipped 30d', 'Received 30d', 'Inbound', 'To order']), ...prods.sort((a, b) => N(b['Value At Risk']) - N(a['Value At Risk'])).map((r) => [{ v: r.Category, s: 'text' }, { v: r['Product Name'], s: 'bold' }, { v: N(r['Stock Value']), s: 'gbp' }, { v: N(r['Value At Risk']), s: 'gbp' }, { v: N(r['Units Available']), s: 'int' }, { v: N(r['Days Of Cover']), s: 'dec' }, { v: N(r['Shipped 30d']), s: 'int' }, { v: N(r['Received 30d']), s: 'int' }, { v: N(r['Units Inbound']), s: 'int' }, { v: N(r['Suggested Order Units']), s: 'int' }])] };
-      const batchSheet = { name: 'Expiry', cols: [18, 30, 10, 12, 12, 10, 10, 12], freeze: { row: 4, col: 1 }, merges: [], rows: [...banner('Batches by expiry', 8), head(['Batch', 'Product', 'WH', 'Status', 'Expiry', 'On hand', 'At risk', 'Value at risk']), ...[...Q.batches].sort((a, b) => a.EXPIRY_DATE - b.EXPIRY_DATE).map((b) => [{ v: b.BATCH_ID, s: 'bold' }, { v: b.PRODUCT_NAME, s: 'text' }, { v: b.WAREHOUSE_ID, s: 'text' }, { v: b.STATUS, s: 'text' }, { v: new Date(Number(b.EXPIRY_DATE)).toISOString().slice(0, 10), s: 'text' }, { v: N(b['Units On Hand']), s: 'int' }, { v: N(b['Units At Risk']), s: 'int' }, { v: N(b['Value At Risk']), s: 'gbp' }])] };
-      const r = evaluate(S);
-      const wiSheet = { name: 'Options', cols: [46, 16], merges: [], rows: [...banner('Options scenario', 2), head(['Lever', 'Setting']), ...LEVERS.map(([k, label, , , , unit]) => [{ v: label, s: 'bold' }, { v: `${S[k]}${unit}`, s: 'text' }]), [], head(['Outcome', 'Value']), ...(r ? [['Write-off avoided', r.avoided, 'gbp'], ['Revenue recovered', r.recovered, 'gbp'], ['Still at risk', r.remaining, 'gbp'], ['Units to order', r.reorder, 'int']].map(([a, v, f]) => [{ v: a, s: 'bold' }, { v, s: f }]) : [])] };
-      const W = workflowState();
-      const wfSheet = { name: 'Workflows', cols: [18, 22, 60, 12], merges: [], rows: [...banner('Requests and audit trail', 4), head(['Request', 'Workflow', 'What', 'Status']), ...W.requests.map((x) => [{ v: x.id, s: 'bold' }, { v: x.action, s: 'text' }, { v: x.label, s: 'text' }, { v: x.status, s: 'text' }]), [], head(['When', 'Who', 'What', 'Run']), ...W.audit.map((a) => [{ v: a.at, s: 'text' }, { v: a.who, s: 'text' }, { v: a.what, s: 'text' }, { v: a.how, s: 'text' }])] };
-      const blob = workbookBlob({ sheets: [summary, prodSheet, batchSheet, wiSheet, wfSheet], title: 'Corvo – Stock Rotation', author: 'Astrato' });
+      const blob = await buildWorkbook();
       window.__lastExport = blob.size;
       const url = URL.createObjectURL(blob);
       const a = Object.assign(document.createElement('a'), { href: url, download: `Corvo_Stock_Rotation_${new Date().toISOString().slice(0, 10)}.xlsx` });
@@ -332,6 +361,16 @@ const main = async () => {
     const detail = [...kpiIds, ...tableIds].map((id) => `${id}: ${moved(id) ? 'moved' : 'same'}${back(id) ? '/restored' : '/NOT restored'}`).join('; ');
     return { pass: Boolean(value) && kpiOk && tableOk && [...kpiIds, ...tableIds].every((id) => before[id] !== ''), detail: `${name} = ${value} → ${detail}` };
   };
+  // The export follows the Stock tab's group: a Warehouse there narrows Summary, Products and Expiry.
+  appState.exportProbe({
+    build: () => buildWorkbook(),
+    select: async () => {
+      pick(XGROUP, 'Warehouse Name', WV, await firstValue('Warehouse Name', WV));
+      for (let i = 0; i < 50 && !(selections.getSelection(XGROUP)?.applied ?? []).some((x) => x.values?.length); i++) await new Promise((r) => setTimeout(r, 100));
+    },
+    clear: () => selections.clearAllSelections(XGROUP),
+    exempt: ['Options', 'Workflows'],
+  });
   appState.check('Stock: a Warehouse selection moves the KPIs and both tables; clearing restores them',
     selectionCheck('stock', 'g-stock', 'Warehouse Name', WV, ['s-oh', 's-oh-d', 's-in', 's-out'], ['s-pos', 's-batch']));
   appState.check('Stock: a Category selection moves the KPIs and tables; clearing restores them',

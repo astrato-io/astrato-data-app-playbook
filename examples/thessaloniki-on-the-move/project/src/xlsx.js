@@ -111,7 +111,8 @@ const colName = (i) => {
   return s;
 };
 
-const sheetXml = (sheet) => {
+/** `footer` is plain text; '&' is doubled so Excel does not read it as a header/footer code. */
+const sheetXml = (sheet, footer = '') => {
   const rows = sheet.rows.map((row, r) => {
     const cells = Array.isArray(row) ? row : row.cells;
     const height = Array.isArray(row) ? undefined : row.height;
@@ -141,7 +142,7 @@ ${sheet.cols ? `<cols>${sheet.cols.map((w, i) => `<col min="${i + 1}" max="${i +
 ${sheet.merges?.length ? `<mergeCells count="${sheet.merges.length}">${sheet.merges.map((m) => `<mergeCell ref="${m}"/>`).join('')}</mergeCells>` : ''}
 <pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/>
 <pageSetup orientation="landscape" paperSize="9" fitToWidth="1" fitToHeight="0"/>
-<headerFooter><oddFooter>&amp;L&amp;8HSBC Wealth &amp;&amp; Personal Banking · Illustrative data&amp;R&amp;8Page &amp;P of &amp;N</oddFooter></headerFooter>
+<headerFooter><oddFooter>&amp;L&amp;8${esc(String(footer).replace(/&/g, '&&'))}&amp;R&amp;8Page &amp;P of &amp;N</oddFooter></headerFooter>
 </worksheet>`;
 };
 
@@ -198,7 +199,7 @@ const zip = (files) => {
   return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 };
 
-export const workbookBlob = ({ sheets, title = 'Report', author = 'Astrato' }) => {
+export const workbookBlob = ({ sheets, title = 'Report', author = 'Astrato', footer = title }) => {
   const now = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
   const files = [
     ['[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -212,7 +213,7 @@ export const workbookBlob = ({ sheets, title = 'Report', author = 'Astrato' }) =
     ['xl/_rels/workbook.xml.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join('')}<Relationship Id="rId${sheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`],
     ['xl/styles.xml', stylesXml()],
-    ...sheets.map((s, i) => [`xl/worksheets/sheet${i + 1}.xml`, sheetXml(s)]),
+    ...sheets.map((s, i) => [`xl/worksheets/sheet${i + 1}.xml`, sheetXml(s, footer)]),
   ];
   return zip(files);
 };

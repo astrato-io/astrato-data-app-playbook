@@ -87,7 +87,7 @@ the caveat, or when the layer could carry it, it counts as app arithmetic.
 
 | # | Criterion | 2 | 1 | 0 | How to test |
 | --- | --- | --- | --- | --- | --- |
-| G1 | Excel report | Formatted multi-sheet workbook (summary, one sheet per tab, data, definitions) following on-screen filters | Single sheet or unformatted, or ignores filters | None | Apply a selection, export, open the file, compare two figures with the screen |
+| G1 | Excel report | Formatted multi-sheet workbook (summary, one sheet per tab, data, definitions) following on-screen filters | Single sheet or unformatted, or ignores filters | None | Apply a selection on one tab, export, open the file, compare figures on every tab's sheet with the screen (the smoke test's export probe) |
 | G2 | What-if | Inputs on the brief's real levers change numbers through the layer, with baseline vs scenario | Inputs exist but change only app-side numbers with no governed baseline | None, though the brief has levers | Move each input; check the baseline is a governed query |
 | G3 | Workflow | Records and audit trail in governed views via writeback (or a labelled fallback where viewers cannot write); maker–checker enforced; reset available | Workflow without audit trail or role rules | None, though the brief has actions | Run one item through each state as each role; try self-approval; read the audit trail; reset |
 

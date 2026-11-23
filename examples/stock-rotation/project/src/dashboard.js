@@ -230,8 +230,7 @@ export const buildTiles = (fields) => {
     if (out.failure) failures.push(out.failure);
     else tiles.push(out.tile);
   }
-  // Each chapter listens to its own selection group, mirrored from the filter bar (MAIN) by the
-  // app: a click re-queries the chapter on screen now and the others when they are scrolled to.
+  // Each page with filters (Stock, Ledger) has its own independent selection group; nothing is mirrored.
     return { tiles, failures };
 };
 export const buildTile = (tile, fields) => build(tile, fields);

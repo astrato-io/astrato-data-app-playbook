@@ -36,7 +36,6 @@ export const mountBuilder = async (ctx, root) => {
   const keyOf = (s) => s?.field?.fieldKey ?? s?.fieldKey;
   const dates = cat.rows.filter((r) => r.date);
   const st = { name: 'Untitled report', view: 'table', rows: [], figures: [], compare: 'none', sort: null, top: 100, period: { field: dates[0]?.key, preset: 'all' } };
-  let applied = [];
   const sharedHash = location.hash; // read before anything rewrites the address
 
   // The period counts back from the last date in the data, not from today.
@@ -62,13 +61,15 @@ export const mountBuilder = async (ctx, root) => {
     for (const s of [...a, ...pending]) if (keyOf(s) === key) selections.removeSelection(group, s);
     if (values?.length) selections.selectValues(group, { field: { fieldKey: key }, fieldKey: key, kind: 'VALUE', operator, values }, { state: 'applied' });
   };
-  const applyPeriod = async () => {
+  // Chained, so the export can wait for the period on screen to be the one applied.
+  let periodDone = Promise.resolve();
+  const applyPeriod = () => (periodDone = periodDone.then(async () => {
     for (const d of dates) if (d.key !== st.period.field) setSelection(d.key, null);
     const r = await periodRange();
     setSelection(st.period.field, r ? [iso(r[0]), iso(r[1])] : null, 'between');
     periodNote.textContent = r ? `${iso(r[0])} – ${iso(r[1])}` : '';
-  };
-  const filters = () => Object.fromEntries(applied.filter((s) => s.operator !== 'between').map((s) => [keyOf(s), s.values]));
+  }).catch((e) => console.error('[period]', e)));
+  const filters = () => Object.fromEntries(selections.getSelection(group).applied.filter((s) => s.operator !== 'between').map((s) => [keyOf(s), s.values]));
   const clearFilters = () => { for (const [key] of Object.entries(filters())) setSelection(key, null); };
 
   // ------------------------------------------------------------------ shell
@@ -202,13 +203,15 @@ export const mountBuilder = async (ctx, root) => {
   };
 
   // ------------------------------------------------------------------ the native object
-  let tileId = null, run = 0, timer = null, lastSpec = null;
+  let tileId = null, run = 0, timer = null, lastSpec = null, rendering = Promise.resolve();
   const hint = (text) => view.replaceChildren(el('div', { class: 'rb-hint', text }));
-  const render = async () => {
+  const render = () => (rendering = draw());
+  const draw = async () => {
+    timer = null;
     const me = ++run;
     if (tileId) { ctx.dropTile(tileId); tileId = null; }
     const ok = needs(st);
-    if (ok !== true) { hint(ok); return; }
+    if (ok !== true) { lastSpec = null; hint(ok); return; }
     const spec = reportSpec(st, cat);
     lastSpec = spec;
     const slot = el('div', { class: 'viz' });
@@ -277,33 +280,54 @@ export const mountBuilder = async (ctx, root) => {
   };
 
   // ------------------------------------------------------------------ export: the object's own rows
+  // buildWorkbook returns the Blob (the smoke test's export probe calls it); exportXlsx downloads it.
+  // There is one selection group and one live object, so the rows follow every filter on screen;
+  // first settle what the screen promises: a chart click still pending, a period still being
+  // resolved, a re-render still in its 300 ms debounce.
+  const buildWorkbook = async () => {
+    if (selections.getSelection(group).pending.some((s) => !cat.get(keyOf(s))?.date)) selections.applyPendingSelections(group);
+    if (timer) { clearTimeout(timer); render(); }
+    await periodDone;
+    await rendering;
+    if (!tileId || !lastSpec) return null;
+    const result = await ctx.getData(tileId);
+    const raw = result?.data?.response?.data ?? result?.data?.data ?? result?.data ?? {};
+    const rows = Array.isArray(raw) ? raw : Object.keys(raw).sort((a, b) => a - b).map((k) => raw[k]);
+    const spec = lastSpec;
+    const cols = [...spec.dims.map((d) => ({ ...d, kind: 'd' })), ...spec.figs.map((m) => ({ ...m, kind: 'm', fmt: excelFormat(m.pattern) })), ...spec.changes.map((c) => ({ ...c, kind: 'm', fmt: '+0.0%;-0.0%;0.0%' }))];
+    const range = await periodRange();
+    const filterText = Object.entries(filters()).map(([k, v]) => `${cat.get(k)?.name}: ${v.join(', ')}`).join(' · ') || 'none';
+    const sortCol = spec.sort?.[0] && cols.find((c) => c.ref === spec.sort[0].by);
+    const meta = [
+      `Period: ${PERIODS[st.period.preset][0]}${range ? ` on ${cat.get(st.period.field)?.name ?? 'date'} (${iso(range[0])} – ${iso(range[1])})` : ''}`,
+      `Filters: ${filterText}`,
+      `Comparison: ${spec.changes.length ? COMPARES[st.compare] : 'none'}`,
+      `Rows: ${rows.length.toLocaleString('en-US')}${rows.length >= spec.top ? ` (the row limit; more rows may exist${sortCol ? `, cut by ${sortCol.label} ${spec.sort[0].direction === 'asc' ? 'ascending' : 'descending'}` : ''}. Raise the row limit for more)` : ''}`,
+      `Exported ${new Date().toISOString().slice(0, 16).replace('T', ' ')} from the governed semantic layer`];
+    const report = {
+      name: 'Report', freeze: meta.length + 3,
+      cols: cols.map((c) => (c.kind === 'd' ? (c.grain ? 12 : 28) : Math.max(14, c.label.length + 4))),
+      rows: [[{ v: st.name, s: 'title' }], ...meta.map((m) => [{ v: m, s: 'note' }]), [],
+        cols.map((c) => ({ v: c.label, s: c.kind === 'd' ? 'head' : 'headr' })),
+        ...rows.map((r) => cols.map((c, i) => (c.kind === 'd' ? { v: c.grain && typeof r[i] === 'number' ? dateLabel(r[i], c.grain) : (r[i] ?? ''), s: 'text' } : { v: typeof r[i] === 'number' ? r[i] : null, s: { fmt: c.fmt } })))],
+    };
+    const about = {
+      name: 'Definitions', cols: [26, 70, 18],
+      rows: [[{ v: 'Definitions', s: 'title' }], [], ['Field', 'Meaning', 'Format'].map((v) => ({ v, s: 'head' })),
+        ...cols.map((c) => [{ v: c.label, s: 'label' }, { v: c.of ? `Change against the ${st.compare === 'lastYear' ? 'same period last year' : 'previous period'}, along the date rows` : cat.get(c.key)?.desc || (c.kind === 'd' ? `Row${c.grain ? ` by ${c.grain}` : ''}` : ''), s: 'text' }, { v: c.kind === 'm' ? c.fmt : c.grain ?? '', s: 'text' }])],
+    };
+    const blob = workbookBlob({ sheets: [report, about], title: st.name });
+    return { blob, rows, cols };
+  };
   let lastExport = null;
   const exportXlsx = async () => {
-    if (!tileId || !lastSpec) { ctx.toast('Build a report first.'); return null; }
     try {
-      const result = await ctx.getData(tileId);
-      const raw = result?.data?.response?.data ?? result?.data?.data ?? result?.data ?? {};
-      const rows = Array.isArray(raw) ? raw : Object.keys(raw).sort((a, b) => a - b).map((k) => raw[k]);
-      const spec = lastSpec;
-      const cols = [...spec.dims.map((d) => ({ ...d, kind: 'd' })), ...spec.figs.map((m) => ({ ...m, kind: 'm', fmt: excelFormat(m.pattern) })), ...spec.changes.map((c) => ({ ...c, kind: 'm', fmt: '+0.0%;-0.0%;0.0%' }))];
-      const range = await periodRange();
-      const filterText = Object.entries(filters()).map(([k, v]) => `${cat.get(k)?.name}: ${v.join(', ')}`).join(' · ') || 'none';
-      const meta = [`Period: ${PERIODS[st.period.preset][0]}${range ? ` (${iso(range[0])} – ${iso(range[1])})` : ''}`, `Filters: ${filterText}`, `Comparison: ${spec.changes.length ? COMPARES[st.compare] : 'none'}`, `Exported ${new Date().toISOString().slice(0, 16).replace('T', ' ')} from the governed semantic layer`];
-      const report = {
-        name: 'Report', freeze: meta.length + 3,
-        cols: cols.map((c) => (c.kind === 'd' ? (c.grain ? 12 : 28) : Math.max(14, c.label.length + 4))),
-        rows: [[{ v: st.name, s: 'title' }], ...meta.map((m) => [{ v: m, s: 'note' }]), [],
-          cols.map((c) => ({ v: c.label, s: c.kind === 'd' ? 'head' : 'headr' })),
-          ...rows.map((r) => cols.map((c, i) => (c.kind === 'd' ? { v: c.grain && typeof r[i] === 'number' ? dateLabel(r[i], c.grain) : (r[i] ?? ''), s: 'text' } : { v: typeof r[i] === 'number' ? r[i] : null, s: { fmt: c.fmt } })))],
-      };
-      const about = {
-        name: 'Definitions', cols: [26, 70, 18],
-        rows: [[{ v: 'Definitions', s: 'title' }], [], ['Field', 'Meaning', 'Format'].map((v) => ({ v, s: 'head' })),
-          ...cols.map((c) => [{ v: c.label, s: 'label' }, { v: c.of ? `Change against the ${st.compare === 'lastYear' ? 'same period last year' : 'previous period'}, along the date rows` : cat.get(c.key)?.desc || (c.kind === 'd' ? `Row${c.grain ? ` by ${c.grain}` : ''}` : ''), s: 'text' }, { v: c.kind === 'm' ? c.fmt : c.grain ?? '', s: 'text' }])],
-      };
-      const blob = workbookBlob({ sheets: [report, about], title: st.name });
-      const a = el('a', { href: URL.createObjectURL(blob), download: `${st.name.replace(/[^\w]+/g, '_') || 'report'}.xlsx` });
+      const built = await buildWorkbook();
+      if (!built) { ctx.toast('Build a report first.'); return null; }
+      const { blob, rows, cols } = built;
+      const a = el('a', { href: URL.createObjectURL(blob), download: `${st.name.replace(/[^\p{L}\p{N}]+/gu, '_') || 'report'}.xlsx` });
       document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
       ctx.toast(`Exported ${rows.length.toLocaleString('en-US')} rows.`);
       lastExport = { rows: rows.length, cols: cols.length, width: rows[0]?.length ?? 0, size: blob.size, first: rows[0] };
       return lastExport;
@@ -314,11 +338,10 @@ export const mountBuilder = async (ctx, root) => {
     }
   };
 
-  selections.onActiveSelectionChange(group).subscribe(({ applied: a, pending }) => {
+  selections.onActiveSelectionChange(group).subscribe(({ pending }) => {
     // A click on a date in a chart would replace the period; drop it. Other clicks apply at once.
     for (const s of pending) if (cat.get(keyOf(s))?.date && s.operator !== 'between') setTimeout(() => selections.removeSelection(group, s), 0);
     if (pending.some((s) => !cat.get(keyOf(s))?.date)) setTimeout(() => selections.applyPendingSelections(group), 250);
-    applied = a;
     renderFilters();
     remember();
   });
@@ -329,5 +352,5 @@ export const mountBuilder = async (ctx, root) => {
   start ??= STARTERS.map((t) => fromStarter(t, cat)).find(Boolean) ?? { ...st, rows: cat.rows.slice(0, 1).map((r) => ({ key: r.key })), figures: cat.figures.slice(0, 1).map((f) => f.key), name: 'First report', period: { preset: 'all' } };
   renderFilters();
   await load(start);
-  return { st, elements: { panelBody, viewSeg, addFilterBtn, clearAllBtn, saveBtn, savedBtn, shareBtn, exportBtn, newBtn, nameIn, compareSel, pop, view, note }, load, snapshot, decode, exportXlsx, share, saved, store, get tileId() { return tileId; }, get lastExport() { return lastExport; }, filters };
+  return { st, elements: { panelBody, viewSeg, addFilterBtn, clearAllBtn, saveBtn, savedBtn, shareBtn, exportBtn, newBtn, nameIn, compareSel, pop, view, note }, load, snapshot, decode, exportXlsx, buildWorkbook, setSelection, clearFilters, share, saved, store, get tileId() { return tileId; }, get lastExport() { return lastExport; }, filters };
 };

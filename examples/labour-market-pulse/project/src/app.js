@@ -20,7 +20,7 @@ import { createFieldIndex } from './fields.js';
 import { TABS, TILES, FILTERS, C } from './catalogue.js';
 import { prepare, staticGroup, opGroup, columnWidths } from './tiles.js';
 import { mountWorkflow } from './workflow.js';
-import { exportWorkbook } from './export.js';
+import { buildWorkbook, downloadWorkbook } from './export.js';
 
 const el = (tag, attrs = {}, kids = []) => {
   const n = document.createElement(tag);
@@ -281,10 +281,10 @@ const main = async () => {
   };
 
   // ---------------------------------------------------------------- selection bar
-  const chipLabel = (key, values) => {
+  const chipLabel = (key, values, all = false) => {
     const name = NAME_BY_KEY[key] ?? fields.nameOf(key);
     const shown = key === keyOf('Period') ? values.map(monthLabel) : values.map(String);
-    return [name === 'Period Year' ? 'Year' : name === 'Period' ? 'Month' : name === 'Sector' ? 'Sector' : name === 'Geography' ? 'Region' : name, shown.slice(0, 3).join(', ') + (shown.length > 3 ? ` +${shown.length - 3}` : '')];
+    return [name === 'Period Year' ? 'Year' : name === 'Period' ? 'Month' : name === 'Sector' ? 'Sector' : name === 'Geography' ? 'Region' : name, all ? shown.join(', ') : shown.slice(0, 3).join(', ') + (shown.length > 3 ? ` +${shown.length - 3}` : '')];
   };
   const renderSelBar = () => {
     const scope = SCOPE[current];
@@ -441,12 +441,23 @@ const main = async () => {
   appState.mark('landing-ready');
 
   // ---------------------------------------------------------------- Excel
+  // The pack reads `mainSel` through its own governed queries, never the tab groups, so hidden tabs
+  // follow the selections without syncing their groups. A chart click still waiting out its 200 ms
+  // auto-apply is applied first, so an export straight after a click includes it.
+  const exportContext = async () => {
+    if (SCOPE[current]) {
+      const waiting = [`g-${current}`, `g-${current}-k`].filter((g) => selections.getSelection(g)?.pending?.length);
+      for (const g of waiting) selections.applyPendingSelections(g);
+      if (waiting.length) await new Promise((r) => setTimeout(r, 50));
+    }
+    return { q, keyOf, mainSel, timeSelected: timeSelected(), chipLabel, scope: SCOPE };
+  };
   exportBtn.addEventListener('click', async () => {
     exportBtn.disabled = true;
     exportBtn.title = 'Building the Excel pack…';
     window.__lastExportError = null;
     // No alert(): a modal dialog blocks the page (and any headless check) until someone dismisses it.
-    try { await exportWorkbook({ q, keyOf, mainSel, timeSelected: timeSelected(), chipLabel }); exportBtn.title = 'Download the briefing pack as Excel, following the current selections'; }
+    try { await downloadWorkbook(await exportContext()); exportBtn.title = 'Download the briefing pack as Excel, following the current selections'; }
     catch (error) { window.__lastExportError = String(error?.message ?? error); exportBtn.title = `Export failed: ${window.__lastExportError}`; console.error('[export]', error); }
     finally { exportBtn.disabled = false; }
   });
@@ -519,6 +530,14 @@ const main = async () => {
     const info = window.__lastExport;
     await clearAll();
     return { pass: info?.sheets?.length === 7 && info.basis === 'Average of the selected months' && !info.diag?.length, detail: JSON.stringify({ error: window.__lastExportError, diag: info?.diag, sheets: info?.sheets, basis: info?.basis, kpis: info?.kpis }) };
+  });
+  // The kit builds the pack without and with a Year from the landing tab, so the other tabs are hidden.
+  // A Year narrows every sheet but Definitions; it goes through the visible tab's group, as a filter does.
+  appState.exportProbe({
+    build: async () => buildWorkbook(await exportContext()),
+    select: () => (SCOPE[current] ? groupSelect(current, 'Year', [2022]) : window.__select('Year', [2022])),
+    clear: () => clearAll(),
+    exempt: ['Definitions'],
   });
   appState.check('What-if: moving the pay award from 4% to 6% changes both scenario numbers; Reset restores them', async () => {
     go('pay'); await quiet();

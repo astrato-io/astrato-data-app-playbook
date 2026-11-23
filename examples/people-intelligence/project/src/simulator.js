@@ -241,21 +241,28 @@ export const mountSimulator = (ctx, grid) => {
           el('td', { class: 'r' }, el('button', { class: 'pi-btn sm', onclick: () => { st.pop = { ...x.pop }; st.L = { ...x.L }; st.preset = 'Loaded'; renderHero(); renderLevers(); loadBase(); } }, el('span', { text: 'Load' })))]))])) : el('p', { class: 'pi-note', text: 'Save scenarios to compare them side by side. Saved scenarios persist for this demo session in your browser.' }));
   };
 
+  /** The governed baseline for a population (persona scope added by ctx.q). Renders nothing, so the export can call it too. */
+  const fetchBase = async (pop) => {
+    const F = popFilters(pop);
+    const FB = F.filter(([f]) => f !== 'Seniority');
+    const [[w] = {}, [k] = {}, [r] = {}] = await Promise.all([
+      ctx.q({ measures: ['Headcount', 'Voluntary Attrition', 'Voluntary Attrition P2Q', 'Voluntary Leavers LTM', 'Replacement Cost Exposure', 'Payroll Cost LTM', 'Critical Role Headcount', 'External Hires LTM'], filters: F, limit: 1 }),
+      ctx.q({ measures: ['Critical Skills Coverage', 'Required FTE'], filters: [...FB, ['Skill Tier', 'Skills', ['Strategic']]], limit: 1 }),
+      ctx.q({ measures: ['Average Cost per Hire'], filters: F, limit: 1 }),
+    ]);
+    const base = { ...Object.fromEntries(Object.entries({ ...w, ...k, ...r }).map(([a, v]) => [a, Number(v ?? 0)])) };
+    if (!base['Critical Skills Coverage']) base['Critical Skills Coverage'] = 0.7;
+    return base;
+  };
   let baseRun = 0;
   const loadBase = async () => {
     const my = ++baseRun;
     st.base = null; renderHero(); renderResults();
     const F = popFilters(st.pop);
-    const FB = F.filter(([f]) => f !== 'Seniority');
     try {
-      const [[w] = {}, [k] = {}, [r] = {}] = await Promise.all([
-        ctx.q({ measures: ['Headcount', 'Voluntary Attrition', 'Voluntary Attrition P2Q', 'Voluntary Leavers LTM', 'Replacement Cost Exposure', 'Payroll Cost LTM', 'Critical Role Headcount', 'External Hires LTM'], filters: F, limit: 1 }),
-        ctx.q({ measures: ['Critical Skills Coverage', 'Required FTE'], filters: [...FB, ['Skill Tier', 'Skills', ['Strategic']]], limit: 1 }),
-        ctx.q({ measures: ['Average Cost per Hire'], filters: F, limit: 1 }),
-      ]);
+      const base = await fetchBase(st.pop);
       if (my !== baseRun) return;
-      st.base = { ...Object.fromEntries(Object.entries({ ...w, ...k, ...r }).map(([a, v]) => [a, Number(v ?? 0)])) };
-      if (!st.base['Critical Skills Coverage']) st.base['Critical Skills Coverage'] = 0.7;
+      st.base = base;
       window.__sim = st;
       renderResults();
     } catch (e) { results.replaceChildren(el('p', { class: 'pi-note', text: `Baseline query failed: ${e?.message ?? e}` })); }
@@ -274,5 +281,7 @@ export const mountSimulator = (ctx, grid) => {
   };
   renderLevers(); renderCompare(); ctx.onPageMount('sim', () => { if (!st.base) loadBase(); });
   ctx.onPersona(() => loadBase());
-  return { open, state: st, project };
+  /** The baseline the scenario projects from: the loaded one, or (page never opened, or reloading after a persona switch) a fresh query. */
+  const baseNow = async () => st.base ?? fetchBase(st.pop);
+  return { open, state: st, project, baseNow };
 };

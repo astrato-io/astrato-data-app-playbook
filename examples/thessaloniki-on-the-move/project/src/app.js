@@ -270,6 +270,12 @@ const main = async () => {
     if (!sel.length) return 'the whole network';
     return sel.map((s) => `${LABEL_OF[s.field.fieldKey] ?? fields.nameOf(s.field.fieldKey)}: ${s.values.map(strip).slice(0, 2).join(' + ')}${s.values.length > 2 ? ` +${s.values.length - 2}` : ''}`).join(' · ');
   };
+  /** Every applied filter with every value, for the report, where a "+3" would hide what the rows follow. */
+  const scopeFull = () => {
+    const sel = mainApplied();
+    if (!sel.length) return 'none (the whole network)';
+    return sel.map((s) => `${LABEL_OF[s.field.fieldKey] ?? fields.nameOf(s.field.fieldKey)}: ${s.values.map(strip).join(', ')}`).join(' · ');
+  };
 
   // ------------------------------------------------------------------ shell
   const chipsHost = el('div', { class: 'chips', 'aria-live': 'polite' });
@@ -1092,11 +1098,23 @@ const main = async () => {
   };
 
   // ------------------------------------------------------------- Excel report
+  // The workbook as a Blob. Every query passes the filter bar's applied selections explicitly
+  // (filtersFor), so every sheet follows them whichever chapter is on screen. A pick still pending
+  // in its 300 ms debounce is applied first, so the report never leaves out the filter just chosen.
+  const buildWorkbook = async () => {
+    if (selections.getSelection(MAIN).pending.length) {
+      clearTimeout(applyTimer);
+      selections.applyPendingSelections(MAIN);
+      // Let the main listener run (a line click there is moved to the route explorer, not kept).
+      await new Promise((r) => setTimeout(r, 0));
+    }
+    return buildReport({ q, filtersFor, views: { SV, LV, ST }, scope: scopeFull(), period: PERIOD });
+  };
   const exportReport = async () => {
     reportBtn.disabled = true;
     reportBtn.lastChild.textContent = ' Building report…';
     try {
-      const blob = await buildReport({ q, filtersFor, views: { SV, LV, ST }, scope: scopeLabel(), period: PERIOD });
+      const blob = await buildWorkbook();
       downloadReport(blob);
       toast('Management report downloaded: 7 tabs, scoped to the filters on screen.');
     } catch (error) {
@@ -1174,8 +1192,12 @@ const main = async () => {
       filterbar.querySelector('.filterbar__reset').click();
       await settleQuiet();
       const after = { kpi: figure(kpi), obj: look(object), chips: chipsHost.innerText.trim() };
-      const pass = before.kpi !== '' && during.kpi !== before.kpi && during.obj !== before.obj && after.kpi === before.kpi && after.chips === '';
-      return { pass, detail: `Category=${value}: "${short(before.kpi)}" -> "${short(during.kpi)}" -> "${short(after.kpi)}"; ${object} ${before.obj} -> ${during.obj} -> ${after.obj}; chips "${during.chips}" -> "${after.chips}"` };
+      // Without the trips extract (not shipped) the live counter has nothing to filter: check only
+      // the governed fleet chart there, and say so.
+      const noExtract = chapter === 'live' && live.missing;
+      const kpiOk = noExtract || (before.kpi !== '' && during.kpi !== before.kpi && after.kpi === before.kpi);
+      const pass = kpiOk && during.obj !== before.obj && after.chips === '';
+      return { pass, detail: `${noExtract ? '(no trips extract: counter not checked) ' : ''}Category=${value}: "${short(before.kpi)}" -> "${short(during.kpi)}" -> "${short(after.kpi)}"; ${object} ${before.obj} -> ${during.obj} -> ${after.obj}; chips "${during.chips}" -> "${after.chips}"` };
     });
   }
   appState.check('route: choosing another line changes the line profile and hourly chart; going back restores them', async () => {
@@ -1210,6 +1232,16 @@ const main = async () => {
     for (let i = 0; i < 100 && (reportBtn.disabled || toastHost.hidden); i++) await new Promise((r) => setTimeout(r, 300));
     const said = toastHost.textContent;
     return { pass: said.startsWith('Management report downloaded'), detail: said };
+  });
+
+  // The kit builds the workbook with no filter and with one line category, from the landing
+  // chapter, and fails any sheet whose figures did not move. The category goes in through the
+  // filter bar's own path, as in the checks above: a pending selection in the main group.
+  appState.exportProbe({
+    build: () => buildWorkbook(),
+    select: async () => selections.selectValues(MAIN, selectionOf(KEY.cat, [await pickCategory()]), { state: 'pending' }),
+    clear: () => resetMain(),
+    exempt: ['Definitions'],
   });
 
   window.__astrato = { timings, live, renderLive, setPlaying, context, facts, mounted, selections, tiles, failures: allFailures, q, col, KEY, setGroup, openLine, sim, renderSim, allMounted };

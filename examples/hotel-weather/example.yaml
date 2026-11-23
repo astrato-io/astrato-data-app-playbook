@@ -52,19 +52,19 @@ start_here:
   - project/src/tiles.js — every object as data (source, stored question or browser question, measures, presentation), the levers
 capabilities:
   - data-blending — project/src/duck.js:71
-  - what-if — project/src/app.js:420
-  - narrative-headline — project/src/app.js:395
+  - what-if — project/src/app.js:424
+  - narrative-headline — project/src/app.js:370
   - simulated-workflow — project/src/offers.js:45
   - role-switcher — project/src/app.js:130
-  - excel-export — project/src/export.js:22
+  - excel-export — project/src/export.js:26
 stealable:
   - "The blend: the rows of ONE stored question (city × night, this autumn and last) are copied into DuckDB beside the weather and joined on city and date, so every demand figure in it is governed — project/src/app.js:297"
   - "A second visualization runtime on a DuckDB engine: native charts on API data, with the app's real selection service, so they click, filter and follow chips like governed ones — project/src/app.js:313"
   - "engine.getData over DuckDB: dimension and measure names map to SQL, dates go back as epoch ms, and the group's applied selections become the WHERE (keys it does not know are ignored) — project/src/duck-engine.js:123"
   - "Scoped selection service for the governed runtime: it hides the browser-only weather keys, emits only when the governed view changes, and adds hidden band selections back on a governed click — project/src/selection-scope.js:46"
   - "Pending selections from chart clicks and range drags are applied after 250 ms of quiet, and an empty range list is dropped before it reaches the engine — project/src/app.js:245"
-  - "Levers set the layer's measure parameters on the mounted offer tiles with setMeasureDefinedParameter through applyRuntimeOperations, only while the tab shows — project/src/app.js:420"
-  - "Right-click a card for its SQL: governed SQL from an MCP dry run of the stored question (tools/governed-sql.mjs), browser SQL from the last statement that chart ran — project/src/app.js:593"
+  - "Levers set the layer's measure parameters on the mounted offer tiles with setMeasureDefinedParameter through applyRuntimeOperations, only while the tab shows — project/src/app.js:424"
+  - "Right-click a card for its SQL: governed SQL from an MCP dry run of the stored question (tools/governed-sql.mjs), browser SQL from the last statement that chart ran — project/src/app.js:619"
   - "Independent check of the blend outside the browser: the same stored question over MCP and the same Open-Meteo request, joined in plain JavaScript — project/tools/verify-blend.mjs:1"
   - "Query lanes with 429 retry and a session cache keyed by the exact request — project/src/throttle.js:32"
 caveats:

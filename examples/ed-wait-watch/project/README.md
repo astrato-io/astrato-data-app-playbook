@@ -17,7 +17,9 @@ A hand-written Astrato App (Vite, vanilla JS, `@astrato-io/visualizations` 0.9.0
 
 Every tab: a sticky selection bar (chips, ×, Clear all, hint), four dropdown filters (month,
 department, arrival band, day; status and owner on Flags), an **Excel report** button (7 sheets:
-Summary, When, Who, Satisfaction, Flags, Data, Definitions), all following the selections.
+Summary, When, Who, Satisfaction, Flags, Data, Definitions). The visit sheets follow the visit
+selections and the Flags sheet the flag selections (flags do not join to visits); each sheet's
+banner names exactly the selections its rows follow.
 
 ## How it is built
 

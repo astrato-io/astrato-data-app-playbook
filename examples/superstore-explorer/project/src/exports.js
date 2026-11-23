@@ -3,8 +3,9 @@
  *
  * CSV: UTF-8 with a byte-order mark, `sep=;` and semicolons, so Excel opens it
  * without an import dialog in any locale.
- * Excel: a real .xlsx — a zip (stored, no compression) of five XML parts —
- * with numbers as numeric cells and text as inline strings.
+ * Excel: a real .xlsx — a zip (stored, no compression) of XML parts, one worksheet per table —
+ * with numbers as numeric cells and text as inline strings. Each sheet opens with the table's
+ * title and its scope (the period and filters its rows follow), then the header and the rows.
  */
 
 const download = (blob, name) => {
@@ -93,26 +94,44 @@ const zip = (files) => {
 const xml = (s) => String(s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const colName = (i) => (i >= 26 ? colName(Math.floor(i / 26) - 1) : '') + String.fromCharCode(65 + (i % 26));
 
-export const toXlsx = ({ columns, rows }) => {
+// Sheet names: at most 31 characters, none of []:*?/\, unique.
+const sheetName = (name, used) => {
+  const base = String(name || 'Data').replace(/[[\]:*?/\\]/g, ' ').trim().slice(0, 31) || 'Data';
+  let out = base;
+  for (let n = 2; used.has(out.toLowerCase()); n++) out = `${base.slice(0, 31 - String(n).length - 1)} ${n}`;
+  used.add(out.toLowerCase());
+  return out;
+};
+
+/** A workbook from one table or several, one sheet each. A table's `sheet` names its sheet. */
+export const toXlsx = (input) => {
+  const NS = 'http://schemas.openxmlformats.org';
+  const tables = [].concat(input);
   const cell = (v, r, c) => {
     const ref = `${colName(c)}${r}`;
     if (typeof v === 'number' && Number.isFinite(v)) return `<c r="${ref}"><v>${v}</v></c>`;
     if (v === null || v === undefined || v === '') return '';
     return `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${xml(v)}</t></is></c>`;
   };
-  const sheetRows = [columns, ...rows].map((row, i) => `<row r="${i + 1}">${row.map((v, c) => cell(v, i + 1, c)).join('')}</row>`).join('');
-  const NS = 'http://schemas.openxmlformats.org';
+  const sheetXml = ({ title, scope, columns, rows }) => {
+    const all = [[title], ...(scope ? [[scope]] : []), [], columns, ...rows];
+    const body = all.map((row, i) => `<row r="${i + 1}">${row.map((v, c) => cell(v, i + 1, c)).join('')}</row>`).join('');
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="${NS}/spreadsheetml/2006/main"><sheetData>${body}</sheetData></worksheet>`;
+  };
+  const used = new Set();
+  const names = tables.map((t) => sheetName(t.sheet, used));
+  const n = tables.map((_, i) => i + 1);
   return zip([
-    ['[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="${NS}/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>`],
+    ['[Content_Types].xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="${NS}/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>${n.map((i) => `<Override PartName="/xl/worksheets/sheet${i}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`],
     ['_rels/.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="${NS}/package/2006/relationships"><Relationship Id="rId1" Type="${NS}/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`],
-    ['xl/workbook.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="${NS}/spreadsheetml/2006/main" xmlns:r="${NS}/officeDocument/2006/relationships"><sheets><sheet name="Data" sheetId="1" r:id="rId1"/></sheets></workbook>`],
-    ['xl/_rels/workbook.xml.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="${NS}/package/2006/relationships"><Relationship Id="rId1" Type="${NS}/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>`],
-    ['xl/worksheets/sheet1.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="${NS}/spreadsheetml/2006/main"><sheetData>${sheetRows}</sheetData></worksheet>`],
+    ['xl/workbook.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="${NS}/spreadsheetml/2006/main" xmlns:r="${NS}/officeDocument/2006/relationships"><sheets>${n.map((i) => `<sheet name="${xml(names[i - 1])}" sheetId="${i}" r:id="rId${i}"/>`).join('')}</sheets></workbook>`],
+    ['xl/_rels/workbook.xml.rels', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="${NS}/package/2006/relationships">${n.map((i) => `<Relationship Id="rId${i}" Type="${NS}/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i}.xml"/>`).join('')}</Relationships>`],
+    ...tables.map((t, i) => [`xl/worksheets/sheet${i + 1}.xml`, sheetXml(t)]),
   ]);
 };
 
-export const exportXlsx = (table) => {
-  const blob = toXlsx(table);
-  download(blob, `${safeName(table.title)}.xlsx`);
+/** Download a workbook Blob built by toXlsx. */
+export const downloadXlsx = (blob, title) => {
+  download(blob, `${safeName(title)}.xlsx`);
   return blob.size;
 };

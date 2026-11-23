@@ -39,6 +39,7 @@ const FORMATS = {
   sint: '[Color10]+#,##0;[Red]-#,##0;0',
   sgbp: '[Color10]+£#,##0;[Red]-£#,##0;£0',
   spos: '[Red]+0.0;[Color10]-0.0;0.0',
+  spts: '[Color10]+0.00" pp";[Red]-0.00" pp";0.00" pp"',
 };
 
 /** Style key → { font, fill, border, fmt, align }. Index order is the cellXfs order. */
@@ -62,7 +63,7 @@ const BASE = {
   bar: { font: { color: AQUA, sz: 10 }, border: { bottom: RULE } },
   barv: { font: { color: 'FFE0583A', sz: 10 }, border: { bottom: RULE } },
 };
-const NUMERIC = ['gbp', 'int', 'usd', 'usd0', 'bn', 'pct', 'pct2', 'spct', 'susd', 'dec', 'usdint', 'ms', 'upt', 'gbpm', 'gbpk', 'psf', 'x', 'sint', 'sgbp', 'spos'];
+const NUMERIC = ['gbp', 'int', 'usd', 'usd0', 'bn', 'pct', 'pct2', 'spct', 'susd', 'dec', 'usdint', 'ms', 'upt', 'gbpm', 'gbpk', 'psf', 'x', 'sint', 'sgbp', 'spos', 'spts'];
 for (const f of NUMERIC) {
   BASE[f] = { fmt: f, border: { bottom: RULE } };
   BASE[`${f}T`] = { fmt: f, font: { b: true }, fill: PALE, border: { top: INK, bottom: INK } };

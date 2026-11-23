@@ -56,17 +56,17 @@ capabilities:
   - writeback-workflow — project/src/workflow.js:106
   - simulated-workflow — project/src/workflow.js:120
   - role-switcher — project/src/workflow.js:28
-  - what-if — project/src/app.js:451
+  - what-if — project/src/app.js:454
   - narrative-headline — project/src/app.js:347
-  - excel-export — project/src/export.js:21
+  - excel-export — project/src/export.js:29
 stealable:
-  - "One rule function for both modes: decide(action, flag, actor, note) refuses with a reason (lead-only sign-off, four eyes on raiser and resolver, note required); the change then goes to writeback in Live or to the browser tab in Practice (src/workflow.js:125) — project/src/workflow.js:48"
-  - "Live writeback as a record update plus an insert into an audit-events view, refusing an update that changed no row, then the query cache cleared and only the flag objects remounted (src/app.js:579) — project/src/workflow.js:106"
+  - "One rule function for both modes: decide(action, flag, actor, note) refuses with a reason (lead-only sign-off, four eyes on raiser and resolver, note required); the change then goes to writeback in Live or to the browser tab in Practice (src/workflow.js:126) — project/src/workflow.js:48"
+  - "Live writeback as a record update plus an insert into an audit-events view, refusing an update that changed no row, then the query cache cleared and only the flag objects remounted (src/app.js:582) — project/src/workflow.js:106"
   - "The comparison window read from the data, not hard-coded: the latest month with visits and its last day give '1–30 Oct 2020 with 1–30 Sep 2020' for the masthead, captions and Excel — project/src/app.js:286"
   - "Text figures never show one selection's words beside another's numbers: every selection change switches the headline and KPI captions to 'Updating…', and only the read for the current selection may fill them — project/src/app.js:335"
   - "Drivers bridge as a native table: Change, Now and Before from a This Month / Last Month measure family per department, sorted by change, with a trend column; the changes add up to the total — project/src/catalogue.js:78"
-  - "Pending clicks applied after 200 ms in every group, and the visible tab's applied state mirrored into one app-wide selection; the trend's own group never takes the month, so it keeps every month — project/src/app.js:430"
-  - "What-if on the target itself: a slider sets the layer's Target Minutes parameter on two native numbers with setMeasureDefinedParameter, beside a governed 30-minute baseline that stays put — project/src/app.js:464"
+  - "Pending clicks applied after 200 ms in every group, and the visible tab's applied state mirrored into one app-wide selection; the trend's own group never takes the month, so it keeps every month — project/src/app.js:433"
+  - "What-if on the target itself: a slider sets the layer's Target Minutes parameter on two native numbers with setMeasureDefinedParameter, beside a governed 30-minute baseline that stays put — project/src/app.js:467"
 caveats:
   - "Scored 45/52 by an independent judge and admitted (bar 44, no gate at 0); the judge's gaps come first below (SCORE.md)."
   - "The comparison window can be mislabelled under a selection: the Review Month axis ends at the latest day in the filtered rows, but the captions use the unfiltered last day (src/app.js:286). Department = Renal compares 1–9 Oct with 1–9 Sep while the cards say 1–30; Wed 06-09h computes 1–28 Sep."

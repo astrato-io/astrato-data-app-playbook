@@ -1,5 +1,5 @@
 /**
- * "Excel view": renders the same sheets the .xlsx pack is written from (buildSheets in main.js) as an
+ * "Excel view": renders the same sheets the .xlsx pack is written from (buildSheets in app.js) as an
  * in-browser spreadsheet — ribbon, name box + formula bar, lettered columns, numbered rows,
  * gridlines, frozen header rows and sheet tabs. Numbers carry the pack's number formats.
  */
@@ -9,10 +9,10 @@ const signed = (v, f) => (v > 0 ? `+${f(v)}` : v < 0 ? `-${f(-v)}` : f(0));
 const FMT = {
   int: (v) => nf(v), gbp: (v) => `£${nf(v)}`, psf: (v) => `£${nf(v, 2)}`, x: (v) => `${nf(v, 2)}x`, dec: (v) => nf(v, 1),
   pct: (v) => `${nf(v * 100, 1)}%`, pct2: (v) => `${nf(v * 100, 2)}%`,
-  spct: (v) => signed(v, (a) => `${nf(a * 100, 1)}%`), sint: (v) => signed(v, (a) => nf(a)), sgbp: (v) => signed(v, (a) => `£${nf(a)}`), spos: (v) => signed(v, (a) => nf(a, 1)),
+  spct: (v) => signed(v, (a) => `${nf(a * 100, 1)}%`), sint: (v) => signed(v, (a) => nf(a)), sgbp: (v) => signed(v, (a) => `£${nf(a)}`), spos: (v) => signed(v, (a) => nf(a, 1)), spts: (v) => signed(v, (a) => `${nf(a, 2)} pp`),
 };
 /** Signed formats colour like the pack: green up, red down (position: down is good). */
-const tone = (s, v) => (!['spct', 'sint', 'sgbp', 'spos'].includes(s) || !v ? '' : (s === 'spos' ? v < 0 : v > 0) ? 'up' : 'dn');
+const tone = (s, v) => (!['spct', 'sint', 'sgbp', 'spos', 'spts'].includes(s) || !v ? '' : (s === 'spos' ? v < 0 : v > 0) ? 'up' : 'dn');
 const col = (i) => { let s = ''; for (i += 1; i; i = Math.floor((i - 1) / 26)) s = String.fromCharCode(65 + ((i - 1) % 26)) + s; return s; };
 
 export const mountSheetView = (host, { clients, build, download }) => {
