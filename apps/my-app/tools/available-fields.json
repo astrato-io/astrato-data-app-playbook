@@ -1,0 +1,535 @@
+[
+ {
+  "kind": "field",
+  "fieldKey": "[Orders Updated].[Orderdate]",
+  "name": "Orderdate",
+  "view": "Orders Updated",
+  "dataType": "date",
+  "aggregations": [
+   {
+    "name": "COUNT",
+    "distinct": true
+   }
+  ]
+ },
+ {
+  "kind": "dimension",
+  "fieldKey": "[dimension].[Order Month]",
+  "name": "Order Month",
+  "item": {
+   "key": "[dimension].[Order Month]",
+   "name": "Order Month",
+   "type": "dimension",
+   "dimension": {
+    "view": "Orders Updated",
+    "name": "Orderdate",
+    "resultType": "date",
+    "dateLevel": "month"
+   },
+   "resultType": "date"
+  }
+ },
+ {
+  "kind": "dimension",
+  "fieldKey": "[dimension].[Trailing 12 Months]",
+  "name": "Trailing 12 Months",
+  "item": {
+   "key": "[dimension].[Trailing 12 Months]",
+   "name": "Trailing 12 Months",
+   "type": "dimension",
+   "dimension": {
+    "view": "Orders Updated",
+    "name": "Orderdate",
+    "resultType": "date",
+    "dateLevel": "month"
+   },
+   "resultType": "date"
+  }
+ },
+ {
+  "kind": "field",
+  "fieldKey": "[Categories].[Categoryname]",
+  "name": "Categoryname",
+  "view": "Categories",
+  "dataType": "string",
+  "aggregations": [
+   {
+    "name": "COUNT",
+    "distinct": true
+   }
+  ]
+ },
+ {
+  "kind": "dimension",
+  "fieldKey": "[dimension].[Category]",
+  "name": "Category",
+  "item": {
+   "key": "[dimension].[Category]",
+   "name": "Category",
+   "type": "dimension",
+   "dimension": {
+    "view": "Categories",
+    "name": "Categoryname",
+    "resultType": "string"
+   },
+   "resultType": "string"
+  }
+ },
+ {
+  "kind": "field",
+  "fieldKey": "[Customers].[Country]",
+  "name": "Country",
+  "view": "Customers",
+  "dataType": "string",
+  "aggregations": [
+   {
+    "name": "COUNT",
+    "distinct": true
+   }
+  ]
+ },
+ {
+  "kind": "dimension",
+  "fieldKey": "[dimension].[Country]",
+  "name": "Country",
+  "item": {
+   "key": "[dimension].[Country]",
+   "name": "Country",
+   "type": "dimension",
+   "dimension": {
+    "view": "Customers",
+    "name": "Country",
+    "resultType": "string"
+   },
+   "resultType": "string"
+  }
+ },
+ {
+  "kind": "field",
+  "fieldKey": "[Customers].[Companyname]",
+  "name": "Companyname",
+  "view": "Customers",
+  "dataType": "string",
+  "aggregations": [
+   {
+    "name": "COUNT",
+    "distinct": true
+   }
+  ]
+ },
+ {
+  "kind": "dimension",
+  "fieldKey": "[dimension].[Customer]",
+  "name": "Customer",
+  "item": {
+   "key": "[dimension].[Customer]",
+   "name": "Customer",
+   "type": "dimension",
+   "dimension": {
+    "view": "Customers",
+    "name": "Companyname",
+    "resultType": "string"
+   },
+   "resultType": "string"
+  }
+ },
+ {
+  "kind": "field",
+  "fieldKey": "[Shippers].[Companyname]",
+  "name": "Companyname",
+  "view": "Shippers",
+  "dataType": "string",
+  "aggregations": [
+   {
+    "name": "COUNT",
+    "distinct": true
+   }
+  ]
+ },
+ {
+  "kind": "dimension",
+  "fieldKey": "[dimension].[Shipper]",
+  "name": "Shipper",
+  "item": {
+   "key": "[dimension].[Shipper]",
+   "name": "Shipper",
+   "type": "dimension",
+   "dimension": {
+    "view": "Shippers",
+    "name": "Companyname",
+    "resultType": "string"
+   },
+   "resultType": "string"
+  }
+ },
+ {
+  "kind": "field",
+  "fieldKey": "[Region and Territory].[FULLNAME]",
+  "name": "FULLNAME",
+  "view": "Region and Territory",
+  "dataType": "string",
+  "aggregations": [
+   {
+    "name": "COUNT",
+    "distinct": true
+   }
+  ]
+ },
+ {
+  "kind": "dimension",
+  "fieldKey": "[dimension].[Salesperson]",
+  "name": "Salesperson",
+  "item": {
+   "key": "[dimension].[Salesperson]",
+   "name": "Salesperson",
+   "type": "dimension",
+   "dimension": {
+    "view": "Region and Territory",
+    "name": "FULLNAME",
+    "resultType": "string"
+   },
+   "resultType": "string"
+  }
+ },
+ {
+  "kind": "field",
+  "fieldKey": "[Shipping Time].[DeliveryStatus]",
+  "name": "DeliveryStatus",
+  "view": "Shipping Time",
+  "dataType": "string",
+  "aggregations": [
+   {
+    "name": "COUNT",
+    "distinct": true
+   }
+  ]
+ },
+ {
+  "kind": "dimension",
+  "fieldKey": "[dimension].[Delivery Status]",
+  "name": "Delivery Status",
+  "item": {
+   "key": "[dimension].[Delivery Status]",
+   "name": "Delivery Status",
+   "type": "dimension",
+   "dimension": {
+    "view": "Shipping Time",
+    "name": "DeliveryStatus",
+    "resultType": "string"
+   },
+   "resultType": "string"
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Gross Sales This Month]",
+  "name": "Gross Sales This Month",
+  "item": {
+   "key": "[calculation].[Gross Sales This Month]",
+   "name": "Gross Sales This Month",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Gross Sales YoY %]",
+  "name": "Gross Sales YoY %",
+  "item": {
+   "key": "[calculation].[Gross Sales YoY %]",
+   "name": "Gross Sales YoY %",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Gross Sales]",
+  "name": "Gross Sales",
+  "item": {
+   "key": "[calculation].[Gross Sales]",
+   "name": "Gross Sales",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Orders This Month]",
+  "name": "Orders This Month",
+  "item": {
+   "key": "[calculation].[Orders This Month]",
+   "name": "Orders This Month",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Orders YoY %]",
+  "name": "Orders YoY %",
+  "item": {
+   "key": "[calculation].[Orders YoY %]",
+   "name": "Orders YoY %",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Order Count]",
+  "name": "Order Count",
+  "item": {
+   "key": "[calculation].[Order Count]",
+   "name": "Order Count",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Active Customers This Month]",
+  "name": "Active Customers This Month",
+  "item": {
+   "key": "[calculation].[Active Customers This Month]",
+   "name": "Active Customers This Month",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Active Customers YoY %]",
+  "name": "Active Customers YoY %",
+  "item": {
+   "key": "[calculation].[Active Customers YoY %]",
+   "name": "Active Customers YoY %",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Active Customers]",
+  "name": "Active Customers",
+  "item": {
+   "key": "[calculation].[Active Customers]",
+   "name": "Active Customers",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Sales per Order This Month]",
+  "name": "Sales per Order This Month",
+  "item": {
+   "key": "[calculation].[Sales per Order This Month]",
+   "name": "Sales per Order This Month",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Sales per Order YoY %]",
+  "name": "Sales per Order YoY %",
+  "item": {
+   "key": "[calculation].[Sales per Order YoY %]",
+   "name": "Sales per Order YoY %",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Sales per Order]",
+  "name": "Sales per Order",
+  "item": {
+   "key": "[calculation].[Sales per Order]",
+   "name": "Sales per Order",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[On-Time % This Month]",
+  "name": "On-Time % This Month",
+  "item": {
+   "key": "[calculation].[On-Time % This Month]",
+   "name": "On-Time % This Month",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[On-Time pts Change YoY]",
+  "name": "On-Time pts Change YoY",
+  "item": {
+   "key": "[calculation].[On-Time pts Change YoY]",
+   "name": "On-Time pts Change YoY",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[On-Time Delivery %]",
+  "name": "On-Time Delivery %",
+  "item": {
+   "key": "[calculation].[On-Time Delivery %]",
+   "name": "On-Time Delivery %",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Gross Sales by Month (12m)]",
+  "name": "Gross Sales by Month (12m)",
+  "item": {
+   "key": "[calculation].[Gross Sales by Month (12m)]",
+   "name": "Gross Sales by Month (12m)",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Gross Sales Year Earlier (12m)]",
+  "name": "Gross Sales Year Earlier (12m)",
+  "item": {
+   "key": "[calculation].[Gross Sales Year Earlier (12m)]",
+   "name": "Gross Sales Year Earlier (12m)",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Gross Sales YoY % (12m)]",
+  "name": "Gross Sales YoY % (12m)",
+  "item": {
+   "key": "[calculation].[Gross Sales YoY % (12m)]",
+   "name": "Gross Sales YoY % (12m)",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Gross Sales Change YoY]",
+  "name": "Gross Sales Change YoY",
+  "item": {
+   "key": "[calculation].[Gross Sales Change YoY]",
+   "name": "Gross Sales Change YoY",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Gross Sales Same Month Last Year]",
+  "name": "Gross Sales Same Month Last Year",
+  "item": {
+   "key": "[calculation].[Gross Sales Same Month Last Year]",
+   "name": "Gross Sales Same Month Last Year",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Share of Gross Sales]",
+  "name": "Share of Gross Sales",
+  "item": {
+   "key": "[calculation].[Share of Gross Sales]",
+   "name": "Share of Gross Sales",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Avg Days to Ship]",
+  "name": "Avg Days to Ship",
+  "item": {
+   "key": "[calculation].[Avg Days to Ship]",
+   "name": "Avg Days to Ship",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Late or Unshipped Orders]",
+  "name": "Late or Unshipped Orders",
+  "item": {
+   "key": "[calculation].[Late or Unshipped Orders]",
+   "name": "Late or Unshipped Orders",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ },
+ {
+  "kind": "calculation",
+  "fieldKey": "[calculation].[Avg Freight Price]",
+  "name": "Avg Freight Price",
+  "item": {
+   "key": "[calculation].[Avg Freight Price]",
+   "name": "Avg Freight Price",
+   "type": "calculation",
+   "calculation": {
+    "calculation": "{m1}"
+   }
+  }
+ }
+]
